@@ -9,49 +9,48 @@ metadata:
   labels:
     app.kubernetes.io/name: {{ include "openvidu.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
-data: |-
+data: 
   {{- if .Values.ingress.enabled }}
-  DOMAIN_OR_PUBLIC_IP: {{ index .Values.ingress.hosts 0 }}
+  DOMAIN_OR_PUBLIC_IP: "{{ index .Values.ingress.hosts 0 }}"
   HTTP_PORT: 80
   HTTPS_PORT: 443
   {{- end }}
-  OPENVIDU_SECRET: {{ .Values.services.openvidu.secret }}
-  COTURN_IP: {{ .Values.services.openvidu.coturn.ip }}
-  COTURN_PORT: {{ .Values.services.openvidu.coturn.port }}
-  COTURN_URIS_LIST: {{ .Values.services.openvidu.coturn.uris }}
-  OPENVIDU_WEBRTC_ICE_SERVERS: {{ .Values.services.openvidu.coturn.iceServers }}
-  KMS_URIS: {{ .Values.services.openvidu.kms.uris }}
+  OPENVIDU_SECRET: "{{ .Values.services.openvidu.secret }}"
+  COTURN_IP: "{{ .Values.services.openvidu.coturn.ip }}"
+  COTURN_PORT: "{{ .Values.services.openvidu.coturn.port }}"
+  COTURN_URIS_LIST: "{{ .Values.services.openvidu.coturn.uris }}"
+  OPENVIDU_WEBRTC_ICE_SERVERS: "{{ .Values.services.openvidu.coturn.iceServers }}"
+  KMS_URIS: "{{ .Values.services.openvidu.kms.uris }}"
   {{- if .Values.services.openvidu.coturn.redis }}
-  COTURN_REDIS_IP: {{ .Values.services.openvidu.coturn.redis.ip }}
-  COTURN_REDIS_DBNAME: {{ .Values.services.openvidu.coturn.redis.db }}
-  COTURN_REDIS_PASSWORD: {{ .Values.services.openvidu.coturn.redis.password }}
+  COTURN_REDIS_IP: "{{ .Values.services.openvidu.coturn.redis.ip }}"
+  COTURN_REDIS_DBNAME: "{{ .Values.services.openvidu.coturn.redis.db }}"
+  COTURN_REDIS_PASSWORD: "{{ .Values.services.openvidu.coturn.redis.password }}"
   {{- end }}
-  SERVER_SSL_ENABLED: {{ .Values.services.openvidu.ssl.enabled }}
+  SERVER_SSL_ENABLED: "{{ .Values.services.openvidu.ssl.enabled }}"
   {{- if .Values.services.openvidu.ssl.enabled }}
-  CERTIFICATE_TYPE: {{ .Values.services.openvidu.ssl.certType }} 
+  CERTIFICATE_TYPE: "{{ .Values.services.openvidu.ssl.certType }}"
   {{- end }}
-  OPENVIDU_RECORDING: {{ .Values.services.openvidu.recording.enabled }}
+  OPENVIDU_RECORDING: "{{ .Values.services.openvidu.recording.enabled }}"
   {{- if .Values.services.openvidu.recording.enabled }}        
-  OPENVIDU_RECORDING_DEBUG: {{ .Values.services.openvidu.recording.debug }}
-  OPENVIDU_RECORDING_PATH: {{ .Values.services.openvidu.recording.path }}
-  OPENVIDU_RECORDING_CUSTOM_LAYOUT: {{ .Values.services.openvidu.recording.layout }}
-  OPENVIDU_RECORDING_PUBLIC_ACCESS: {{ .Values.services.openvidu.recording.public }}
-  OPENVIDU_RECORDING_NOTIFICATION: {{ .Values.services.openvidu.recording.notification }}
-  OPENVIDU_RECORDING_AUTOSTOP_TIMEOUT: {{ .Values.services.openvidu.recording.autostop }}
+  OPENVIDU_RECORDING_DEBUG: "{{ .Values.services.openvidu.recording.debug }}"
+  OPENVIDU_RECORDING_PATH: "{{ .Values.services.openvidu.recording.path }}"
+  OPENVIDU_RECORDING_CUSTOM_LAYOUT: "{{ .Values.services.openvidu.recording.layout }}"
+  OPENVIDU_RECORDING_PUBLIC_ACCESS: "{{ .Values.services.openvidu.recording.public }}"
+  OPENVIDU_RECORDING_NOTIFICATION: "{{ .Values.services.openvidu.recording.notification }}"
+  OPENVIDU_RECORDING_AUTOSTOP_TIMEOUT: "{{ .Values.services.openvidu.recording.autostop }}"
   {{- end }}
-  OPENVIDU_STREAMS_VIDEO_MAX_RECV_BANDWIDTH: {{ .Values.services.openvidu.bandwidth.received.max | default 1000 }}
-  OPENVIDU_STREAMS_VIDEO_MIN_RECV_BANDWIDTH: {{ .Values.services.openvidu.bandwidth.received.min | default 300 }}
-  OPENVIDU_STREAMS_VIDEO_MAX_SEND_BANDWIDTH: {{ .Values.services.openvidu.bandwidth.send.max | default 1000 }}
-  OPENVIDU_STREAMS_VIDEO_MIN_SEND_BANDWIDTH: {{ .Values.services.openvidu.bandwidth.send.min | default 300 }}
-  OPENVIDU_WEBHOOK: {{ .Values.services.openvidu.webhook.enabled }}
+  OPENVIDU_STREAMS_VIDEO_MAX_RECV_BANDWIDTH: "{{ .Values.services.openvidu.bandwidth.received.max | default 1000 }}"
+  OPENVIDU_STREAMS_VIDEO_MIN_RECV_BANDWIDTH: "{{ .Values.services.openvidu.bandwidth.received.min | default 300 }}"
+  OPENVIDU_STREAMS_VIDEO_MAX_SEND_BANDWIDTH: "{{ .Values.services.openvidu.bandwidth.send.max | default 1000 }}"
+  OPENVIDU_STREAMS_VIDEO_MIN_SEND_BANDWIDTH: "{{ .Values.services.openvidu.bandwidth.send.min | default 300 }}"
+  OPENVIDU_WEBHOOK: "{{ .Values.services.openvidu.webhook.enabled }}"
   {{- if .Values.services.openvidu.webhook.enabled }}
-  OPENVIDU_WEBHOOK_ENDPOINT: {{ .Values.services.openvidu.webhook.endpoint }}    
-  OPENVIDU_WEBHOOK_HEADERS: {{ .Values.services.openvidu.webhook.headers }}
-  OPENVIDU_WEBHOOK_EVENTS: {{ .Values.services.openvidu.webhook.events }}
+  OPENVIDU_WEBHOOK_ENDPOINT: "{{ .Values.services.openvidu.webhook.endpoint }}"    
+  OPENVIDU_WEBHOOK_HEADERS: "{{ .Values.services.openvidu.webhook.headers }}"
+  OPENVIDU_WEBHOOK_EVENTS: "{{ .Values.services.openvidu.webhook.events }}"
   {{- end }}
-  OPENVIDU_SESSIONS_GARBAGE_INTERVAL: {{- .Values.services.openvidu.gc.interval }}
-  OPENVIDU_SESSIONS_GARBAGE_THRESHOLD: {{- .Values.services.openvidu.gc.threshold }}
-  OPENVIDU_CDR: {{ .Values.services.openvidu.cdr.enabled }}
-  OPENVIDU_CDR_PATH: {{ .Values.services.openvidu.cdr.enabled }}    
+  OPENVIDU_SESSIONS_GARBAGE_INTERVAL: "{{ .Values.services.openvidu.gc.interval }}"
+  OPENVIDU_SESSIONS_GARBAGE_THRESHOLD: "{{ .Values.services.openvidu.gc.threshold }}"
+  OPENVIDU_CDR: "{{ .Values.services.openvidu.cdr.enabled }}"
+  OPENVIDU_CDR_PATH: "{{ .Values.services.openvidu.cdr.enabled }}"    
   {{- end }}
-  
