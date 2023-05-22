@@ -45,6 +45,7 @@ data:
   OPENVIDU_WEBHOOK_HEADERS: '{{ .Values.services.openvidu.webhook.headers }}'
   OPENVIDU_WEBHOOK_EVENTS: '{{ .Values.services.openvidu.webhook.events }}'
   {{- end }}
+  OPENVIDU_STREAMS_ALLOW_TRANSCODING:  "{{ .Values.services.openvidu.transcoding.enabled }}"  
   OPENVIDU_SESSIONS_GARBAGE_INTERVAL: "{{ .Values.services.openvidu.gc.interval }}"
   OPENVIDU_SESSIONS_GARBAGE_THRESHOLD: "{{ .Values.services.openvidu.gc.threshold }}"
   OPENVIDU_CDR: "{{ .Values.services.openvidu.cdr.enabled }}"

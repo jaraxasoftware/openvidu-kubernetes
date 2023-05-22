@@ -59,6 +59,8 @@ services:
       public: false
       notification: publisher_moderator
       autostop: 120
+    transcoding:
+      enabled: false
     webhook:
       enabled: true
       endpoint: http://localhost/api/v1/your_webhook/openvidu
