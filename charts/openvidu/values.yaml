@@ -1,0 +1,110 @@
+# Default values for openvidu.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+replicaCount: 1
+
+# optional list of image pull secrets to use to pull images
+jx:
+  # optional image pull secrets
+  imagePullSecrets: []
+
+  # whether to create a Release CRD when installing charts with Release CRDs included
+  releaseCRD: true
+
+serviceAccount:
+  create: false
+
+service:
+  name: openvidu
+  externalPort: 5443
+
+services:
+  openvidu:
+    enabled: true
+    image: 
+      repository: openvidu/openvidu-server
+      tag: 2.27.0
+      pullPolicy: IfNotPresent
+    port: 5443
+    configDir: /opt/openvidu/
+    secret: openvidu
+    protocols:
+      - TCP
+    kms:
+      uris: '["ws://localhost:8888/kurento"]'
+    coturn:
+      ip: develop-turn.jaraxa.systems
+      port: 3478
+      uris: "turn:develop-turn.jaraxa.systems:3478?transport=tcp"
+      redis:
+        ip: coturn-kubernetes-redis-master
+        db: 2
+        password: weyH5XXIpm
+    bandwidth:
+      received:
+        max: 0
+        min: 0
+      send:
+        max: 0
+        min: 0
+    recording:
+      enabled: false
+      debug: false
+      path: /opt/openvidu/recordings
+      layout: /opt/openvidu/custom-layout
+      public: false
+      notification: publisher_moderator
+      autostop: 120
+    webhook:
+      enabled: true
+      endpoint: https://develop.jaraxa.systems/pet/api/v1/webhooks/openvidu
+      headers: ""
+      events: '["sessionCreated", "sessionDestroyed", "participantJoined", "participantLeft", "webrtcConnectionCreated", "webrtcConnectionDestroyed", "recordingStatusChanged", "filterEventDispatched"]'
+    gc:
+      interval: 900
+      threshold: 3600
+    cdr: 
+      enabled: false
+      path: /opt/openvidu/cdr
+    env: {}
+
+  kms:
+    enabled: true
+    image: 
+      repository: kurento/kurento-media-server
+      fixed_tag: 7.0.1
+      pullPolicy: IfNotPresent
+    env:
+      KMS_MIN_PORT: "40000"
+      KMS_MAX_PORT: "45000"
+
+  openvidu-call:
+    enabled: false
+    image: 
+      repository: openvidu/openvidu-call
+      tag: 2.27.0
+      pullPolicy: IfNotPresent
+    protocols:
+      - TCP        
+    port: 5442
+    env: {}
+
+ingress:
+  enabled: false
+  annotations: {}
+  paths:
+    - /(.*)
+  hosts:
+    - openvidu.localhost
+  tls:
+    - secretName: openvidu-secret
+      hosts:
+        - openvidu.localhost
+
+resources: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

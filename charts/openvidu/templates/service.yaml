@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "openvidu.fullname" . }}
+  labels:
+{{ include "openvidu.labels" . | indent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+  {{- range $name, $val := .Values.services }}
+    {{- range $index, $proto :=  $val.protocols }}
+    {{- if $val.port }}
+    - port: {{ $val.port }}
+      targetPort: {{ $val.port }}
+      protocol: {{ $proto }}
+      name: "{{ $val.port }}-{{ $proto | lower }}"
+    {{- else }}    
+    {{- end }}
+    {{- end }}
+  {{- end }}  
+  selector:
+    app.kubernetes.io/name: {{ include "openvidu.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}

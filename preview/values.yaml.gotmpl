@@ -1,0 +1,28 @@
+ingress:
+  enabled: true
+  class: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+  paths:
+    - /(.*)
+  hosts:
+    - "{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"
+  tls:
+{{- if and (.Values.jxRequirements.ingress.tls.enabled) (hasKey .Values.jxRequirements.ingress "tls") (hasKey .Values.jxRequirements.ingress.tls "secretName") }} 
+    - secretName: "{{ .Values.jxRequirements.ingress.tls.secretName }}"
+      hosts:
+        - "{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"
+{{- else if .Values.jxRequirements.ingress.tls.production }}
+    - secretName: "tls-{{ .Values.jxRequirements.ingress.domain | replace "." "-" }}-p"
+      hosts:
+        - "{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"
+{{- else }}
+    - secretName: "tls-{{ .Values.jxRequirements.ingress.domain | replace "." "-" }}-s"
+      hosts:
+        - "{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"
+{{- end }}
+
+image:
+  repository: "{{ requiredEnv "DOCKER_REGISTRY" }}/{{ requiredEnv "DOCKER_REGISTRY_ORG" }}/{{ requiredEnv "APP_NAME" }}"
+  tag: "{{ requiredEnv "VERSION" }}"
+  pullPolicy: "Always"

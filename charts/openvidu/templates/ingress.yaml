@@ -1,0 +1,55 @@
+{{- if .Values.ingress.enabled -}}
+{{- $serviceName := include "openvidu.fullname" . -}}
+{{- $servicePort := .Values.service.externalPort -}}
+{{- $paths := .Values.ingress.paths -}}
+apiVersion: {{ template "openvidu.ingress.apiVersion" . }}
+kind: Ingress
+metadata:
+  name: {{ include "openvidu.fullname" . }}
+  labels:
+    app: {{ .Chart.Name }}
+    chart: {{ .Chart.Name }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+  {{- range $key, $value := .Values.ingress.labels }}
+    {{ $key }}: {{ $value | quote }}
+  {{- end }}
+{{- if .Values.ingress.annotations }}
+  annotations:
+{{ toYaml .Values.ingress.annotations | indent 4 }}
+{{- end }}
+spec:
+  rules:
+  {{- if .Values.ingress.hosts }}
+  {{- range $host := .Values.ingress.hosts }}
+    - host: {{ $host }}
+      http:
+        paths:
+  {{- range $p := $paths }}
+          - path: {{ $p }}
+            pathType: ImplementationSpecific          
+            backend:
+              service:
+                name:  {{ $serviceName }}
+                port:
+                  number: {{ $servicePort }}
+  {{- end -}}
+  {{- end -}}
+  {{- else }}
+    - http:
+        paths:
+  {{- range $p := $paths }}
+          - path: {{ $p }}
+            pathType: ImplementationSpecific          
+            backend:
+              service:
+                name:  {{ $serviceName }}
+                port:
+                  number: {{ $servicePort }}
+  {{- end -}}
+  {{- end -}}
+  {{- if .Values.ingress.tls }}
+  tls:
+{{ toYaml .Values.ingress.tls | indent 4 }}
+  {{- end -}}
+{{- end -}}

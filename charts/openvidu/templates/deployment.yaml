@@ -1,0 +1,108 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+{{- if .Values.annotations }}
+  annotations:
+{{ toYaml .Values.annotations | indent 8 }}
+{{- end }}
+  name: {{ include "openvidu.fullname" . }}
+  labels:
+{{ include "openvidu.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "openvidu.fullname" . }}   
+      app.kubernetes.io/name: {{ include "openvidu.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "openvidu.fullname" . }}
+        app.kubernetes.io/name: {{ include "openvidu.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      imagePullSecrets:
+{{- range $pval := .Values.jx.imagePullSecrets }}
+      - name: {{ quote $pval }}
+{{- end }}     
+      serviceAccountName: {{ template "openvidu.serviceAccountName" . }}
+      containers:
+      {{- range $name, $val := .Values.services }}
+      {{- if $val.enabled }}
+      - name: {{ $name }}
+        {{- if eq $name "openvidu" }}
+        image: "{{ $val.image.repository }}:{{ $val.image.tag }}"      
+        {{- else }}
+        image: "{{ $val.image.repository }}:{{ $val.image.fixed_tag }}"      
+        {{- end }}
+        imagePullPolicy: {{ $val.image.pullPolicy }}
+        ports:
+        {{- range $index, $proto :=  $val.protocols }}
+        {{- if $val.port }}
+          - name: "{{ $val.port }}-{{ $proto | lower }}"
+            containerPort: {{ $val.port }}
+            protocol: {{ $proto }}
+        livenessProbe:
+          httpGet:
+            path: /
+            port: {{ $val.port }}
+        readinessProbe:
+          httpGet:
+            path: /
+            port: {{ $val.port }}             
+        {{- else }}
+        {{- range untilStep ($val.env.KMS_MIN_PORT|int) ($val.env.KMS_MAX_PORT|int) 1}}
+          - containerPort: {{ . }}
+            protocol: {{ $proto }}
+        {{- end }} 
+        {{- end }}
+        {{- end }}
+        {{- if $val.env }}
+        env:
+        {{- range $pkey, $pval := $val.env }}
+        - name: {{ $pkey }}
+          value: {{ quote $pval }}
+        {{- end }}
+        {{- end }}
+        {{- if $val.configDir }}
+        volumeMounts:
+        - name: {{ include "openvidu.fullname" $ }}
+          mountPath: {{ $val.configDir }}
+          subPath: .env
+        {{- if $.Values.ingress.enabled }}
+        {{- if $val.certDir }}
+        - name: tls-{{ .Chart.Name }}
+          mountPath: {{ $val.certDir }}certificate.crt
+          subPath: tls.crt
+        - name: tls-{{ .Chart.Name }}
+          mountPath: {{ $val.certDir }}certificate.key
+          subPath: tls.key
+        {{- end }}
+        {{- end }}                        
+        {{- end }}                          
+        resources:
+          {{- toYaml $.Values.resources | nindent 12 }}
+      {{- end }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      volumes:
+      - name: {{ include "openvidu.fullname" . }}
+        configMap:
+          name: {{ include "openvidu.fullname" . }} 
+      {{- if .Values.ingress.enabled }}
+      - name: tls-{{ .Chart.Name }}
+        secret:
+          secretName: {{ (index .Values.ingress.tls 0).secretName }}
+      {{- end }}
