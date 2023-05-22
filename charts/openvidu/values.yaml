@@ -39,6 +39,7 @@ services:
       ip: localhost.openvidu
       port: 3478
       uris: "turn:localhost:3478?transport=tcp"
+      iceServers: '["url=turn:localhost:3478,username=turn,credential=nknk"]'
       redis:
         ip: localhost-redis-master
         db: 1
@@ -61,7 +62,7 @@ services:
     webhook:
       enabled: true
       endpoint: http://localhost/api/v1/your_webhook/openvidu
-      headers: ""
+      headers: '[""]'
       events: '["sessionCreated", "sessionDestroyed", "participantJoined", "participantLeft", "webrtcConnectionCreated", "webrtcConnectionDestroyed", "recordingStatusChanged", "filterEventDispatched"]'
     gc:
       interval: 900
