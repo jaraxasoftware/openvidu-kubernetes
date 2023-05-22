@@ -33,13 +33,13 @@ services:
     kms:
       uris: '["ws://localhost:8888/kurento"]'
     coturn:
-      ip: develop-turn.jaraxa.systems
+      ip: localhost.openvidu
       port: 3478
-      uris: "turn:develop-turn.jaraxa.systems:3478?transport=tcp"
+      uris: "turn:localhost:3478?transport=tcp"
       redis:
-        ip: coturn-kubernetes-redis-master
-        db: 2
-        password: weyH5XXIpm
+        ip: localhost-redis-master
+        db: 1
+        password: changeit
     bandwidth:
       received:
         max: 0
@@ -57,7 +57,7 @@ services:
       autostop: 120
     webhook:
       enabled: true
-      endpoint: https://develop.jaraxa.systems/pet/api/v1/webhooks/openvidu
+      endpoint: http://localhost/api/v1/your_webhook/openvidu
       headers: ""
       events: '["sessionCreated", "sessionDestroyed", "participantJoined", "participantLeft", "webrtcConnectionCreated", "webrtcConnectionDestroyed", "recordingStatusChanged", "filterEventDispatched"]'
     gc:
