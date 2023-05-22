@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/name: {{ include "openvidu.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
 data: 
-    .env:
+    .env: |-
         {{- if .Values.ingress.enabled }}
         DOMAIN_OR_PUBLIC_IP={{- index .Values.ingress.hosts 0 }}
         HTTP_PORT=80
