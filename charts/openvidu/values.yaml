@@ -30,6 +30,9 @@ services:
     secret: openvidu
     protocols:
       - TCP
+    ssl:
+      enabled: false
+      certType: owncert
     kms:
       uris: '["ws://localhost:8888/kurento"]'
     coturn:

@@ -13,6 +13,8 @@ data:
     .env:
         {{- if .Values.ingress.enabled }}
         DOMAIN_OR_PUBLIC_IP={{- index .Values.ingress.hosts 0 }}
+        HTTP_PORT=80
+        HTTPS_PORT=443
         {{- end }}
         OPENVIDU_SECRET={{- .Values.services.openvidu.secret }}
         COTURN_IP={{- .Values.services.openvidu.coturn.ip }}
@@ -25,11 +27,9 @@ data:
         COTURN_REDIS_DBNAME={{- .Values.services.openvidu.coturn.redis.db }}
         COTURN_REDIS_PASSWORD={{- .Values.services.openvidu.coturn.redis.password }}
         {{- end }}
-        {{- if .Values.services.openvidu.ssl }}
-        SERVER_SSL_ENABLED=true
-        CERTIFICATE_TYPE=owncert
-        HTTP_PORT=80
-        HTTPS_PORT=443
+        SERVER_SSL_ENABLED={{- .Values.services.openvidu.ssl.enabled }}
+        {{- if .Values.services.openvidu.ssl.enabled }}        
+        CERTIFICATE_TYPE={{- .Values.services.openvidu.ssl.certType }} 
         {{- end }}
         OPENVIDU_RECORDING={{- .Values.services.openvidu.recording.enabled }}
         {{- if .Values.services.openvidu.recording.enabled }}        
