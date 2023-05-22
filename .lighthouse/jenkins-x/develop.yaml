@@ -48,9 +48,9 @@ spec:
         - name: promote-jx-promote
           resources: {}
           script: |
-            #!/usr/bin/env sh
-            #source .jx/variables.sh
-            #jx promote -b --env $ENVIRONMENT --timeout 16m
+            !/usr/bin/env sh
+            source .jx/variables.sh
+            jx promote -b --env $ENVIRONMENT --timeout 16m
   podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 12h0m0s
