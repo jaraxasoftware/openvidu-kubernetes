@@ -16,7 +16,7 @@ data:
   COTURN_PORT: "{{ .Values.services.openvidu.coturn.port }}"
   COTURN_URIS_LIST: {{ .Values.services.openvidu.coturn.uris }}
   OPENVIDU_WEBRTC_ICE_SERVERS: '{{ .Values.services.openvidu.coturn.iceServers }}'
-  KMS_URIS: {{ .Values.services.openvidu.kms.uris }}
+  KMS_URIS: '{{ .Values.services.openvidu.kms.uris }}'
   {{- if .Values.services.openvidu.coturn.redis }}
   COTURN_REDIS_IP: "{{ .Values.services.openvidu.coturn.redis.ip }}"
   COTURN_REDIS_DBNAME: "{{ .Values.services.openvidu.coturn.redis.db }}"
