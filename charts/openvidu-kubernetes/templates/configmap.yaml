@@ -9,7 +9,7 @@ data:
   {{- if .Values.ingress.enabled }}
   DOMAIN_OR_PUBLIC_IP: {{ index .Values.ingress.hosts 0 }}
   HTTP_PORT: "80"
-  HTTPS_PORT: "443"
+  HTTPS_PORT: "{{ .Values.services.openvidu.port }}"
   {{- end }}
   OPENVIDU_SECRET: "{{ .Values.services.openvidu.secret }}"
   COTURN_IP: {{ .Values.services.openvidu.coturn.ip }}
