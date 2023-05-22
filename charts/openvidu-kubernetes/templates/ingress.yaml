@@ -1,6 +1,6 @@
 {{- if .Values.ingress.enabled -}}
 {{- $serviceName := include "openvidu.fullname" . -}}
-{{- $servicePort := .Values.service.externalPort -}}
+{{- $servicePort := .Values.services.openvidu.port -}}
 {{- $paths := .Values.ingress.paths -}}
 apiVersion: {{ template "openvidu.ingress.apiVersion" . }}
 kind: Ingress

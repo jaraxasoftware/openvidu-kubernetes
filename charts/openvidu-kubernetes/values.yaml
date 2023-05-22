@@ -25,7 +25,7 @@ services:
       repository: openvidu/openvidu-server
       tag: 2.27.0
       pullPolicy: IfNotPresent
-    port: 5443
+    port: 443
     configDir: /opt/openvidu/
     secret: openvidu
     protocols:
