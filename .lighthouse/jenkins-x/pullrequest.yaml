@@ -12,14 +12,11 @@ spec:
         metadata: {}
         stepTemplate:
           env:
-          image: uses:jaraxasoftware/jaraxa-pipeline-catalog/tasks/maven/pullrequest.yaml@versionStream
+          image: uses:jaraxasoftware/jaraxa-pipeline-catalog/tasks/helm/pullrequest.yaml@versionStream
           name: ""
           resources:
             # override limits for all containers here
             limits: {}
-          volumeMounts:
-          - mountPath: /root/.m2/
-            name: maven-settings
           workingDir: /workspace/source
         steps:
         - image: uses:jaraxasoftware/jaraxa-pipeline-catalog/tasks/git-clone/git-clone-pr.yaml@versionStream
@@ -30,21 +27,9 @@ spec:
             # override requests for the pod here
             requests:
               cpu: 400m
-              memory: 512Mi
-        - name: build-set-version
-          resources: {}
-        - name: build-mvn-install
-          resources: {}
-        - name: check-registry
-          resources: {}
-        - name: build-container-build
-          resources: {}
+              memory: 512Mi      
         - name: promote-jx-preview
           resources: {}
-        volumes:
-        - name: maven-settings
-          secret:
-            secretName: jenkins-maven-settings
   podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 12h0m0s

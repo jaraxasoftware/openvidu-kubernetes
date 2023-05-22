@@ -14,8 +14,6 @@ spec:
           env:
           - name: ENVIRONMENT
             value: dkv-develop
-          - name: REPO_NAME
-            value: openvidu
           image: uses:jaraxasoftware/jaraxa-pipeline-catalog/tasks/helm/release.yaml@versionStream
           name: ""
           resources: {}
