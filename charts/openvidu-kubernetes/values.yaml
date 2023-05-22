@@ -62,7 +62,7 @@ services:
     webhook:
       enabled: true
       endpoint: http://localhost/api/v1/your_webhook/openvidu
-      headers: '[""]'
+      headers: ""
       events: '["sessionCreated", "sessionDestroyed", "participantJoined", "participantLeft", "webrtcConnectionCreated", "webrtcConnectionDestroyed", "recordingStatusChanged", "filterEventDispatched"]'
     gc:
       interval: 900
