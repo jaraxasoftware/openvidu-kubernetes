@@ -35,10 +35,10 @@ data:
   OPENVIDU_RECORDING_NOTIFICATION: "{{ .Values.services.openvidu.recording.notification }}"
   OPENVIDU_RECORDING_AUTOSTOP_TIMEOUT: "{{ .Values.services.openvidu.recording.autostop }}"
   {{- end }}
-  OPENVIDU_STREAMS_VIDEO_MAX_RECV_BANDWIDTH: "{{ .Values.services.openvidu.bandwidth.received.max | default 1000 }}"
-  OPENVIDU_STREAMS_VIDEO_MIN_RECV_BANDWIDTH: "{{ .Values.services.openvidu.bandwidth.received.min | default 300 }}"
-  OPENVIDU_STREAMS_VIDEO_MAX_SEND_BANDWIDTH: "{{ .Values.services.openvidu.bandwidth.send.max | default 1000 }}"
-  OPENVIDU_STREAMS_VIDEO_MIN_SEND_BANDWIDTH: "{{ .Values.services.openvidu.bandwidth.send.min | default 300 }}"
+  OPENVIDU_STREAMS_VIDEO_MAX_RECV_BANDWIDTH: "{{ .Values.services.openvidu.bandwidth.received.max }}"
+  OPENVIDU_STREAMS_VIDEO_MIN_RECV_BANDWIDTH: "{{ .Values.services.openvidu.bandwidth.received.min }}"
+  OPENVIDU_STREAMS_VIDEO_MAX_SEND_BANDWIDTH: "{{ .Values.services.openvidu.bandwidth.send.max }}"
+  OPENVIDU_STREAMS_VIDEO_MIN_SEND_BANDWIDTH: "{{ .Values.services.openvidu.bandwidth.send.min }}"
   OPENVIDU_WEBHOOK: "{{ .Values.services.openvidu.webhook.enabled }}"
   {{- if .Values.services.openvidu.webhook.enabled }}
   OPENVIDU_WEBHOOK_ENDPOINT: {{ .Values.services.openvidu.webhook.endpoint }}
