@@ -12,6 +12,8 @@ spec:
         metadata: {}
         stepTemplate:
           env:
+          - name: BUILD_VERSION
+            value: -DEVELOP
           - name: ENVIRONMENT
             value: dkv-develop
           image: uses:jaraxasoftware/jaraxa-pipeline-catalog/tasks/helm/release.yaml@versionStream
@@ -22,6 +24,10 @@ spec:
         - image: uses:jaraxasoftware/jaraxa-pipeline-catalog/tasks/git-clone/git-clone.yaml@versionStream
           name: ""
           resources: {}
+        - name: next-version
+          script: |
+            #!/usr/bin/env sh
+            echo $BUILD_VERSION-$BUILD_ID >> VERSION
         - name: jx-variables
           resources: {}
         - name: chart-docs
@@ -33,8 +39,8 @@ spec:
             set -v
             source .jx/variables.sh
             if [ -d "charts/$REPO_NAME" ]; then
-            jx gitops yset -p version -v "$VERSION-DEVELOP" -f ./charts/$REPO_NAME/Chart.yaml
-            jx gitops yset -p appVersion -v "$VERSION-DEVELOP" -f ./charts/$REPO_NAME/Chart.yaml
+            jx gitops yset -p version -v "$VERSION" -f ./charts/$REPO_NAME/Chart.yaml
+            jx gitops yset -p appVersion -v "$VERSION" -f ./charts/$REPO_NAME/Chart.yaml
             jx gitops yset -p 'services.openvidu.image.tag' -v "$VERSION" -f ./charts/$REPO_NAME/values.yaml;
             else echo no charts; fi
         - name: promote-helm-release
@@ -42,9 +48,9 @@ spec:
         #- name: promote-jx-promote
         #  resources: {}
         #  script: |
-            #!/usr/bin/env sh
-            #source .jx/variables.sh
-            #jx promote -b --env $ENVIRONMENT --timeout 16m
+        #    #!/usr/bin/env sh
+        #    #source .jx/variables.sh
+        #    #jx promote -b --env $ENVIRONMENT --timeout 16m
   podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 12h0m0s

@@ -12,17 +12,16 @@ spec:
         metadata: {}
         stepTemplate:
           env:
+        
           - name: ENVIRONMENT
             value: dkv-prod
-          - name: REPO_NAME
-            value: openvidu          
           image: uses:jaraxasoftware/jaraxa-pipeline-catalog/tasks/helm/release.yaml@versionStream
           name: ""
           resources: {}
         steps:
         - image: uses:jaraxasoftware/jaraxa-pipeline-catalog/tasks/git-clone/git-clone.yaml@versionStream
           name: ""
-          resources: {}
+          resources: {}     
         - name: jx-variables
           resources: {}
         - name: chart-docs

@@ -12,10 +12,10 @@ spec:
         metadata: {}
         stepTemplate:
           env:
+          - name: BUILD_VERSION
+            value: -PRE          
           - name: ENVIRONMENT
-            value: dkv-staging
-          - name: REPO_NAME
-            value: openvidu            
+            value: dkv-staging         
           image: uses:jaraxasoftware/jaraxa-pipeline-catalog/tasks/helm/release.yaml@versionStream
           name: ""
           resources: {}
@@ -24,6 +24,10 @@ spec:
         - image: uses:jaraxasoftware/jaraxa-pipeline-catalog/tasks/git-clone/git-clone.yaml@versionStream
           name: ""
           resources: {}
+        - name: next-version
+          script: |
+            #!/usr/bin/env sh
+            echo $BUILD_VERSION-$BUILD_ID >> VERSION          
         - name: jx-variables
           resources: {}
         - name: chart-docs
