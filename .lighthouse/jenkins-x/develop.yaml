@@ -48,7 +48,7 @@ spec:
         - name: promote-jx-promote
           resources: {}
           script: |
-            !/usr/bin/env sh
+            #!/usr/bin/env sh
             source .jx/variables.sh
             jx promote -b --env $ENVIRONMENT --timeout 16m
   podTemplate: {}
