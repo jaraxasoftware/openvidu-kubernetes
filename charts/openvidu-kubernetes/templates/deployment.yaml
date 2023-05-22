@@ -65,25 +65,25 @@ spec:
           value: {{ quote $pval }}
         {{- end }}
         {{- end }}
-        {{- if $val.configDir }}
+        envFrom:
+        - configMapRef:
+            name: {{ include "openvidu.fullname" $ }}
         volumeMounts:
-        - name: {{ include "openvidu.fullname" $ }}
-          mountPath: {{ $val.configDir }}
-          subPath: .env
         {{- if $.Values.ingress.enabled }}
-        {{- if $val.certDir }}
+          {{- if $.Values.services.openvidu.ssl.enabled }} 
+            {{- if $val.certDir }}
         - name: tls-{{ .Chart.Name }}
           mountPath: {{ $val.certDir }}certificate.crt
           subPath: tls.crt
         - name: tls-{{ .Chart.Name }}
           mountPath: {{ $val.certDir }}certificate.key
           subPath: tls.key
-        {{- end }}
+            {{- end }}
+          {{- end }}
         {{- end }}                        
         {{- end }}                          
         resources:
           {{- toYaml $.Values.resources | nindent 12 }}
-      {{- end }}
       {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
@@ -98,11 +98,10 @@ spec:
         {{- toYaml . | nindent 8 }}
     {{- end }}
       volumes:
-      - name: {{ include "openvidu.fullname" . }}
-        configMap:
-          name: {{ include "openvidu.fullname" . }} 
       {{- if .Values.ingress.enabled }}
+        {{- if .Values.services.openvidu.ssl.enabled }}   
       - name: tls-{{ .Chart.Name }}
         secret:
           secretName: {{ (index .Values.ingress.tls 0).secretName }}
+        {{- end }}
       {{- end }}
