@@ -15,7 +15,7 @@ data:
   COTURN_IP: {{ .Values.services.openvidu.coturn.ip }}
   COTURN_PORT: "{{ .Values.services.openvidu.coturn.port }}"
   COTURN_URIS_LIST: {{ .Values.services.openvidu.coturn.uris }}
-  OPENVIDU_WEBRTC_ICE_SERVERS: {{ .Values.services.openvidu.coturn.iceServers }}
+  OPENVIDU_WEBRTC_ICE_SERVERS: '{{ .Values.services.openvidu.coturn.iceServers }}'
   KMS_URIS: {{ .Values.services.openvidu.kms.uris }}
   {{- if .Values.services.openvidu.coturn.redis }}
   COTURN_REDIS_IP: "{{ .Values.services.openvidu.coturn.redis.ip }}"
@@ -42,8 +42,8 @@ data:
   OPENVIDU_WEBHOOK: "{{ .Values.services.openvidu.webhook.enabled }}"
   {{- if .Values.services.openvidu.webhook.enabled }}
   OPENVIDU_WEBHOOK_ENDPOINT: {{ .Values.services.openvidu.webhook.endpoint }}
-  OPENVIDU_WEBHOOK_HEADERS: {{ .Values.services.openvidu.webhook.headers }}
-  OPENVIDU_WEBHOOK_EVENTS: {{ .Values.services.openvidu.webhook.events }}
+  OPENVIDU_WEBHOOK_HEADERS: '{{ .Values.services.openvidu.webhook.headers }}'
+  OPENVIDU_WEBHOOK_EVENTS: '{{ .Values.services.openvidu.webhook.events }}'
   {{- end }}
   OPENVIDU_SESSIONS_GARBAGE_INTERVAL: "{{ .Values.services.openvidu.gc.interval }}"
   OPENVIDU_SESSIONS_GARBAGE_THRESHOLD: "{{ .Values.services.openvidu.gc.threshold }}"
