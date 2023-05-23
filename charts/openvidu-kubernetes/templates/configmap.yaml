@@ -49,4 +49,4 @@ data:
   OPENVIDU_SESSIONS_GARBAGE_INTERVAL: "{{ .Values.services.openvidu.gc.interval }}"
   OPENVIDU_SESSIONS_GARBAGE_THRESHOLD: "{{ .Values.services.openvidu.gc.threshold }}"
   OPENVIDU_CDR: "{{ .Values.services.openvidu.cdr.enabled }}"
-  OPENVIDU_CDR_PATH: "{{ .Values.services.openvidu.cdr.enabled }}"
+  OPENVIDU_CDR_PATH: "{{ .Values.services.openvidu.cdr.path }}"
