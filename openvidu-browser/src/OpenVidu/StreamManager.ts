@@ -400,6 +400,9 @@ export abstract class StreamManager extends EventDispatcher {
             interval: newInterval,
             threshold: newThreshold
         };
+        if (!!currentHarkOptions.audioContext) {
+            this.stream.harkOptions.audioContext = currentHarkOptions.audioContext;
+        }
         if (!!this.stream.speechEvent) {
             this.stream.speechEvent.setInterval(newInterval);
             this.stream.speechEvent.setThreshold(newThreshold);

@@ -238,6 +238,7 @@ export class OpenVidu {
                             ? properties.resolution
                             : '640x480',
                 videoSource: typeof properties.videoSource !== 'undefined' ? properties.videoSource : undefined,
+                streamSource: typeof properties.streamSource !== 'undefined' ? properties.streamSource : undefined,
                 videoSimulcast: properties.videoSimulcast,
                 filter: properties.filter
             };

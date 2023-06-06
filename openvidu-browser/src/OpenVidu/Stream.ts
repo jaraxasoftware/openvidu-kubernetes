@@ -50,6 +50,7 @@ import hark = require('hark');
  * @hidden
  */
 import EventEmitter = require('wolfy87-eventemitter');
+import { SubscriberProperties } from '../OpenViduInternal/Interfaces/Public/SubscriberProperties';
 /**
  * @hidden
  */
@@ -1083,7 +1084,16 @@ export class Stream {
                     : this.session.openvidu.advancedConfiguration.publisherSpeakingEventsOptions || {};
                 harkOptions.interval = typeof harkOptions.interval === 'number' ? harkOptions.interval : 100;
                 harkOptions.threshold = typeof harkOptions.threshold === 'number' ? harkOptions.threshold : -50;
-                this.speechEvent = hark(this.mediaStream, harkOptions);
+                try {
+                    this.speechEvent = hark(this.mediaStream, harkOptions);
+                } catch (e) {
+                    logger.warn("Unable to add hark to existing stream");
+                    this.speechEvent = new EventEmitter();
+                    this.speechEvent.stop = function() {};
+                    this.speechEvent.setInterval = function() {};
+                    this.speechEvent.setThreshold = function() {};
+                    return false;
+                }
             }
             return true;
         }
@@ -1464,11 +1474,15 @@ export class Stream {
             this.disposeMediaStream();
         }
 
-        this.mediaStream = new MediaStream();
-        let receiver: RTCRtpReceiver;
-        for (receiver of this.webRtcPeer.pc.getReceivers()) {
-            if (!!receiver.track) {
-                this.mediaStream.addTrack(receiver.track);
+        if ((this.streamManager as Subscriber).properties.useStreamEvent) {
+            this.mediaStream = this.webRtcPeer.eventMediaStream;
+        } else {
+            this.mediaStream = new MediaStream();
+            let receiver: RTCRtpReceiver;
+            for (receiver of this.webRtcPeer.pc.getReceivers()) {
+                if (!!receiver.track) {
+                    this.mediaStream.addTrack(receiver.track);
+                }
             }
         }
         logger.debug('Peer remote stream', this.mediaStream);
