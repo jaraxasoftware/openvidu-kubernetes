@@ -271,13 +271,15 @@ export class Session extends EventDispatcher {
                             : properties.insertMode
                         : VideoInsertMode.APPEND,
                 subscribeToAudio: typeof param3.subscribeToAudio !== 'undefined' ? param3.subscribeToAudio : true,
-                subscribeToVideo: typeof param3.subscribeToVideo !== 'undefined' ? param3.subscribeToVideo : true
+                subscribeToVideo: typeof param3.subscribeToVideo !== 'undefined' ? param3.subscribeToVideo : true,
+                useStreamEvent: typeof param3.useStreamEvent !== 'undefined' ? param3.useStreamEvent : false,
             };
         } else {
             properties = {
                 insertMode: VideoInsertMode.APPEND,
                 subscribeToAudio: true,
-                subscribeToVideo: true
+                subscribeToVideo: true,
+                useStreamEvent: false,
             };
         }
 
