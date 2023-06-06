@@ -107,7 +107,7 @@ export class PlatformUtils {
     public isIPhoneOrIPad(): boolean {
         const userAgent = !!platform.ua ? platform.ua : navigator.userAgent;
         const isTouchable = 'ontouchend' in document;
-        const isIPad = /\b(\w*Macintosh\w*)\b/.test(userAgent) && isTouchable;
+        const isIPad = (/\b(\w*Macintosh\w*)\b/.test(userAgent) || /\b(\w*iPad\w*)\b/.test(userAgent)) && isTouchable;
         const isIPhone = /\b(\w*iPhone\w*)\b/.test(userAgent) && /\b(\w*Mobile\w*)\b/.test(userAgent) && isTouchable;
         return isIPad || isIPhone;
     }

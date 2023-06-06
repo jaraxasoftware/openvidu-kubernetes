@@ -82,6 +82,12 @@ export interface PublisherProperties {
     videoSource?: string | MediaStreamTrack | boolean;
 
     /**
+     * For compatibility with iOS WebRTC plugin
+     * - A MediaStream obtained from {@link OpenVidu.getUserMedia}
+     */
+    streamSource?: MediaStream;
+
+    /**
      * Use Simulcast video on WebRTC Publishers.
      * Senders will encode duplicate video streams with different qualities,
      * so the media server is able to select the most appropriate quality stream
