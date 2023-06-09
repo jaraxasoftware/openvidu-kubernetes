@@ -6,7 +6,7 @@ metadata:
 spec:
   pipelineSpec:
     tasks:
-    - name: from-build-pack
+    - name: openvidu-kubernetes
       resources: {}
       taskSpec:
         metadata: {}
@@ -30,6 +30,29 @@ spec:
             echo $BUILD_VERSION-$BUILD_ID >> VERSION
         - name: jx-variables
           resources: {}
+        - image: node:18-slim
+          name: build-npm-version
+          workingDir: /workspace/source/openvidu-browser
+          script: |
+            #!/bin/bash
+            source .jx/variables.sh
+            npm --no-git-tag-version version $VERSION           
+        - image: node:18-slim
+          name: openvidu-browser-build
+          workingDir: /workspace/source/openvidu-browser
+          script: |
+            #!/usr/bin/env bash
+            source .jx/variables.sh
+            echo "Building openvidu-browser"
+            npm run build
+            npm run browserify
+        - image: node:18-slim
+          name: build-npm-publish
+          workingDir: /workspace/source/openvidu-browser
+          script: |
+            #!/bin/bash
+            source .jx/variables.sh
+            npm publish               
         - name: chart-docs
           resources: {}    
         - name: promote-changelog-uat
@@ -41,11 +64,16 @@ spec:
             if [ -d "charts/$REPO_NAME" ]; then
             jx gitops yset -p version -v "$VERSION" -f ./charts/$REPO_NAME/Chart.yaml
             jx gitops yset -p appVersion -v "$VERSION" -f ./charts/$REPO_NAME/Chart.yaml
-            else echo no charts; fi
+            else echo no charts; fi       
         - name: promote-helm-release
           resources: {}
         - name: promote-jx-promote
           resources: {}
+        volumes:
+        - name: npmrc
+          secret:
+            optional: true
+            secretName: npmrc-nexus          
   podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 12h0m0s

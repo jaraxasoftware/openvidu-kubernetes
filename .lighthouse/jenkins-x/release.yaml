@@ -6,15 +6,16 @@ metadata:
 spec:
   pipelineSpec:
     tasks:
-    - name: from-build-pack
+    - name: openvidu-kubernetes
       resources: {}
       taskSpec:
         metadata: {}
         stepTemplate:
-          env:
-        
+          env:        
           - name: ENVIRONMENT
             value: dkv-prod
+          - name: ARTIFACT
+            value: static/js/openvidu-browser            
           image: uses:jaraxasoftware/jaraxa-pipeline-catalog/tasks/helm/release.yaml@versionStream
           name: ""
           resources: {}
@@ -24,22 +25,62 @@ spec:
           resources: {}     
         - name: jx-variables
           resources: {}
+        - image: node:18-slim
+          name: build-npm-version
+          workingDir: /workspace/source/openvidu-browser
+          script: |
+            #!/bin/bash
+            source .jx/variables.sh
+            npm --no-git-tag-version version $VERSION           
+        - image: node:18-slim
+          name: openvidu-browser-build
+          workingDir: /workspace/source/openvidu-browser
+          script: |
+            #!/usr/bin/env bash
+            source .jx/variables.sh
+            echo "Building openvidu-browser"
+            npm run build
+            npm run browserify
+        - image: node:18-slim
+          name: build-npm-publish
+          workingDir: /workspace/source/openvidu-browser
+          script: |
+            #!/bin/bash
+            source .jx/variables.sh
+            npm publish            
         - name: chart-docs
           resources: {}    
-        - name: promote-changelog-uat
+        - name: promote-changelog
+          resources: {}
+        - env:
+          - name: GITHUB_TOKEN
+            valueFrom:
+              secretKeyRef:
+                key: oauth
+                name: lighthouse-oauth-token          
+          image: golang:1.15
+          name: upload-artifacts-release
           resources: {}
           script: |
-            #!/usr/bin/env sh
-            set -v
+            #!/usr/bin/env bash
             source .jx/variables.sh
-            if [ -d "charts/$REPO_NAME" ]; then
-            jx gitops yset -p version -v "$VERSION" -f ./charts/$REPO_NAME/Chart.yaml
-            jx gitops yset -p appVersion -v "$VERSION" -f ./charts/$REPO_NAME/Chart.yaml
-            else echo no charts; fi
+
+            go get github.com/github-release/github-release
+            github-release upload \
+              --user ${REPO_OWNER} \
+              --repo ${REPO_NAME} \
+              --tag v${VERSION} \
+              --name "${REPO_NAME}-linux-amd64" \
+              --file ${ARTIFACT}-latest            
         - name: promote-helm-release
           resources: {}
         - name: promote-jx-promote
           resources: {}
+        volumes:
+        - name: npmrc
+          secret:
+            optional: true
+            secretName: npmrc          
   podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 12h0m0s
