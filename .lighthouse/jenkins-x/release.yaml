@@ -31,6 +31,7 @@ spec:
             #!/bin/bash
             source .jx/variables.sh
             cd openvidu-browser
+            npm install
             npm --no-git-tag-version version $VERSION           
         - image: node:18-slim
           name: openvidu-browser-build
