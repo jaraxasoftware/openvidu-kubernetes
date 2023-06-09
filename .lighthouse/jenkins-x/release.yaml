@@ -27,27 +27,27 @@ spec:
           resources: {}
         - image: node:18-slim
           name: build-npm-version
-          workingDir: /workspace/source/openvidu-browser
           script: |
             #!/bin/bash
             source .jx/variables.sh
+            cd openvidu-browser
             npm --no-git-tag-version version $VERSION           
         - image: node:18-slim
           name: openvidu-browser-build
-          workingDir: /workspace/source/openvidu-browser
           script: |
             #!/usr/bin/env bash
             source .jx/variables.sh
+            cd openvidu-browser
             echo "Building openvidu-browser"
             npm run build
             npm run browserify
         - image: node:18-slim
           name: build-npm-publish
-          workingDir: /workspace/source/openvidu-browser
           script: |
             #!/bin/bash
             source .jx/variables.sh
-            npm publish            
+            cd openvidu-browser
+            npm publish           
         - name: chart-docs
           resources: {}    
         - name: promote-changelog
