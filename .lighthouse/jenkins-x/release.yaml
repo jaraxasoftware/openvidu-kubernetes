@@ -31,7 +31,7 @@ spec:
           resources: {}     
         - name: jx-variables
           resources: {}
-        - image: node:18-slim
+        - image: node:14-slim
           name: build-npm-version
           script: |
             #!/bin/bash
@@ -39,7 +39,7 @@ spec:
             cd openvidu-browser
             npm install
             npm --no-git-tag-version version $VERSION           
-        - image: node:18-slim
+        - image: node:14-slim
           name: openvidu-browser-build
           script: |
             #!/usr/bin/env bash

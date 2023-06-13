@@ -35,7 +35,7 @@ spec:
             echo $BUILD_VERSION-$BUILD_ID >> VERSION          
         - name: jx-variables
           resources: {}
-        - image: node:18-slim
+        - image: node:14-slim
           name: build-npm-version
           script: |
             #!/bin/bash
@@ -43,7 +43,7 @@ spec:
             cd openvidu-browser
             npm install
             npm --no-git-tag-version version $VERSION           
-        - image: node:18-slim
+        - image: node:14-slim
           name: openvidu-browser-build
           script: |
             #!/usr/bin/env bash
@@ -52,7 +52,7 @@ spec:
             echo "Building openvidu-browser"
             npm run build
             npm run browserify
-        - image: node:18-slim
+        - image: node:14-slim
           name: build-npm-publish
           script: |
             #!/bin/bash
