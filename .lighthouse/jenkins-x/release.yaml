@@ -28,7 +28,11 @@ spec:
         steps:
         - image: uses:jaraxasoftware/jaraxa-pipeline-catalog/tasks/git-clone/git-clone.yaml@versionStream
           name: ""
-          resources: {}     
+          resources: {}
+        - name: next-version
+          script: |
+            #!/usr/bin/env sh
+            echo $BUILD_ID >> VERSION              
         - name: jx-variables
           resources: {}
         - image: node:14-slim
