@@ -2,26 +2,21 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 replicaCount: 1
-
 # optional list of image pull secrets to use to pull images
 jx:
   # optional image pull secrets
   imagePullSecrets: []
-
   # whether to create a Release CRD when installing charts with Release CRDs included
   releaseCRD: true
-
 serviceAccount:
   create: false
-
 service:
   name: openvidu
   externalPort: 5443
-
 services:
   openvidu:
     enabled: true
-    image: 
+    image:
       repository: openvidu/openvidu-server
       tag: 2.27.0
       pullPolicy: IfNotPresent
@@ -29,7 +24,7 @@ services:
     configDir: /opt/openvidu/
     secret: openvidu
     protocols:
-      - TCP
+    - TCP
     ssl:
       enabled: false
       certType: owncert
@@ -69,48 +64,44 @@ services:
     gc:
       interval: 900
       threshold: 3600
-    cdr: 
+    cdr:
       enabled: false
       path: /opt/openvidu/cdr
     env: {}
-
   kms:
     enabled: true
-    image: 
+    image:
       repository: kurento/kurento-media-server
       fixed_tag: 7.0.1
       pullPolicy: IfNotPresent
     env:
       KMS_MIN_PORT: "40000"
       KMS_MAX_PORT: "45000"
-
   openvidu-call:
     enabled: false
-    image: 
+    image:
       repository: openvidu/openvidu-call
       fixed_tag: 2.27.0
       pullPolicy: IfNotPresent
     protocols:
-      - TCP        
+    - TCP
     port: 5442
     env: {}
-
 ingress:
   enabled: false
   annotations: {}
   paths:
-    - /(.*)
+  - /(.*)
   hosts:
-    - openvidu.localhost
+  - openvidu.localhost
   tls:
-    - secretName: openvidu-secret
-      hosts:
-        - openvidu.localhost
-
+  - secretName: openvidu-secret
+    hosts:
+    - openvidu.localhost
 resources: {}
-
 nodeSelector: {}
-
 tolerations: []
-
 affinity: {}
+image:
+  repository: ghcr.io/jaraxasoftware/openvidu-kubernetes
+  tag: 2.27.0-1687897917228

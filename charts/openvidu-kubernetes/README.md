@@ -1,0 +1,93 @@
+# openvidu-kubernetes
+
+![Version: 2.27.0](https://img.shields.io/badge/Version-2.27.0-informational?style=flat-square) ![AppVersion: 2.27.0](https://img.shields.io/badge/AppVersion-2.27.0-informational?style=flat-square)
+
+Jaraxa implementation of openvidu on Kubernetes
+
+**Homepage:** <https://github.com/jaraxasoftware/openvidu-kubernetes/>
+
+## Maintainers
+
+| Name | Email | Url |
+| ---- | ------ | --- |
+| Sergio Jurado | sergio.jurado@jaraxa.com |  |
+
+## Source Code
+
+* <https://github.com/openvidu/openvidu/>
+
+## Values
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| affinity | object | `{}` |  |
+| ingress.annotations | object | `{}` |  |
+| ingress.enabled | bool | `false` |  |
+| ingress.hosts[0] | string | `"openvidu.localhost"` |  |
+| ingress.paths[0] | string | `"/(.*)"` |  |
+| ingress.tls[0].hosts[0] | string | `"openvidu.localhost"` |  |
+| ingress.tls[0].secretName | string | `"openvidu-secret"` |  |
+| jx.imagePullSecrets | list | `[]` |  |
+| jx.releaseCRD | bool | `true` |  |
+| nodeSelector | object | `{}` |  |
+| replicaCount | int | `1` |  |
+| resources | object | `{}` |  |
+| service.externalPort | int | `5443` |  |
+| service.name | string | `"openvidu"` |  |
+| serviceAccount.create | bool | `false` |  |
+| services.kms.enabled | bool | `true` |  |
+| services.kms.env.KMS_MAX_PORT | string | `"45000"` |  |
+| services.kms.env.KMS_MIN_PORT | string | `"40000"` |  |
+| services.kms.image.fixed_tag | string | `"7.0.1"` |  |
+| services.kms.image.pullPolicy | string | `"IfNotPresent"` |  |
+| services.kms.image.repository | string | `"kurento/kurento-media-server"` |  |
+| services.openvidu-call.enabled | bool | `false` |  |
+| services.openvidu-call.env | object | `{}` |  |
+| services.openvidu-call.image.fixed_tag | string | `"2.27.0"` |  |
+| services.openvidu-call.image.pullPolicy | string | `"IfNotPresent"` |  |
+| services.openvidu-call.image.repository | string | `"openvidu/openvidu-call"` |  |
+| services.openvidu-call.port | int | `5442` |  |
+| services.openvidu-call.protocols[0] | string | `"TCP"` |  |
+| services.openvidu.bandwidth.received.max | int | `1000` |  |
+| services.openvidu.bandwidth.received.min | int | `300` |  |
+| services.openvidu.bandwidth.send.max | int | `1000` |  |
+| services.openvidu.bandwidth.send.min | int | `300` |  |
+| services.openvidu.cdr.enabled | bool | `false` |  |
+| services.openvidu.cdr.path | string | `"/opt/openvidu/cdr"` |  |
+| services.openvidu.configDir | string | `"/opt/openvidu/"` |  |
+| services.openvidu.coturn.iceServers | string | `"[\"url=turn:localhost:3478,username=turn,credential=nknk\"]"` |  |
+| services.openvidu.coturn.ip | string | `"localhost.openvidu"` |  |
+| services.openvidu.coturn.port | int | `3478` |  |
+| services.openvidu.coturn.redis.db | int | `1` |  |
+| services.openvidu.coturn.redis.ip | string | `"localhost-redis-master"` |  |
+| services.openvidu.coturn.redis.password | string | `"changeit"` |  |
+| services.openvidu.coturn.uris | string | `"turn:localhost:3478?transport=tcp"` |  |
+| services.openvidu.enabled | bool | `true` |  |
+| services.openvidu.env | object | `{}` |  |
+| services.openvidu.gc.interval | int | `900` |  |
+| services.openvidu.gc.threshold | int | `3600` |  |
+| services.openvidu.image.pullPolicy | string | `"IfNotPresent"` |  |
+| services.openvidu.image.repository | string | `"openvidu/openvidu-server"` |  |
+| services.openvidu.image.tag | string | `"2.27.0"` |  |
+| services.openvidu.kms.uris | string | `"[\"ws://localhost:8888/kurento\"]"` |  |
+| services.openvidu.port | int | `443` |  |
+| services.openvidu.protocols[0] | string | `"TCP"` |  |
+| services.openvidu.recording.autostop | int | `120` |  |
+| services.openvidu.recording.debug | bool | `false` |  |
+| services.openvidu.recording.enabled | bool | `false` |  |
+| services.openvidu.recording.layout | string | `"/opt/openvidu/custom-layout"` |  |
+| services.openvidu.recording.notification | string | `"publisher_moderator"` |  |
+| services.openvidu.recording.path | string | `"/opt/openvidu/recordings"` |  |
+| services.openvidu.recording.public | bool | `false` |  |
+| services.openvidu.secret | string | `"openvidu"` |  |
+| services.openvidu.ssl.certType | string | `"owncert"` |  |
+| services.openvidu.ssl.enabled | bool | `false` |  |
+| services.openvidu.transcoding.enabled | bool | `false` |  |
+| services.openvidu.webhook.enabled | bool | `true` |  |
+| services.openvidu.webhook.endpoint | string | `"http://localhost/api/v1/your_webhook/openvidu"` |  |
+| services.openvidu.webhook.events | string | `"[\"sessionCreated\", \"sessionDestroyed\", \"participantJoined\", \"participantLeft\", \"webrtcConnectionCreated\", \"webrtcConnectionDestroyed\", \"recordingStatusChanged\", \"filterEventDispatched\"]"` |  |
+| services.openvidu.webhook.headers | string | `""` |  |
+| tolerations | list | `[]` |  |
+
+----------------------------------------------
+Autogenerated from chart metadata using [helm-docs v1.4.0](https://github.com/norwoodj/helm-docs/releases/v1.4.0)

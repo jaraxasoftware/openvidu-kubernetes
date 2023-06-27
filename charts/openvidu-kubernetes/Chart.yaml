@@ -2,8 +2,8 @@ apiVersion: v2
 name: openvidu-kubernetes
 description: Jaraxa implementation of openvidu on Kubernetes
 home: https://github.com/jaraxasoftware/openvidu-kubernetes/
-version: 2.27.0
-appVersion: 2.27.0
+version: 2.27.0-1687897917228
+appVersion: 2.27.0-1687897917228
 icon: https://jaraxa-public.s3.eu-central-1.amazonaws.com/LogoJRX-web.svg
 maintainers:
 - email: sergio.jurado@jaraxa.com
