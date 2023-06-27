@@ -52,7 +52,7 @@ spec:
             echo "Building openvidu-browser"
             npm run build
             npm run browserify
-        - image: node:18-slim
+        - image: node:14-slim
           name: build-npm-publish
           script: |
             #!/bin/bash
