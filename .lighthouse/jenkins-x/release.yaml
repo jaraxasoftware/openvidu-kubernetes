@@ -32,7 +32,7 @@ spec:
         - name: next-version
           script: |
             #!/usr/bin/env sh
-            echo $BUILD_ID >> VERSION              
+            echo -$BUILD_ID >> VERSION              
         - name: jx-variables
           resources: {}
         - image: node:14-slim
