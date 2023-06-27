@@ -63,26 +63,26 @@ spec:
           resources: {}    
         - name: promote-changelog
           resources: {}
-        - env:
-          - name: GITHUB_TOKEN
-            valueFrom:
-              secretKeyRef:
-                key: oauth
-                name: lighthouse-oauth-token          
-          image: golang:1.15
-          name: upload-artifacts-release
-          resources: {}
-          script: |
-            #!/usr/bin/env bash
-            source .jx/variables.sh
-
-            go get github.com/github-release/github-release
-            github-release upload \
-              --user ${REPO_OWNER} \
-              --repo ${REPO_NAME} \
-              --tag v${VERSION} \
-              --name "${REPO_NAME}-linux-amd64" \
-              --file ${ARTIFACT}-latest            
+        #- env:
+        #  - name: GITHUB_TOKEN
+        #    valueFrom:
+        #      secretKeyRef:
+        #        key: oauth
+        #        name: lighthouse-oauth-token          
+        #  image: golang:1.15
+        #  name: upload-artifacts-release
+        #  resources: {}
+        #  script: |
+        #    #!/usr/bin/env bash
+        #    source .jx/variables.sh
+        #
+        #    go get github.com/github-release/github-release
+        #    github-release upload \
+        #      --user ${REPO_OWNER} \
+        #      --repo ${REPO_NAME} \
+        #      --tag v${VERSION} \
+        #      --name "${REPO_NAME}-linux-amd64" \
+        #      --file ${ARTIFACT}-latest            
         - name: promote-helm-release
           resources: {}
         - name: promote-jx-promote
