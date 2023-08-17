@@ -54,7 +54,7 @@ data:
   OPENVIDU_EDITION: pro
   OPENVIDU_PRO_LICENSE: "{{- .Values.services.openvidu.pro.license }}"
   OPENVIDU_PRO_CLUSTER: "{{- .Values.services.openvidu.pro.cluster }}"
-  OPENVIDU_PRO_COTURN_IN_MEDIA_NODES: false
+  OPENVIDU_PRO_COTURN_IN_MEDIA_NODES: "false"
   OPENVIDU_PRO_CLUSTER_AUTOSCALING: "{{- .Values.services.openvidu.pro.autoscaling }}"
   OPENVIDU_PRO_CLUSTER_MODE: "{{- .Values.services.openvidu.pro.mode }}"
   OPENVIDU_PRO_CLUSTER_ENVIRONMENT: "{{- .Values.services.openvidu.pro.enviroment }}"
