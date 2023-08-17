@@ -60,4 +60,5 @@ data:
   OPENVIDU_PRO_CLUSTER_ENVIRONMENT: "{{- .Values.services.openvidu.pro.environment }}"
   OPENVIDU_PRO_CLUSTER_LOAD_STRATEGY: "{{- .Values.services.openvidu.pro.loadStrategy }}"
   OPENVIDU_PRO_ELASTICSEARCH: "{{- .Values.services.openvidu.pro.elasticsearch }}"
+  OPENVIDU_PRO_NETWORK_QUALITY: "{{- .Values.services.openvidu.pro.networkQoS }}"
   {{- end }}

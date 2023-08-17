@@ -37,6 +37,7 @@ services:
       autoscaling: false
       loadStrategy: streams
       elasticsearch: false
+      networkQoS: false
     protocols:
       - TCP
     ssl:
