@@ -50,3 +50,14 @@ data:
   OPENVIDU_SESSIONS_GARBAGE_THRESHOLD: "{{ .Values.services.openvidu.gc.threshold }}"
   OPENVIDU_CDR: "{{ .Values.services.openvidu.cdr.enabled }}"
   OPENVIDU_CDR_PATH: "{{ .Values.services.openvidu.cdr.path }}"
+  {{- if .Values.services.openvidu.pro.enabled }}
+  OPENVIDU_EDITION: pro
+  OPENVIDU_PRO_LICENSE: "{{- .Values.services.openvidu.pro.license }}"
+  OPENVIDU_PRO_CLUSTER: "{{- .Values.services.openvidu.pro.cluster }}"
+  OPENVIDU_PRO_COTURN_IN_MEDIA_NODES: false
+  OPENVIDU_PRO_CLUSTER_AUTOSCALING: "{{- .Values.services.openvidu.pro.autoscaling }}"
+  OPENVIDU_PRO_CLUSTER_MODE: "{{- .Values.services.openvidu.pro.mode }}"
+  OPENVIDU_PRO_CLUSTER_ENVIRONMENT: "{{- .Values.services.openvidu.pro.enviroment }}"
+  OPENVIDU_PRO_CLUSTER_LOAD_STRATEGY: "{{- .Values.services.openvidu.pro.loadStrategy }}"
+  OPENVIDU_PRO_ELASTICSEARCH: "{{- .Values.services.openvidu.pro.elasticsearch }}"
+  {{- end }}

@@ -28,6 +28,15 @@ services:
     port: 443
     configDir: /opt/openvidu/
     secret: openvidu
+    pro:
+      enabled: false
+      license: xxxxxx-yyyyyy-zzzzzz-aaaaaa-bbbb
+      cluster: true
+      mode: manual
+      environment: on_premise
+      autoscaling: false
+      loadStrategy: streams
+      elasticsearch: false
     protocols:
       - TCP
     ssl:
@@ -72,6 +81,15 @@ services:
     cdr: 
       enabled: false
       path: /opt/openvidu/cdr
+    env: {}
+
+  media-node-controller:
+    enabled: false
+    image: 
+      repository: openvidu/media-node-controller
+      fixed_tag: 2.27.0
+      pullPolicy: IfNotPresent
+    port: 3000
     env: {}
 
   kms:
