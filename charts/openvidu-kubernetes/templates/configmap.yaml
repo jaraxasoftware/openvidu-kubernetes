@@ -62,7 +62,9 @@ data:
   OPENVIDU_PRO_NETWORK_QUALITY: "{{- .Values.services.openvidu.pro.networkQoS }}"
   OPENVIDU_PRO_ELASTICSEARCH: "{{- .Values.services.openvidu.pro.elasticsearch.enabled }}"  
     {{- if .Values.services.openvidu.pro.elasticsearch.enabled }}
-  OPENVIDU_PRO_ELASTICSEARCH_HOST: "https://{{ include "openvidu.fullname" . }}-elastisearch:9200"
-  OPENVIDU_PRO_KIBANA_HOST: "https://{{ include "openvidu.fullname" . }}-kibana:5601"
+  OPENVIDU_PRO_ELASTICSEARCH_HOST: "https://{{ include "openvidu.fullname" . }}-elastisearch-es-http:9200"
+  OPENVIDU_PRO_KIBANA_HOST: "https://{{ include "openvidu.fullname" . }}-kibana-kb-http:5601"
+  ELASTICSEARCH_USERNAME: "{{- .Values.services.openvidu.pro.elasticsearch.user }}"
+  ELASTICSEARCH_PASSWORD: "{{- .Values.services.openvidu.pro.elasticsearch.password }}"
     {{- end }}
   {{- end }}

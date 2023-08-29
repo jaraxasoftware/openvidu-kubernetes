@@ -42,6 +42,8 @@ services:
         nodeCount: 1
         volumeSize: 10Gi
         storageClassName: do-block-storage
+        user: elastic
+        password: changeme
       networkQoS: false
     protocols:
       - TCP
