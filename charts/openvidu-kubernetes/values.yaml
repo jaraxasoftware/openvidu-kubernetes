@@ -36,7 +36,12 @@ services:
       environment: on_premise
       autoscaling: false
       loadStrategy: streams
-      elasticsearch: false
+      elasticsearch: 
+        enabled: false
+        version: 7.17.9
+        nodeCount: 1
+        volumeSize: 10Gi
+        storageClassName: do-block-storage
       networkQoS: false
     protocols:
       - TCP
