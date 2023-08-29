@@ -12,7 +12,7 @@ spec:
   volumeClaimDeletePolicy: DeleteOnScaledownOnly
   nodeSets:
   - name: default
-    count: "{{- .Values.services.openvidu.pro.elasticsearch.nodeCount }}"
+    count: {{- .Values.services.openvidu.pro.elasticsearch.nodeCount }}
     volumeClaimTemplates:
     - metadata:
         name: elasticsearch-data
@@ -22,7 +22,7 @@ spec:
         resources:
           requests:
             storage: {{- .Values.services.openvidu.pro.elasticsearch.volumeSize }}
-        storageClassName: "{{- .Values.services.openvidu.pro.elasticsearch.storageClassName }}"
+        storageClassName: {{- .Values.services.openvidu.pro.elasticsearch.storageClassName }}
 --- 
 apiVersion: kibana.k8s.elastic.co/v1
 kind: Kibana
@@ -33,7 +33,7 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}  
 spec:
   version: "{{- .Values.services.openvidu.pro.elasticsearch.version }}"
-  count: "{{- .Values.services.openvidu.pro.elasticsearch.nodeCount }}"
+  count: {{- .Values.services.openvidu.pro.elasticsearch.nodeCount }}
   elasticsearchRef:
     name: {{ include "openvidu.fullname" . }}-elasticsearch        
 {{- end }}
