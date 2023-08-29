@@ -30,7 +30,11 @@ spec:
             securityContext:
               privileged: true
               runAsUser: 0
-            command: ['sh', '-c', 'sysctl -w vm.max_map_count=262144']   
+            command: ['sh', '-c', 'sysctl -w vm.max_map_count=262144'] 
+  http:
+    tls:
+      selfSignedCertificate:
+        disabled: true            
 ---
 apiVersion: kibana.k8s.elastic.co/v1
 kind: Kibana
@@ -44,5 +48,9 @@ spec:
   count: {{ .Values.services.openvidu.pro.elasticsearch.nodeCount }}
   elasticsearchRef:
     name: {{ include "openvidu.fullname" . }}-elasticsearch
+  http:
+    tls:
+      selfSignedCertificate:
+        disabled: true    
 {{- end }}
 {{- end }}
