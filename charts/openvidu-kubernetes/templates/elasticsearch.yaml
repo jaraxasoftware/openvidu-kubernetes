@@ -23,8 +23,14 @@ spec:
           requests:
             storage: {{ .Values.services.openvidu.pro.elasticsearch.volumeSize }}
         storageClassName: {{ .Values.services.openvidu.pro.elasticsearch.storageClassName }}
-    config:
-      node.store.allow_mmap: false        
+    podTemplate:
+      spec:
+        initContainers:
+          - name: sysctl
+            securityContext:
+              privileged: true
+              runAsUser: 0
+            command: ['sh', '-c', 'sysctl -w vm.max_map_count=262144']   
 ---
 apiVersion: kibana.k8s.elastic.co/v1
 kind: Kibana
