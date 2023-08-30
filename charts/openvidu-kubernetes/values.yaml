@@ -44,6 +44,17 @@ services:
         storageClassName: do-block-storage
         user: elastic
         password: changeme
+        kibanaIngress:
+          enabled: false
+          annotations: {}
+          paths:
+            - /kibana/
+          hosts:
+            - openvidu.localhost
+          tls:
+            - secretName: openvidu-secret
+              hosts:
+                - openvidu.localhost        
       networkQoS: false
     protocols:
       - TCP

@@ -51,6 +51,62 @@ spec:
   http:
     tls:
       selfSignedCertificate:
-        disabled: true    
+        disabled: true
+---
+{{- if .Values.services.openvidu.pro.elasticsearch.kibanaIngress.enabled -}}
+{{- $serviceName := include "openvidu.fullname" . -}}
+{{- $servicePort := 5601 -}}
+{{- $paths := .Values.services.openvidu.pro.elasticsearch.kibanaIngress.paths -}}
+apiVersion: {{ template "openvidu.ingress.apiVersion" . }}
+kind: Ingress
+metadata:
+  name: {{ include "openvidu.fullname" . }}
+  labels:
+    app: {{ .Chart.Name }}
+    chart: {{ .Chart.Name }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+  {{- range $key, $value := .Values.services.openvidu.pro.elasticsearch.kibanaIngress.labels }}
+    {{ $key }}: {{ $value | quote }}
+  {{- end }}
+{{- if .Values.services.openvidu.pro.elasticsearch.kibanaIngress.annotations }}
+  annotations:
+{{ toYaml .Values.services.openvidu.pro.elasticsearch.kibanaIngress.annotations | indent 4 }}
+{{- end }}
+spec:
+  rules:
+  {{- if .Values.services.openvidu.pro.elasticsearch.kibanaIngress.hosts }}
+  {{- range $host := .Values.services.openvidu.pro.elasticsearch.kibanaIngress.hosts }}
+    - host: {{ $host }}
+      http:
+        paths:
+  {{- range $p := $paths }}
+          - path: {{ $p }}
+            pathType: ImplementationSpecific          
+            backend:
+              service:
+                name:  {{ $serviceName }}-kibana-kb-http
+                port:
+                  number: {{ $servicePort }}
+  {{- end -}}
+  {{- end -}}
+  {{- else }}
+    - http:
+        paths:
+  {{- range $p := $paths }}
+          - path: {{ $p }}
+            pathType: ImplementationSpecific          
+            backend:
+              service:
+                name:  {{ $serviceName }}-kibana-kb-http
+                port:
+                  number: {{ $servicePort }}
+  {{- end -}}
+  {{- end -}}
+  {{- if .Values.services.openvidu.pro.elasticsearch.kibanaIngress.tls }}
+  tls:
+{{ toYaml .Values.services.openvidu.pro.elasticsearch.kibanaIngress.tls | indent 4 }}
+  {{- end -}}
+{{- end -}}
 {{- end }}
 {{- end }}
