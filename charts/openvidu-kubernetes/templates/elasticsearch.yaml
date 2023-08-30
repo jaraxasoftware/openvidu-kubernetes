@@ -51,6 +51,9 @@ spec:
   config:
     server.basePath: "/kibana"
     server.rewriteBasePath: true
+    {{- if .Values.services.openvidu.pro.elasticsearch.kibanaIngress.enabled }}
+    server.publicBaseUrl: "https://{{ index .Values.services.openvidu.pro.elasticsearch.kibanaIngress.hosts 0 }}/kibana"
+    {{- end }}
   http:
     tls:
       selfSignedCertificate:
