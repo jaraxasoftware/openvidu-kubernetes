@@ -55,6 +55,13 @@ spec:
     tls:
       selfSignedCertificate:
         disabled: true
+  podTemplate:
+    spec:
+      containers:
+      - name: kibana        
+        readinessProbe:
+          httpGet:
+            path: /kibana/login
 ---
 {{- if .Values.services.openvidu.pro.elasticsearch.kibanaIngress.enabled -}}
 {{- $serviceName := include "openvidu.fullname" . -}}
