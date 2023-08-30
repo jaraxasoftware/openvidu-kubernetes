@@ -60,8 +60,15 @@ spec:
       containers:
       - name: kibana        
         readinessProbe:
+          failureThreshold: 3
           httpGet:
             path: /kibana/login
+            port: 5601
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
 ---
 {{- if .Values.services.openvidu.pro.elasticsearch.kibanaIngress.enabled -}}
 {{- $serviceName := include "openvidu.fullname" . -}}
