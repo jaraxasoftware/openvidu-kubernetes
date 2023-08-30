@@ -48,6 +48,9 @@ spec:
   count: {{ .Values.services.openvidu.pro.elasticsearch.nodeCount }}
   elasticsearchRef:
     name: {{ include "openvidu.fullname" . }}-elasticsearch
+  config:
+    server.basePath: "/kibana"
+    server.rewriteBasePath: true
   http:
     tls:
       selfSignedCertificate:
