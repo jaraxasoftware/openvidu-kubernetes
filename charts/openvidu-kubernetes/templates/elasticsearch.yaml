@@ -60,7 +60,7 @@ spec:
 apiVersion: {{ template "openvidu.ingress.apiVersion" . }}
 kind: Ingress
 metadata:
-  name: {{ include "openvidu.fullname" . }}
+  name: {{ include "openvidu.fullname" . }}-kibana
   labels:
     app: {{ .Chart.Name }}
     chart: {{ .Chart.Name }}
