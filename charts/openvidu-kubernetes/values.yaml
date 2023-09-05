@@ -103,7 +103,7 @@ services:
     env: {}
 
   media-node-controller:
-    enabled: true
+    enabled: false
     image: 
       repository: openvidu/media-node-controller
       fixed_tag: 2.27.0

@@ -90,9 +90,7 @@ spec:
           subPath: tls.key
             {{- end }}
           {{- end }}
-        {{- end }} 
-        - mountPath: /var/run/docker.sock
-          name: docker-socket
+        {{- end }}
         {{- end }}                          
         resources:
           {{- toYaml $.Values.resources | nindent 12 }}
@@ -117,7 +115,3 @@ spec:
           secretName: {{ (index .Values.ingress.tls 0).secretName }}
         {{- end }}
       {{- end }}
-      - hostPath:
-          path: /var/run/docker.sock
-          type: ""
-        name: docker-socket
