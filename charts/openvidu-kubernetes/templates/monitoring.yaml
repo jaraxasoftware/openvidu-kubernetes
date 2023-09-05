@@ -264,3 +264,5 @@ roleRef:
   kind: ClusterRole
   name: {{ include "openvidu.fullname" . }}-metricbeat
   apiGroup: rbac.authorization.k8s.io
+{{- end }}
+{{- end }}
