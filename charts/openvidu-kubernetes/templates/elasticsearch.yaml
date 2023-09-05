@@ -45,7 +45,7 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}  
 spec:
   version: {{ .Values.services.openvidu.pro.elasticsearch.version }}
-  count: {{ .Values.services.openvidu.pro.elasticsearch.nodeCount }}
+  count: {{ .Values.services.openvidu.pro.elasticsearch.nodeCount | default 1 }}
   elasticsearchRef:
     name: {{ include "openvidu.fullname" . }}-elasticsearch
   config:
