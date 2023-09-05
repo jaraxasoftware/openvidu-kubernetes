@@ -250,7 +250,6 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: {{ include "openvidu.fullname" . }}-metricbeat
-  namespace: default
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
