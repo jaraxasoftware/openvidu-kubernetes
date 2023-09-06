@@ -300,6 +300,5 @@ spec:
 {{ toYaml .Values.services.openvidu.pro.elasticsearch.kibanaIngress.tls | indent 4 }}
   {{- end -}}
 {{- end -}}
----
 {{- end }}
 {{- end }}
