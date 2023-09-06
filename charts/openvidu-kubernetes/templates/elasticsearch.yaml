@@ -71,6 +71,9 @@ spec:
     processors:
     - add_cloud_metadata: {}
     - add_host_metadata: {}
+    output:
+      elasticsearch:
+        index: "%{[fields.log_type]}-%{+yyyy.MM.dd}"
   daemonSet:
     podTemplate:
       spec:
