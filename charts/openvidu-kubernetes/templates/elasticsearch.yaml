@@ -15,6 +15,9 @@ spec:
   kibanaRef:
     name: {{ include "openvidu.fullname" . }}-kibana
   config:
+    setup:
+      kibana:
+        path: /kibana
     metricbeat:
       autodiscover:
         providers:
