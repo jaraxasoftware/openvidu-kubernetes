@@ -22,6 +22,9 @@ spec:
         path: /kibana
       ilm:
         enabled: false
+      template:
+        name: "metricbeat"
+        pattern: "metricbeat-*"
     metricbeat:
       autodiscover:
         providers:
@@ -75,6 +78,9 @@ spec:
     processors:
     - add_cloud_metadata: {}
     - add_host_metadata: {}
+    output:
+      elasticsearch:
+        index: "metricbeat-%{+yyyy.MM.dd}"
   daemonSet:
     podTemplate:
       spec:
