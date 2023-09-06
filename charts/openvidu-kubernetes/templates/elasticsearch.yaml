@@ -16,6 +16,8 @@ spec:
     name: {{ include "openvidu.fullname" . }}-kibana
   config:
     setup:
+      dashboards: 
+        enabled: false
       kibana:
         path: /kibana
       ilm:
