@@ -18,6 +18,9 @@ spec:
     setup:
       kibana:
         path: /kibana
+      template:
+        name: "metricbeat"
+        pattern: "metricbeat-*"
     metricbeat:
       autodiscover:
         providers:
