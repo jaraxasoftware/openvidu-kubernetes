@@ -91,7 +91,7 @@ spec:
             {{- end }}
           {{- end }}
         {{- end }}
-        {{- end }}                          
+        {{- end }}
         resources:
           {{- toYaml $.Values.resources | nindent 12 }}
       {{- end }}

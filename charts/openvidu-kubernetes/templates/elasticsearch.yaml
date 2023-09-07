@@ -35,49 +35,36 @@ spec:
           type: kubernetes
       modules:
       - module: system
-        period: 10s
         metricsets:
-        - cpu
-        - load
-        - memory
-        - network
-        - process
-        - process_summary
-        process:
-          include_top_n:
-            by_cpu: 5
-            by_memory: 5
-        processes:
-        - .*
-      - module: system
-        period: 1m
-        metricsets:
-        - filesystem
-        - fsstat
+          - cpu
+          - diskio
+          - memory
+          - network
+          - filesystem
+          - fsstat
+          - process_summary
+          - uptime
+        filesystem.ignore_types: [nfs, smbfs, autofs, devtmpfs, devpts, hugetlbfs, tmpfs, sysfs, securityfs, cgroup2, cgroup, pstore, debugfs, configfs, fusectl, proc, fuse.lxcfs, squashfs]
+        processes: ['.*']
         processors:
-        - drop_event:
-            when:
-              regexp:
-                system:
-                  filesystem:
-                    mount_point: ^/(sys|cgroup|proc|dev|etc|host|lib)($|/)
-      - module: kubernetes
-        period: 10s
-        node: ${NODE_NAME}
-        hosts:
-        - https://${NODE_NAME}:10250
-        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-        ssl:
-          verification_mode: none
-        metricsets:
-        - node
-        - system
-        - pod
-        - container
-        - volume
-    processors:
-    - add_cloud_metadata: {}
-    - add_host_metadata: {}
+          - drop_event:
+                when:
+                  or:
+                    - regexp:
+                          system.network.name: '^(veth|lo|docker|br-)($|)'
+                    - regexp:
+                          system.filesystem.mount_point: '^/(sys|cgroup|proc|dev|etc|host)($|/)'
+                    - regexp:
+                          system.filesystem.mount_point: '^/hostfs/(sys|cgroup|proc|dev|etc|host)($|/)'
+          - add_cloud_metadata: {}
+          - add_host_metadata: {}                          
+        enabled: true
+        period: 60s
+        cpu.metrics: [normalized_percentages]
+    fields:
+      cluster_id: openvidu-pro-develop
+      node_id: master_develop
+      node_role: masternode
     output:
       elasticsearch:
         index: "metricbeat-%{+yyyy.MM.dd}"
