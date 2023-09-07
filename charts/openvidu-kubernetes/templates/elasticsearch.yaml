@@ -62,8 +62,8 @@ spec:
         period: 60s
         cpu.metrics: [normalized_percentages]
     fields:
-      cluster_id: openvidu-pro-develop
-      node_id: master_develop
+      cluster_id: {{ index .Values.ingress.hosts 0 }}
+      node_id: {{ index .Values.ingress.hosts 0 }}
       node_role: masternode
     output:
       elasticsearch:
