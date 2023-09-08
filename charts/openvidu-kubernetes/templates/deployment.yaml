@@ -95,8 +95,12 @@ spec:
         - name: metricbeat-{{ $.Chart.Name }}
           readOnly: true
           mountPath: /usr/share/metricbeat/metricbeat.yml
-          subPath: metricbeat.yml 
-        {{- end }}            
+          subPath: metricbeat.yml
+        {{- end }}
+        {{- if eq $name "media-node-controller" }}
+        - name: docker-socket
+          mountPath: /var/run/docker.sock
+        {{- end }}                   
         {{- end }}
         resources:
           {{- toYaml $.Values.resources | nindent 12 }}
@@ -124,3 +128,6 @@ spec:
       - name: metricbeat-{{ .Chart.Name }}
         configMap:
           name: {{ include "openvidu.fullname" . }}-metricbeat
+      - name: docker-socket
+        hostPath:
+          path: /var/run/docker.sock
