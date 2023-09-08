@@ -62,7 +62,7 @@ data:
   OPENVIDU_PRO_NETWORK_QUALITY: "{{- .Values.services.openvidu.pro.networkQoS }}"
   OPENVIDU_PRO_ELASTICSEARCH: "{{- .Values.services.openvidu.pro.elasticsearch.enabled }}"  
     {{- if .Values.services.openvidu.pro.elasticsearch.enabled }}
-  OPENVIDU_PRO_ELASTICSEARCH_HOST: "http://{{ include "openvidu.fullname" . }}-elasticsearch-es-http:9200"
+  OPENVIDU_PRO_ELASTICSEARCH_HOST: "http://{{ include "openvidu.fullname" . }}-elasticsearch-es-internal-http:9200"
   OPENVIDU_PRO_KIBANA_HOST: "https://{{ index .Values.services.openvidu.pro.elasticsearch.kibanaIngress.hosts 0 }}/kibana"
   OPENVIDU_PRO_STATS_MONITORING_INTERVAL: "30"
   ELASTICSEARCH_USERNAME: "{{- .Values.services.openvidu.pro.elasticsearch.user }}"
@@ -112,5 +112,7 @@ data:
         output:
           elasticsearch:
             hosts: ["${OPENVIDU_PRO_ELASTICSEARCH_HOST}"]
+            username: "${ELASTICSEARCH_USERNAME}"
+            password: "${ELASTICSEARCH_PASSWORD}"
         setup.ilm.enabled: false    
 
