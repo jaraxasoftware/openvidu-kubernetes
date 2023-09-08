@@ -44,6 +44,7 @@ services:
         storageClassName: do-block-storage
         user: elastic
         password: changeme
+        serviceType: ClusterIP
         kibanaIngress:
           enabled: false
           annotations: {}
