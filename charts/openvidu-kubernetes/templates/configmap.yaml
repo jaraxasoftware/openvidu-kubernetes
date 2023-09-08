@@ -78,13 +78,7 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
 data:
     metricbeat.yml: |
-        metricbeat.modules:
-          - module: nginx
-            metricsets: ["stubstatus"]
-            enabled: true
-            period: ${OPENVIDU_PRO_STATS_MONITORING_INTERVAL}s
-            hosts: ["http://127.0.0.1"]
-            server_status_path: "nginx_status"
+        metricbeat.modules:k dedsadsadasdasdasd
           - module: system
             metricsets:
               - cpu

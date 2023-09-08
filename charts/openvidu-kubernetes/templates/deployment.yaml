@@ -82,19 +82,19 @@ spec:
         {{- if $.Values.ingress.enabled }}
           {{- if $.Values.services.openvidu.ssl.enabled }} 
             {{- if $val.certDir }}
-        - name: tls-{{ .Chart.Name }}
+        - name: tls-{{ $.Chart.Name }}
           mountPath: {{ $val.certDir }}certificate.crt
           subPath: tls.crt
-        - name: tls-{{ .Chart.Name }}
+        - name: tls-{{ $.Chart.Name }}
           mountPath: {{ $val.certDir }}certificate.key
           subPath: tls.key
             {{- end }}
-          {{- end }}
-        {{- if eq $name "metricbeat" }}
-        - name: metricbeat-{{ .Chart.Name }}
-          mountPath: /usr/share/metricbeat/
-        {{- end }}           
+          {{- end }}       
         {{- end }}
+        {{- if eq $name "metricbeat" }}
+        - name: metricbeat-{{ $.Chart.Name }}
+          mountPath: /usr/share/metricbeat/
+        {{- end }}            
         {{- end }}
         resources:
           {{- toYaml $.Values.resources | nindent 12 }}
