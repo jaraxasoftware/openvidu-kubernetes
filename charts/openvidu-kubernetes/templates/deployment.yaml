@@ -93,6 +93,7 @@ spec:
         {{- end }}
         {{- if eq $name "metricbeat" }}
         - name: metricbeat-{{ $.Chart.Name }}
+          readOnly: true
           mountPath: /usr/share/metricbeat/metricbeat.yml
           subPath: metricbeat.yml 
         {{- end }}            
