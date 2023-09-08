@@ -90,6 +90,10 @@ spec:
           subPath: tls.key
             {{- end }}
           {{- end }}
+        {{- if eq $name "metricbeat" }}
+        - name: metricbeat-{{ .Chart.Name }}
+          mountPath: /usr/share/metricbeat/
+        {{- end }}           
         {{- end }}
         {{- end }}
         resources:
@@ -115,3 +119,6 @@ spec:
           secretName: {{ (index .Values.ingress.tls 0).secretName }}
         {{- end }}
       {{- end }}
+      - name: metricbeat-{{ .Chart.Name }}
+        configMap:
+          name: {{ include "openvidu.fullname" . }}-metricbeat
