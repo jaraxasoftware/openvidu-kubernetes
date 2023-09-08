@@ -112,7 +112,17 @@ data:
         output:
           elasticsearch:
             hosts: ["${OPENVIDU_PRO_ELASTICSEARCH_HOST}"]
+            index: "metricbeat-%{+yyyy.MM.dd}"
             username: "${ELASTICSEARCH_USERNAME}"
             password: "${ELASTICSEARCH_PASSWORD}"
-        setup.ilm.enabled: false    
+        setup:
+          dashboards: 
+            enabled: false
+          kibana:
+            path: /kibana
+          ilm:
+            enabled: false
+          template:
+            name: "metricbeat"
+            pattern: "metricbeat-*"            
 
