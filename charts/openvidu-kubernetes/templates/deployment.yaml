@@ -78,48 +78,31 @@ spec:
         envFrom:
         - configMapRef:
             name: {{ include "openvidu.fullname" $ }}
-        volumeMounts:
-        {{- if $.Values.ingress.enabled }}
-          {{- if $.Values.services.openvidu.ssl.enabled }} 
-            {{- if $val.certDir }}
-        - name: tls-{{ $.Chart.Name }}
-          mountPath: {{ $val.certDir }}certificate.crt
-          subPath: tls.crt
-        - name: tls-{{ $.Chart.Name }}
-          mountPath: {{ $val.certDir }}certificate.key
-          subPath: tls.key
-            {{- end }}
-          {{- end }}       
-        {{- end }}
-        {{- if eq $name "metricbeat" }}
+        volumeMounts:            
+        {{- if eq $name "metricbeat" }}    
         - name: metricbeat-{{ $.Chart.Name }}
           readOnly: true
           mountPath: /usr/share/metricbeat/metricbeat.yml
           subPath: metricbeat.yml
         - name: docker-socket
           mountPath: /var/run/docker.sock 
-          readOnly: true
-        {{- end }}
-        {{- if eq $name "filebeat" }}
-        - name: filebeat-{{ $.Chart.Name }}
-          readOnly: true
-          mountPath: /usr/share/filebeat/filebeat.yml
-          subPath: filebeat.yml
-        - name: docker-socket
-          mountPath: /var/run/docker.sock
-          readOnly: true
-        - name: docker-lib
-          mountPath: /var/lib/docker/containers
-          readOnly: true
-        {{- end }}        
-        {{- if eq $name "media-node-controller" }}
+          readOnly: true 
+        {{- else if eq $name "media-node-controller" }}
         - name: docker-socket
           mountPath: /var/run/docker.sock
           readOnly: true
         - name: docker-lib
           mountPath: /var/lib/docker/containers
           readOnly: true          
-        {{- end }}                   
+        {{- else if eq $name "logging" }}    
+        - name: filebeat-{{ $.Chart.Name }}
+          readOnly: true
+          mountPath: /usr/share/filebeat/filebeat.yml
+          subPath: filebeat.yml
+        - name: docker-socket
+          mountPath: /var/run/docker.sock 
+          readOnly: true        
+        {{- end }}
         {{- end }}
         resources:
           {{- toYaml $.Values.resources | nindent 12 }}
@@ -147,6 +130,9 @@ spec:
       - name: metricbeat-{{ .Chart.Name }}
         configMap:
           name: {{ include "openvidu.fullname" . }}-metricbeat
+      - name: filebeat-{{ .Chart.Name }}
+        configMap:
+          name: {{ include "openvidu.fullname" . }}-filebeat          
       - name: docker-socket
         hostPath:
           path: /var/run/docker.sock

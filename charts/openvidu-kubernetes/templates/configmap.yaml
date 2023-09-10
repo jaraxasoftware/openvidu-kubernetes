@@ -223,5 +223,5 @@ data:
         logging.json: true
         logging.metrics.enabled: false
         setup.ilm.enabled: false
-                    
+---                    
 
