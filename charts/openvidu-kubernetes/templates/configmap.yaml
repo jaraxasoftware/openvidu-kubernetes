@@ -145,10 +145,11 @@ data:
             - type: kubernetes
               include_pod_uid: true
               in_cluster: true
+              host: '${NODE_NAME}'              
               include_annotations: '*'
               templates:
                 - condition.and:
-                    - equals:
+                    - contains:
                         kubernetes.pod.name: "openvidu-kubernetes"
                     - not.contains:
                         kubernetes.container.name: "filebeat"
@@ -165,9 +166,11 @@ data:
                         path: "/var/log/pods/*${data.kubernetes.pod.uid}/"
                         ids:
                           - "${data.kubernetes.container.name}"
+        processors:
+          - add_cloud_metadata:
+          - add_container_metadata:                    
         output:
-          elasticsearch:
-            host: '${NODE_NAME}'          
+          elasticsearch:          
             hosts: ["${OPENVIDU_PRO_ELASTICSEARCH_HOST}"]
             username: "${ELASTICSEARCH_USERNAME}"
             password: "${ELASTICSEARCH_PASSWORD}"
