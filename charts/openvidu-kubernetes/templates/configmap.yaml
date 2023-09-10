@@ -145,7 +145,7 @@ data:
             - type: kubernetes
               include_pod_uid: true
               in_cluster: true
-              host: '${NODE_NAME}'              
+              host: '${HOSTNAME}'              
               include_annotations: '*'
               templates:
                 - condition.and:
@@ -168,6 +168,15 @@ data:
                           - "${data.kubernetes.container.name}"
         processors:
           - add_cloud_metadata:
+          - add_kubernetes_metadata:
+              in_cluster: true
+              default_matchers.enabled: false
+              default_indexers.enabled: false
+              host: ${NODE_NAME}
+              matchers:
+                - logs_path:
+                    logs_path: '/var/log/pods'
+                    resource_type: 'pod'          
           - add_docker_metadata:                    
         output:
           elasticsearch:          
