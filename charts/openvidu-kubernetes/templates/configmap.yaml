@@ -67,6 +67,7 @@ data:
   OPENVIDU_PRO_STATS_MONITORING_INTERVAL: "30"
   ELASTICSEARCH_USERNAME: "{{- .Values.services.openvidu.pro.elasticsearch.user }}"
   ELASTICSEARCH_PASSWORD: "{{- .Values.services.openvidu.pro.elasticsearch.password }}"
+  MEDIA_NODE_IP: "localhost"
     {{- end }}
   {{- end }}
 ---
@@ -106,6 +107,7 @@ data:
             period: ${OPENVIDU_PRO_STATS_MONITORING_INTERVAL}s
             cpu.metrics: [normalized_percentages]
         fields:
+            ip: "${MEDIA_NODE_IP}"
             cluster_id: ${OPENVIDU_PRO_CLUSTER_ID:${DOMAIN_OR_PUBLIC_IP:undefined}}
             node_id: master_${OPENVIDU_PRO_CLUSTER_ID:${DOMAIN_OR_PUBLIC_IP:undefined}}
             node_role: masternode
