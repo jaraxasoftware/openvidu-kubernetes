@@ -137,52 +137,34 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
 data:
     filebeat.yml: |
-        filebeat.inputs:
-          - type: log
-            paths:
-              - /var/log/pods/{{ .Release.Name }}_{{ include "openvidu.name" . }}*/kms/*.log'
-            fields:
-              kurento-media-server: true
-              ip: "${MEDIA_NODE_IP}"
-              cluster_id: ${OPENVIDU_PRO_CLUSTER_ID:${DOMAIN_OR_PUBLIC_IP:undefined}}
-              node_id: medianode_${OPENVIDU_PRO_CLUSTER_ID:${DOMAIN_OR_PUBLIC_IP:undefined}}
-              node_role: medianode
-            fields_under_root: true
-          - type: container
-            paths:
-              - '/var/log/pods/{{ .Release.Name }}_{{ include "openvidu.name" . }}*/*/*.log'
-            fields:
-                cluster_id: ${OPENVIDU_PRO_CLUSTER_ID:${DOMAIN_OR_PUBLIC_IP:undefined}}
-                node_id: master_${OPENVIDU_PRO_CLUSTER_ID:${DOMAIN_OR_PUBLIC_IP:undefined}}
-                node_role: masternode
-            fields_under_root: true
-        processors:
-          - add_docker_metadata:
-              host: "unix:///var/run/docker.sock"
-          - add_host_metadata:
-              netinfo.enabled: true
-          - decode_json_fields:
-              fields: ["message"]
-              target: "json"
-              overwrite_keys: true
-          - drop_event:
-              when.or:
-                - contains:
-                    container.image.name: docker.elastic.co/beats/filebeat-oss
-                - contains:
-                    container.image.name: docker.elastic.co/beats/metricbeat-oss
-                - contains:
-                    container.image.name: ghcr.io/jaraxasoftware/coturn-kubernetes
-                - contains:
-                    container.image.name: docker.elastic.co/elasticsearch/elasticsearch
-                - contains:
-                    container.image.name: docker.elastic.co/kibana/kibana
-                - contains:
-                    container.image.name: docker.elastic.co/beats/filebeat-oss
-                - contains:
-                    container.image.name: docker.elastic.co/beats/metricbeat-oss
-                - contains:
-                    container.image.name: openvidu/openvidu-server-pro
+        filebeat.config.modules:
+          enabled: true
+          path: ${path.config}/modules.d/*.yml
+        filebeat.autodiscover:
+          providers:
+            - type: kubernetes
+              include_pod_uid: true
+              in_cluster: true
+              include_annotations: '*'
+              templates:
+                - condition.and:
+                    - equals:
+                        kubernetes.pod.name: "openvidu-kubernetes"
+                    - not.contains:
+                        kubernetes.container.name: "filebeat"
+                    - not.contains:
+                        kubernetes.container.name: "metricbeat"
+                    - not.contains:
+                        kubernetes.container.name: "openvidu-server"                                                                 
+                  config:
+                    - type: docker
+                      combine_partial: true
+                      cri.parse_flags: true
+                      cri.force: true
+                      containers:
+                        path: "/var/log/pods/*${data.kubernetes.pod.uid}/"
+                        ids:
+                          - "${data.kubernetes.container.name}"
         output:
           elasticsearch:
             hosts: ["${OPENVIDU_PRO_ELASTICSEARCH_HOST}"]
