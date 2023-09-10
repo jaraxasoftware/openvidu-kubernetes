@@ -168,7 +168,7 @@ data:
                           - "${data.kubernetes.container.name}"
         processors:
           - add_cloud_metadata:
-          - add_container_metadata:                    
+          - add_docker_metadata:                    
         output:
           elasticsearch:          
             hosts: ["${OPENVIDU_PRO_ELASTICSEARCH_HOST}"]

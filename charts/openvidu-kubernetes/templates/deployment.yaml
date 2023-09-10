@@ -75,6 +75,10 @@ spec:
           value: {{ quote $pval }}
         {{- end }}
         {{- end }}
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName        
         envFrom:
         - configMapRef:
             name: {{ include "openvidu.fullname" $ }}
