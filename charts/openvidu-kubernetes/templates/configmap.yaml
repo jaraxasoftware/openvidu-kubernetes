@@ -167,6 +167,7 @@ data:
                           - "${data.kubernetes.container.name}"
         output:
           elasticsearch:
+            host: '${NODE_NAME}'          
             hosts: ["${OPENVIDU_PRO_ELASTICSEARCH_HOST}"]
             username: "${ELASTICSEARCH_USERNAME}"
             password: "${ELASTICSEARCH_PASSWORD}"
