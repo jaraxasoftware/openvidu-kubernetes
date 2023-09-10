@@ -140,7 +140,7 @@ data:
         filebeat.inputs:
           - type: log
             paths:
-              - /var/log/kurento-media-server/*.log
+              - /var/log/pods/{{ .Release.Name }}_{{ include "openvidu.name" . }}*/kms/*.log'
             fields:
               kurento-media-server: true
               ip: "${MEDIA_NODE_IP}"
@@ -150,7 +150,7 @@ data:
             fields_under_root: true
           - type: container
             paths:
-              - '/var/log/pods/*/*.log'
+              - '/var/log/pods/{{ .Release.Name }}_{{ include "openvidu.name" . }}*/*/*.log'
             fields:
                 cluster_id: ${OPENVIDU_PRO_CLUSTER_ID:${DOMAIN_OR_PUBLIC_IP:undefined}}
                 node_id: master_${OPENVIDU_PRO_CLUSTER_ID:${DOMAIN_OR_PUBLIC_IP:undefined}}
