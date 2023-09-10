@@ -74,10 +74,12 @@ spec:
         - name: {{ $pkey }}
           value: {{ quote $pval }}
         {{- end }}
+        {{- else if eq $name "logging"}}
+        env:
         - name: NODE_NAME
           valueFrom:
             fieldRef:
-              fieldPath: spec.nodeName         
+              fieldPath: spec.nodeName      
         {{- end }}     
         envFrom:
         - configMapRef:
