@@ -145,6 +145,7 @@ data:
             paths:
               - /var/log/kurento-media-server/*.log
             fields:
+              kurento-media-server: true
               ip: "${MEDIA_NODE_IP}"
               cluster_id: ${OPENVIDU_PRO_CLUSTER_ID:${DOMAIN_OR_PUBLIC_IP:undefined}}
               node_id: medianode_${OPENVIDU_PRO_CLUSTER_ID:${DOMAIN_OR_PUBLIC_IP:undefined}}
