@@ -90,10 +90,7 @@ spec:
         {{- else if eq $name "media-node-controller" }}
         - name: docker-socket
           mountPath: /var/run/docker.sock
-          readOnly: true
-        - name: docker-lib
-          mountPath: /var/lib/docker/containers
-          readOnly: true          
+          readOnly: true         
         {{- else if eq $name "logging" }}    
         - name: filebeat-{{ $.Chart.Name }}
           readOnly: true
@@ -101,7 +98,10 @@ spec:
           subPath: filebeat.yml
         - name: docker-socket
           mountPath: /var/run/docker.sock 
-          readOnly: true        
+          readOnly: true 
+        - name: docker-lib
+          mountPath: /var/lib/docker/containers
+          readOnly: true                 
         {{- end }}
         {{- end }}
         resources:
