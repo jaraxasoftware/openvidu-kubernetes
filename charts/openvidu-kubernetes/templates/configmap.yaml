@@ -138,9 +138,6 @@ metadata:
 data:
     filebeat.yml: |
         filebeat.inputs:
-          - type: container
-            paths:
-              - '/var/lib/docker/containers/*/*.log'
           - type: log
             paths:
               - /var/log/kurento-media-server/*.log
@@ -196,26 +193,10 @@ data:
                 when.or:
                   - equals:
                       kurento-media-server: true
-              - index: "filebeat-mediasoup-%{+yyyy.MM.dd}"
-                when.or:
-                  - contains:
-                      container.image.name: openvidu/mediasoup-controller
               - index: "filebeat-media-node-controller-%{+yyyy.MM.dd}"
                 when.or:
                   - contains:
                       container.image.name: openvidu/media-node-controller
-              - index: "filebeat-openvidu-recording-%{+yyyy.MM.dd}"
-                when.or:
-                  - contains:
-                      container.image.name: openvidu/openvidu-recording
-              - index: "filebeat-nginx-%{+yyyy.MM.dd}"
-                when.or:
-                  - contains:
-                      container.image.name: openvidu/openvidu-proxy
-              - index: "filebeat-speech-to-text-%{+yyyy.MM.dd}"
-                when.or:
-                  - contains:
-                      container.image.name: openvidu/speech-to-text-service
             pipelines:
               - pipeline: kurento-pipeline
                 when.or:
@@ -223,5 +204,10 @@ data:
                       kurento-media-server: true
         logging.json: true
         logging.metrics.enabled: false
-        setup.ilm.enabled: false
+        setup:
+          ilm:
+            enabled: false
+          template:
+            name: "filebeat"
+            pattern: "filebeat-*"        
 ---
