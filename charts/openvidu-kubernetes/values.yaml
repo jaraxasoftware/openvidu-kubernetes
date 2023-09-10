@@ -121,11 +121,20 @@ services:
     env:
       KMS_MIN_PORT: "40000"
       KMS_MAX_PORT: "45000"
+      KURENTO_LOGS_PATH: "/var/log/kurento-media-server/"
+          
 
   metricbeat:
     enabled: false
     image: 
       repository: docker.elastic.co/beats/metricbeat-oss
+      fixed_tag: 7.17.9
+      pullPolicy: IfNotPresent
+
+  filebeat:
+    enabled: false
+    image: 
+      repository: docker.elastic.co/beats/filebeat-oss
       fixed_tag: 7.17.9
       pullPolicy: IfNotPresent
 

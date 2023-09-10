@@ -96,10 +96,29 @@ spec:
           readOnly: true
           mountPath: /usr/share/metricbeat/metricbeat.yml
           subPath: metricbeat.yml
+        - name: docker-socket
+          mountPath: /var/run/docker.sock 
+          readOnly: true
         {{- end }}
+        {{- if eq $name "filebeat" }}
+        - name: filebeat-{{ $.Chart.Name }}
+          readOnly: true
+          mountPath: /usr/share/filebeat/filebeat.yml
+          subPath: filebeat.yml
+        - name: docker-socket
+          mountPath: /var/run/docker.sock
+          readOnly: true
+        - name: docker-lib
+          mountPath: /var/lib/docker/containers
+          readOnly: true
+        {{- end }}        
         {{- if eq $name "media-node-controller" }}
         - name: docker-socket
           mountPath: /var/run/docker.sock
+          readOnly: true
+        - name: docker-lib
+          mountPath: /var/lib/docker/containers
+          readOnly: true          
         {{- end }}                   
         {{- end }}
         resources:
@@ -131,3 +150,6 @@ spec:
       - name: docker-socket
         hostPath:
           path: /var/run/docker.sock
+      - name: docker-lib
+        hostPath:
+          path: /var/lib/docker/containers

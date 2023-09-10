@@ -126,5 +126,102 @@ data:
             enabled: false
           template:
             name: "metricbeat"
-            pattern: "metricbeat-*"            
+            pattern: "metricbeat-*"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "openvidu.fullname" . }}-filebeat
+  labels:
+    app.kubernetes.io/name: {{ include "openvidu.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+data:
+    filebeat.yml: |
+        filebeat.inputs:
+          - type: container
+            paths:
+              - '/var/lib/docker/containers/*/*.log'
+          - type: log
+            paths:
+              - ${KURENTO_LOGS_PATH}*.log
+            fields:
+              ip: "${MEDIA_NODE_IP}"
+              cluster_id: ${OPENVIDU_PRO_CLUSTER_ID:${DOMAIN_OR_PUBLIC_IP:undefined}}
+              node_id: medianode_${OPENVIDU_PRO_CLUSTER_ID:${DOMAIN_OR_PUBLIC_IP:undefined}}
+              node_role: medianode
+            fields_under_root: true
+          - type: container
+            paths:
+              - '/var/lib/docker/containers/*/*.log'
+            fields:
+                cluster_id: ${OPENVIDU_PRO_CLUSTER_ID:${DOMAIN_OR_PUBLIC_IP:undefined}}
+                node_id: master_${OPENVIDU_PRO_CLUSTER_ID:${DOMAIN_OR_PUBLIC_IP:undefined}}
+                node_role: masternode
+            fields_under_root: true
+        processors:
+          - add_docker_metadata:
+              host: "unix:///var/run/docker.sock"
+          - add_host_metadata:
+              netinfo.enabled: true
+          - decode_json_fields:
+              fields: ["message"]
+              target: "json"
+              overwrite_keys: true
+          - drop_event:
+              when.or:
+                - contains:
+                    container.image.name: docker.elastic.co/beats/filebeat-oss
+                - contains:
+                    container.image.name: docker.elastic.co/beats/metricbeat-oss
+                - contains:
+                    container.image.name: ghcr.io/jaraxasoftware/coturn-kubernetes
+                - contains:
+                    container.image.name: docker.elastic.co/elasticsearch/elasticsearch
+                - contains:
+                    container.image.name: docker.elastic.co/kibana/kibana
+                - contains:
+                    container.image.name: docker.elastic.co/beats/filebeat-oss
+                - contains:
+                    container.image.name: docker.elastic.co/beats/metricbeat-oss
+                - contains:
+                    container.image.name: openvidu/openvidu-server-pro
+        output:
+          elasticsearch:
+            hosts: ["${OPENVIDU_PRO_ELASTICSEARCH_HOST}"]
+            username: "${ELASTICSEARCH_USERNAME}"
+            password: "${ELASTICSEARCH_PASSWORD}"
+            indices:
+              - index: "filebeat-kurento-%{+yyyy.MM.dd}"
+                when.or:
+                  - equals:
+                      kurento-media-server: true
+              - index: "filebeat-mediasoup-%{+yyyy.MM.dd}"
+                when.or:
+                  - contains:
+                      container.image.name: openvidu/mediasoup-controller
+              - index: "filebeat-media-node-controller-%{+yyyy.MM.dd}"
+                when.or:
+                  - contains:
+                      container.image.name: openvidu/media-node-controller
+              - index: "filebeat-openvidu-recording-%{+yyyy.MM.dd}"
+                when.or:
+                  - contains:
+                      container.image.name: openvidu/openvidu-recording
+              - index: "filebeat-nginx-%{+yyyy.MM.dd}"
+                when.or:
+                  - contains:
+                      container.image.name: openvidu/openvidu-proxy
+              - index: "filebeat-speech-to-text-%{+yyyy.MM.dd}"
+                when.or:
+                  - contains:
+                      container.image.name: openvidu/speech-to-text-service
+            pipelines:
+              - pipeline: kurento-pipeline
+                when.or:
+                  - equals:
+                      kurento-media-server: true
+        logging.json: true
+        logging.metrics.enabled: false
+        setup.ilm.enabled: false
+                    
 
