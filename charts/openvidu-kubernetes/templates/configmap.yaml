@@ -150,7 +150,7 @@ data:
             fields_under_root: true
           - type: container
             paths:
-              - '/var/lib/docker/containers/*/*.log'
+              - '/var/log/pods/*/*.log'
             fields:
                 cluster_id: ${OPENVIDU_PRO_CLUSTER_ID:${DOMAIN_OR_PUBLIC_IP:undefined}}
                 node_id: master_${OPENVIDU_PRO_CLUSTER_ID:${DOMAIN_OR_PUBLIC_IP:undefined}}
