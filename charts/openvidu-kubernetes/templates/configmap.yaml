@@ -143,7 +143,7 @@ data:
               - '/var/lib/docker/containers/*/*.log'
           - type: log
             paths:
-              - ${KURENTO_LOGS_PATH}*.log
+              - /var/log/kurento-media-server/*.log
             fields:
               ip: "${MEDIA_NODE_IP}"
               cluster_id: ${OPENVIDU_PRO_CLUSTER_ID:${DOMAIN_OR_PUBLIC_IP:undefined}}
@@ -223,5 +223,4 @@ data:
         logging.json: true
         logging.metrics.enabled: false
         setup.ilm.enabled: false
----                    
-
+---
