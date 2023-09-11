@@ -51,7 +51,7 @@ spec:
             {{- end }}          
           {{- end }}
           {{- end }}
-        {{- if eq $name "media-server-node"}}          
+        {{- if eq $name "media-node-controller"}}          
         livenessProbe:
           httpGet:
             path: /
