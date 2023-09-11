@@ -110,7 +110,7 @@ data:
             ip: "${MEDIA_NODE_IP}"
             cluster_id: ${OPENVIDU_PRO_CLUSTER_ID:${DOMAIN_OR_PUBLIC_IP:undefined}}
             node_id: master_${OPENVIDU_PRO_CLUSTER_ID:${DOMAIN_OR_PUBLIC_IP:undefined}}
-            node_role: medianode
+            node_role: masternode
         output:
           elasticsearch:
             hosts: ["${OPENVIDU_PRO_ELASTICSEARCH_HOST}"]
@@ -142,7 +142,7 @@ data:
           type: kubernetes
           hints.default_config.enabled: "false"
           templates:
-          - condition.contains.kubernetes.pod: "openvidu-kubernetes"
+          - condition.contains.kubernetes.pod.name: "openvidu-kubernetes"
             config:
             - paths: ["/var/log/containers/*${data.kubernetes.container.id}.log"]
               type: container
