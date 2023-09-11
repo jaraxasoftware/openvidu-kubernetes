@@ -54,7 +54,7 @@ spec:
         {{- if eq $name "media-node-controller"}}          
         livenessProbe:
           httpGet:
-            path: /media-node/
+            path: /media-node
             port: {{ $val.port }}
           initialDelaySeconds: {{ $.Values.livenessProbe.initialDelaySeconds }}
           periodSeconds: {{ $.Values.livenessProbe.periodSeconds }}
