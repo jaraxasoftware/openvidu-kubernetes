@@ -84,7 +84,19 @@ spec:
         envFrom:
         - configMapRef:
             name: {{ include "openvidu.fullname" $ }}              
-        volumeMounts:            
+        volumeMounts:
+        {{- if $.Values.ingress.enabled }}
+          {{- if $.Values.services.openvidu.ssl.enabled }} 
+            {{- if $val.certDir }}
+        - name: tls-{{ .Chart.Name }}
+          mountPath: {{ $val.certDir }}certificate.crt
+          subPath: tls.crt
+        - name: tls-{{ .Chart.Name }}
+          mountPath: {{ $val.certDir }}certificate.key
+          subPath: tls.key
+            {{- end }}
+          {{- end }}
+        {{- end }}                    
         {{- if eq $name "metricbeat" }}    
         - name: metricbeat-{{ $.Chart.Name }}
           readOnly: true
