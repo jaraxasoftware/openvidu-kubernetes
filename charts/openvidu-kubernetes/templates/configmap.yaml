@@ -110,7 +110,7 @@ data:
             ip: "${MEDIA_NODE_IP}"
             cluster_id: ${OPENVIDU_PRO_CLUSTER_ID:${DOMAIN_OR_PUBLIC_IP:undefined}}
             node_id: master_${OPENVIDU_PRO_CLUSTER_ID:${DOMAIN_OR_PUBLIC_IP:undefined}}
-            node_role: masternode
+            node_role: medianode
         output:
           elasticsearch:
             hosts: ["${OPENVIDU_PRO_ELASTICSEARCH_HOST}"]
@@ -137,43 +137,18 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
 data:
     filebeat.yml: |
-        filebeat.config.modules:
-          enabled: true
-          path: ${path.config}/modules.d/*.yml
-        filebeat.autodiscover:
-          providers:
-            - type: kubernetes
-              include_pod_uid: true
-              in_cluster: true
-              host: '${HOSTNAME}'              
-              include_annotations: '*'
-              templates:
-                - condition.and:
-                    - contains:
-                        kubernetes.pod.name: "openvidu-kubernetes"
-                    - not.contains:
-                        kubernetes.container.name: "filebeat"
-                    - not.contains:
-                        kubernetes.container.name: "metricbeat"
-                    - not.contains:
-                        kubernetes.container.name: "openvidu-server"                                                                 
-                  config:
-                    - type: docker
-                      combine_partial: true
-                      cri.parse_flags: true
-                      cri.force: true
-                      containers:
-                        path: "/var/log/pods/*${data.kubernetes.pod.uid}/"
-                        ids:
-                          - "${data.kubernetes.container.name}"
+        filebeat.autodiscover.providers:
+        - node: ${NODE_NAME}
+          type: kubernetes
+          hints.default_config.enabled: "false"
+          templates:
+          - condition.equals.kubernetes.pod: openvidu-kubernetes
+            config:
+            - paths: ["/var/log/containers/*${data.kubernetes.container.id}.log"]
+              type: container
         processors:
-          - add_cloud_metadata:
-          - add_kubernetes_metadata:
-              in_cluster: true
-              default_matchers.enabled: false
-              default_indexers.enabled: false
-              host: ${NODE_NAME}         
-          - add_docker_metadata:                    
+        - add_cloud_metadata: {}
+        - add_host_metadata: {}                
         output:
           elasticsearch:          
             hosts: ["${OPENVIDU_PRO_ELASTICSEARCH_HOST}"]

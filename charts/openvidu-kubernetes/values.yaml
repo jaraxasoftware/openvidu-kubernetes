@@ -110,6 +110,8 @@ services:
       fixed_tag: 2.27.0
       pullPolicy: IfNotPresent
     port: 3000
+    protocols:
+      - TCP    
     env: {}
 
   kms:
