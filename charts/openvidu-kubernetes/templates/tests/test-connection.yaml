@@ -11,5 +11,5 @@ spec:
     - name: wget
       image: busybox
       command: ['wget']
-      args:  ['{{ include "openvidu.fullname" . }}:{{ .Values.service.externalPort }}']
+      args:  ['{{ include "openvidu.fullname" . }}-master:{{ .Values.service.externalPort }}']
   restartPolicy: Never
