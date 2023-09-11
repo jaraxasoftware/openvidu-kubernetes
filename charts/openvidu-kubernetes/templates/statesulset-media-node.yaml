@@ -63,7 +63,7 @@ spec:
           failureThreshold: {{ $.Values.livenessProbe.failureThreshold }}
         readinessProbe:
           httpGet:
-            path: /
+            path: /media-node
             port: {{ $val.port }}
           initialDelaySeconds: {{ $.Values.readinessProbe.initialDelaySeconds }}            
           periodSeconds: {{ $.Values.readinessProbe.periodSeconds }}
