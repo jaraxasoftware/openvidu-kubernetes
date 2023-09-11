@@ -18,9 +18,13 @@ service:
   name: openvidu
   externalPort: 5443
 
+# Mandatory. Can be deployment or distributed
+mode: distributed
+
 services:
   openvidu:
     enabled: true
+    type: master
     image: 
       repository: openvidu/openvidu-server
       tag: 2.27.0
@@ -36,6 +40,8 @@ services:
       environment: on_premise
       autoscaling: false
       loadStrategy: streams
+      masterReplicas: 1
+      mediaNodeReplicas: 1
       elasticsearch: 
         enabled: false
         version: 7.17.9
@@ -105,18 +111,26 @@ services:
 
   media-node-controller:
     enabled: false
+    type: media
     image: 
       repository: openvidu/media-node-controller
-      fixed_tag: 2.27.0
+      tag: 2.27.0
       pullPolicy: IfNotPresent
+    protocols:
+      - TCP        
+    port: 3000      
     env: {}
 
   kms:
-    enabled: true
+    enabled: false
+    type: media
     image: 
       repository: kurento/kurento-media-server
-      fixed_tag: 7.0.1
+      tag: 7.0.1
       pullPolicy: IfNotPresent
+    protocols:
+      - TCP        
+    port: 8888
     env:
       KURENTO_LOGS_PATH: "/var/log/kurento-media-server/"
       KMS_MIN_PORT: "40000"
@@ -124,23 +138,26 @@ services:
 
   logging:
     enabled: false
+    type: monitoring
     image: 
       repository: docker.elastic.co/beats/filebeat-oss
-      fixed_tag: 7.17.9
+      tag: 7.17.9
       pullPolicy: IfNotPresent
 
   metricbeat:
     enabled: false
+    type: monitoring
     image: 
       repository: docker.elastic.co/beats/metricbeat-oss
-      fixed_tag: 7.17.9
+      tag: 7.17.9
       pullPolicy: IfNotPresent
 
   openvidu-call:
     enabled: false
+    type: test
     image: 
       repository: openvidu/openvidu-call
-      fixed_tag: 2.27.0
+      tag: 2.27.0
       pullPolicy: IfNotPresent
     protocols:
       - TCP        

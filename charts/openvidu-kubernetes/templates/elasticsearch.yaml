@@ -151,7 +151,7 @@ rules:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: {{ include "openvidu.fullname" . }}-filebeat
+  name: {{ include "openvidu.fullname" . }}-logging
   namespace: {{ .Release.Namespace }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -160,7 +160,7 @@ metadata:
   name: {{ include "openvidu.fullname" . }}-filebeat
 subjects:
 - kind: ServiceAccount
-  name: {{ include "openvidu.fullname" . }}-filebeat
+  name: {{ include "openvidu.fullname" . }}-logging
   namespace: {{ .Release.Namespace }}
 roleRef:
   kind: ClusterRole
