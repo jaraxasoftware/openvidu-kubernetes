@@ -152,6 +152,7 @@ data:
         output:
           elasticsearch:          
             hosts: ["${OPENVIDU_PRO_ELASTICSEARCH_HOST}"]
+            index: "filebeat-%{+yyyy.MM.dd}"
             username: "${ELASTICSEARCH_USERNAME}"
             password: "${ELASTICSEARCH_PASSWORD}"
             indices:
