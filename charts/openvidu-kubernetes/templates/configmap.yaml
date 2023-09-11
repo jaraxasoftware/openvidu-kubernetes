@@ -172,11 +172,7 @@ data:
               in_cluster: true
               default_matchers.enabled: false
               default_indexers.enabled: false
-              host: ${NODE_NAME}
-              matchers:
-                - logs_path:
-                    logs_path: '/var/log/pods'
-                    resource_type: 'pod'          
+              host: ${NODE_NAME}         
           - add_docker_metadata:                    
         output:
           elasticsearch:          
