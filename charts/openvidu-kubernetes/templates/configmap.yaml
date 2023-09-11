@@ -157,14 +157,14 @@ data:
             indices:
               - index: "filebeat-kurento-%{+yyyy.MM.dd}"
                 when.or:
-                  - ${data.kubernetes.container.name}: "kms"
+                  - kubernetes.container.name: "kms"
               - index: "filebeat-media-node-controller-%{+yyyy.MM.dd}"
                 when.or:
-                  - ${data.kubernetes.container.name}: "media-node-controller"
+                  - kubernetes.container.name: "media-node-controller"
             pipelines:
               - pipeline: kurento-pipeline
                 when.or:
-                  - ${data.kubernetes.container.name}: "kms"
+                  - kubernetes.container.name: "kms"
         logging.json: true
         logging.metrics.enabled: false
         setup:

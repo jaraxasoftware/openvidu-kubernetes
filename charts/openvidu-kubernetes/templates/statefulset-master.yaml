@@ -12,6 +12,8 @@ metadata:
 spec:
   serviceName: {{ include "openvidu.fullname" . }}-master
   replicas: {{ .Values.services.openvidu.masterReplicas }}
+  updateStrategy:
+    type: {{ .Values.updateStrategy }}  
   selector:
     matchLabels:
       app: {{ include "openvidu.fullname" . }}

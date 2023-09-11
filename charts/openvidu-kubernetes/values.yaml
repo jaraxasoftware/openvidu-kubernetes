@@ -21,6 +21,8 @@ service:
 # Mandatory. Can be deployment or distributed
 mode: deployment
 
+updateStrategy: OnDelete
+
 services:
   openvidu:
     enabled: true
