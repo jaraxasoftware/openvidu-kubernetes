@@ -161,7 +161,7 @@ metadata:
 subjects:
 - kind: ServiceAccount
   name: {{ include "openvidu.fullname" . }}-filebeat
-  namespace: default
+  namespace: {{ .Release.Namespace }}
 roleRef:
   kind: ClusterRole
   name: {{ include "openvidu.fullname" . }}-filebeat
