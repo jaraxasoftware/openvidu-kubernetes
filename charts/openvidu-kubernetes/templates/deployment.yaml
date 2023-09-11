@@ -130,11 +130,6 @@ spec:
     {{- end }}
       serviceAccountName: {{ include "openvidu.fullname" $ }}-filebeat
       automountServiceAccountToken: true
-      terminationGracePeriodSeconds: 30        
-      securityContext:
-        runAsUser: 0
-      dnsPolicy: ClusterFirstWithHostNet
-      hostNetwork: true
       volumes:
       {{- if .Values.ingress.enabled }}
         {{- if .Values.services.openvidu.ssl.enabled }}   
