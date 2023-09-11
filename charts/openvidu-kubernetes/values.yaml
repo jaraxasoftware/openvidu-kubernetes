@@ -19,7 +19,7 @@ service:
   externalPort: 5443
 
 # Mandatory. Can be deployment or distributed
-mode: distributed
+mode: deployment
 
 services:
   openvidu:
@@ -122,7 +122,7 @@ services:
     env: {}
 
   kms:
-    enabled: false
+    enabled: true
     type: media
     image: 
       repository: kurento/kurento-media-server

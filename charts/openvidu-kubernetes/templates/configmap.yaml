@@ -67,7 +67,7 @@ data:
   OPENVIDU_PRO_STATS_MONITORING_INTERVAL: "30"
   ELASTICSEARCH_USERNAME: "{{- .Values.services.openvidu.pro.elasticsearch.user }}"
   ELASTICSEARCH_PASSWORD: "{{- .Values.services.openvidu.pro.elasticsearch.password }}"
-  MEDIA_NODE_IP: "localhost"
+  MEDIA_NODE_IP: "{{ include "openvidu.name" . }}-media-node"
     {{- end }}
   {{- end }}
 ---
@@ -110,7 +110,7 @@ data:
             ip: "${MEDIA_NODE_IP}"
             cluster_id: ${OPENVIDU_PRO_CLUSTER_ID:${DOMAIN_OR_PUBLIC_IP:undefined}}
             node_id: master_${OPENVIDU_PRO_CLUSTER_ID:${DOMAIN_OR_PUBLIC_IP:undefined}}
-            node_role: masternode
+            node_role: ${NODE_ROLE}
         output:
           elasticsearch:
             hosts: ["${OPENVIDU_PRO_ELASTICSEARCH_HOST}"]

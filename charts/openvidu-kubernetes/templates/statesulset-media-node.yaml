@@ -10,7 +10,8 @@ metadata:
   labels:
 {{ include "openvidu.labels" . | indent 4 }}
 spec:
-  replicas: {{ .Values.replicaCount }}
+  serviceName: {{ include "openvidu.fullname" . }}-media-node
+  replicas: {{ .Values.services.openvidu.masterReplicas }}
   selector:
     matchLabels:
       app: {{ include "openvidu.fullname" . }}   
@@ -23,8 +24,6 @@ spec:
         app.kubernetes.io/name: {{ include "openvidu.name" . }}-media-node
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
-      serviceName: {{ include "openvidu.fullname" . }}-media-node
-      replicas: {{ .Values.services.openvidu.masterReplicas }}
       imagePullSecrets:
 {{- range $pval := .Values.jx.imagePullSecrets }}
       - name: {{ quote $pval }}
@@ -77,12 +76,14 @@ spec:
         - name: {{ $pkey }}
           value: {{ quote $pval }}
         {{- end }}
-        {{- if eq $name "logging"}}                
-        env:
+        {{- if eq $name "logging"}}
         - name: NODE_NAME
           valueFrom:
             fieldRef:
-              fieldPath: spec.nodeName      
+              fieldPath: spec.nodeName
+        {{- else if eq $name "metricbeat" }}
+        - name: NODE_ROLE
+          value: medianode
         {{- end }}                        
         envFrom:
         - configMapRef:
