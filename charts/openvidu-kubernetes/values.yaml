@@ -167,7 +167,7 @@ services:
     env: {}
 
 ingress:
-  enabled: false
+  enabled: true
   annotations: {}
   paths:
     - /(.*)

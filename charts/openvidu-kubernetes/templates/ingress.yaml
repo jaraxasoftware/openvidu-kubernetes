@@ -30,7 +30,11 @@ spec:
             pathType: ImplementationSpecific          
             backend:
               service:
+              {{- if eq $.Values.mode "distributed" }}
+                name:  {{ $serviceName }}-master
+              {{- else }}
                 name:  {{ $serviceName }}
+              {{- end }}              
                 port:
                   number: {{ $servicePort }}
   {{- end -}}
@@ -43,7 +47,11 @@ spec:
             pathType: ImplementationSpecific          
             backend:
               service:
+              {{- if eq $.Values.mode "distributed" }}
+                name:  {{ $serviceName }}-master
+              {{- else }}
                 name:  {{ $serviceName }}
+              {{- end }}  
                 port:
                   number: {{ $servicePort }}
   {{- end -}}
