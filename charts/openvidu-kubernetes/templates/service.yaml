@@ -58,6 +58,7 @@ metadata:
 {{ include "openvidu.labels" . | indent 4 }}
 spec:
   type: {{ .Values.service.type }}
+  clusterIP: None
   ports:
   {{- range $name, $val := .Values.services }}
     {{- range $index, $proto :=  $val.protocols }}
