@@ -67,6 +67,7 @@ data:
   OPENVIDU_PRO_STATS_MONITORING_INTERVAL: "30"
   ELASTICSEARCH_USERNAME: "{{- .Values.services.openvidu.pro.elasticsearch.user }}"
   ELASTICSEARCH_PASSWORD: "{{- .Values.services.openvidu.pro.elasticsearch.password }}"
+  OPENVIDU_BROWSER_LOGS: "{{- .Values.services.openvidu.pro.browserLogs }}"
   MEDIA_NODE_IP: "{{ include "openvidu.name" . }}-media-node"
     {{- end }}
   {{- end }}

@@ -42,8 +42,10 @@ services:
       environment: on_premise
       autoscaling: false
       loadStrategy: streams
+      networkQoS: false      
       masterReplicas: 1
-      mediaNodeReplicas: 1
+      mediaNodeReplicas: 1  
+      browserLogs: disabled
       elasticsearch: 
         enabled: false
         version: 7.17.9
@@ -63,8 +65,7 @@ services:
           tls:
             - secretName: openvidu-secret
               hosts:
-                - openvidu.localhost        
-      networkQoS: false
+                - openvidu.localhost
     protocols:
       - TCP
     ssl:
