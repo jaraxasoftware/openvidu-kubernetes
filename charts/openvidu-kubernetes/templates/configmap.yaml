@@ -110,7 +110,7 @@ data:
         fields:
             ip: "${MEDIA_NODE_IP}"
             cluster_id: ${OPENVIDU_PRO_CLUSTER_ID:${DOMAIN_OR_PUBLIC_IP:undefined}}
-            node_id: master_${OPENVIDU_PRO_CLUSTER_ID:${DOMAIN_OR_PUBLIC_IP:undefined}}
+            node_id: ${NODE_ROLE}_${OPENVIDU_PRO_CLUSTER_ID:${DOMAIN_OR_PUBLIC_IP:undefined}}
             node_role: ${NODE_ROLE}
         output:
           elasticsearch:

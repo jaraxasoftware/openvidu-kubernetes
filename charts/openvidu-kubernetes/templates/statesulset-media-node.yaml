@@ -96,7 +96,11 @@ spec:
           subPath: metricbeat.yml
         - name: docker-socket
           mountPath: /var/run/docker.sock 
-          readOnly: true      
+          readOnly: true
+        {{- else if eq $name "media-node-controller" }}    
+        - name: docker-socket
+          mountPath: /var/run/docker.sock 
+          readOnly: true                    
         {{- else if eq $name "logging" }}    
         - name: filebeat-{{ $.Chart.Name }}
           readOnly: true
