@@ -11,7 +11,7 @@ metadata:
 {{ include "openvidu.labels" . | indent 4 }}
 spec:
   serviceName: {{ include "openvidu.fullname" . }}-media-node
-  replicas: {{ .Values.services.openvidu.masterReplicas }}
+  replicas: {{ .Values.services.openvidu.mediaNodeReplicas }}
   updateStrategy:
     type: {{ .Values.updateStrategy }}  
   selector:
