@@ -51,10 +51,9 @@ spec:
             {{- end }}          
           {{- end }}
           {{- end }}
-        {{- if eq $name "media-node-controller"}}          
+        {{- if eq $name "kms"}}          
         livenessProbe:
-          httpGet:
-            path: /media-node/status
+          tcpSocket:
             port: {{ $val.port }}
           initialDelaySeconds: {{ $.Values.livenessProbe.initialDelaySeconds }}
           periodSeconds: {{ $.Values.livenessProbe.periodSeconds }}
@@ -62,8 +61,7 @@ spec:
           timeoutSeconds: {{ $.Values.livenessProbe.timeoutSeconds }}
           failureThreshold: {{ $.Values.livenessProbe.failureThreshold }}
         readinessProbe:
-          httpGet:
-            path: /media-node/status
+          tcpSocket:
             port: {{ $val.port }}
           initialDelaySeconds: {{ $.Values.readinessProbe.initialDelaySeconds }}            
           periodSeconds: {{ $.Values.readinessProbe.periodSeconds }}
