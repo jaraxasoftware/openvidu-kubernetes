@@ -66,8 +66,16 @@ spec:
           timeoutSeconds: {{ $.Values.readinessProbe.timeoutSeconds }}
           failureThreshold: {{ $.Values.readinessProbe.failureThreshold }}
         {{- end }}
+        {{- if eq $name "openvidu" }}
+        resources:        
+          {{- toYaml $.Values.resourcesPro.master | nindent 10 }}
+        {{- else if eq $val.type "monitoring" }}
         resources:
-          {{- toYaml $.Values.resources | nindent 12 }}          
+          {{- toYaml $.Values.resourcesPro.monitoring | nindent 10 }}
+        {{- else }}
+        resources:
+          {{- toYaml $.Values.resources | nindent 12 }}        
+        {{- end }}
         env:
         {{- range $pkey, $pval := $val.env }}
         - name: {{ $pkey }}

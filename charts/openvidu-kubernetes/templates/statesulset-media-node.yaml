@@ -69,14 +69,22 @@ spec:
           timeoutSeconds: {{ $.Values.readinessProbe.timeoutSeconds }}
           failureThreshold: {{ $.Values.readinessProbe.failureThreshold }}
         {{- end }}          
+        {{- if eq $name "kms" }}
+        resources:        
+          {{- toYaml $.Values.resourcesPro.media | nindent 10 }}
+        {{- else if or (eq $val.type "monitoring") (eq $name "media-node-controller") }}
         resources:
-          {{- toYaml $.Values.resources | nindent 12 }}          
+          {{- toYaml $.Values.resourcesPro.monitoring | nindent 10 }}
+        {{- else }}
+        resources:
+          {{- toYaml $.Values.resources | nindent 12 }}        
+        {{- end }}     
         env:
         {{- range $pkey, $pval := $val.env }}
         - name: {{ $pkey }}
           value: {{ quote $pval }}
         {{- end }}
-        {{- if eq $name "logging"}}
+        {{- if eq $name "logging" }}
         - name: NODE_NAME
           valueFrom:
             fieldRef:
