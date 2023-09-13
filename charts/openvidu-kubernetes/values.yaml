@@ -195,27 +195,9 @@ readinessProbe:
   failureThreshold: 3
 
 resourcesPro:
-  master:
-    limits:
-      cpu: 1
-      memory: 2048Mi
-    requests:
-      cpu: 200m
-      memory: 512Mi
-  media:
-    limits:
-      cpu: 1
-      memory: 2048Mi
-    requests:
-      cpu: 200m
-      memory: 512Mi      
-  monitoring: 
-    limits:
-      cpu: 500
-      memory: 300Mi
-    requests:
-      cpu: 200m
-      memory: 100Mi
+  master: {}
+  media: {}
+  monitoring: {}
 
 resources: {}
 
