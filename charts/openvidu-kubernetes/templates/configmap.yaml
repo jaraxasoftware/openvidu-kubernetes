@@ -64,9 +64,10 @@ data:
     {{- if .Values.services.openvidu.pro.elasticsearch.enabled }}
   OPENVIDU_PRO_ELASTICSEARCH_HOST: "http://{{ include "openvidu.fullname" . }}-elasticsearch-es-internal-http:9200"
   OPENVIDU_PRO_KIBANA_HOST: "https://{{ index .Values.services.openvidu.pro.elasticsearch.kibanaIngress.hosts 0 }}/kibana"
-  OPENVIDU_PRO_STATS_MONITORING_INTERVAL: "30"
+  OPENVIDU_PRO_STATS_MONITORING_INTERVAL: "{{- .Values.services.openvidu.pro.monitoringInterval }}"
   ELASTICSEARCH_USERNAME: "{{- .Values.services.openvidu.pro.elasticsearch.user }}"
   ELASTICSEARCH_PASSWORD: "{{- .Values.services.openvidu.pro.elasticsearch.password }}"
+  OPENVIDU_PRO_ELASTICSEARCH_MAX_DAYS_DELETE: "{{- .Values.services.openvidu.pro.elasticsearch.daysRetention }}"
   OPENVIDU_BROWSER_LOGS: "{{- .Values.services.openvidu.pro.browserLogs }}"
   MEDIA_NODE_IP: "{{ include "openvidu.name" . }}-media-node"
     {{- end }}

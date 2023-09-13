@@ -46,6 +46,7 @@ services:
       masterReplicas: 1
       mediaNodeReplicas: 1  
       browserLogs: disabled
+      monitoringInterval: 30
       elasticsearch: 
         enabled: false
         version: 7.17.9
@@ -55,6 +56,7 @@ services:
         user: elastic
         password: changeme
         serviceType: ClusterIP
+        daysRetention: 7
         kibanaIngress:
           enabled: false
           annotations: {}
