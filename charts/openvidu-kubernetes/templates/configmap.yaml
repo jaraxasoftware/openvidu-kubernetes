@@ -16,7 +16,22 @@ data:
   COTURN_PORT: "{{ .Values.services.openvidu.coturn.port }}"
   COTURN_URIS_LIST: {{ .Values.services.openvidu.coturn.uris }}
   OPENVIDU_WEBRTC_ICE_SERVERS: '{{ .Values.services.openvidu.coturn.iceServers }}'
-  KMS_URIS: '{{ .Values.services.openvidu.kms.uris }}'
+  {{- if eq .Values.mode "distributed" }} 
+  KMS_URIS: [
+    {{- $replicas := (.Values.services.openvidu.pro.mediaNodeReplicas | int ) }}
+    {{- range $index, $element := until $replicas }}
+      {{- if $index }}, {{- end -}}
+      "ws://{{ include "openvidu.name" $ }}-media-node-{{$index}}.{{ include "openvidu.name" $ }}-media-node:8888/kurento"
+    {{- end -}}
+    ]
+  {{- else }}
+  KMS_URIS: '[{{- $uris := .Values.services.openvidu.kms.uris }}
+    {{- if gt (len $uris) 1 -}}
+    "{{- join "\",\"" $uris }}"
+    {{- else -}}
+    "{{ $uris | first }}"
+    {{- end -}}]'
+  {{- end }}
   {{- if .Values.services.openvidu.coturn.redis }}
   COTURN_REDIS_IP: "{{ .Values.services.openvidu.coturn.redis.ip }}"
   COTURN_REDIS_DBNAME: "{{ .Values.services.openvidu.coturn.redis.db }}"

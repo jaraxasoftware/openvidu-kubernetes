@@ -74,7 +74,8 @@ services:
       enabled: false
       certType: owncert
     kms:
-      uris: '["ws://localhost:8888/kurento"]'
+      uris: 
+        - "ws://localhost:8888/kurento"
     coturn:
       ip: localhost.openvidu
       port: 3478
