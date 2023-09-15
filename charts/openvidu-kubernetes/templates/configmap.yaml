@@ -17,13 +17,13 @@ data:
   COTURN_URIS_LIST: {{ .Values.services.openvidu.coturn.uris }}
   OPENVIDU_WEBRTC_ICE_SERVERS: '{{ .Values.services.openvidu.coturn.iceServers }}'
   {{- if eq .Values.mode "distributed" }} 
-  KMS_URIS: [
+  KMS_URIS: '[
     {{- $replicas := (.Values.services.openvidu.pro.mediaNodeReplicas | int ) }}
     {{- range $index, $element := until $replicas }}
       {{- if $index }}, {{- end -}}
       "ws://{{ include "openvidu.name" $ }}-media-node-{{$index}}.{{ include "openvidu.name" $ }}-media-node:8888/kurento"
     {{- end -}}
-    ]
+    ]'
   {{- else }}
   KMS_URIS: '[{{- $uris := .Values.services.openvidu.kms.uris }}
     {{- if gt (len $uris) 1 -}}
