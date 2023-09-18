@@ -75,7 +75,8 @@ data:
   OPENVIDU_PRO_CLUSTER_ENVIRONMENT: "{{- .Values.services.openvidu.pro.environment }}"
   OPENVIDU_PRO_CLUSTER_LOAD_STRATEGY: "{{- .Values.services.openvidu.pro.loadStrategy }}"
   OPENVIDU_PRO_NETWORK_QUALITY: "{{- .Values.services.openvidu.pro.networkQoS }}"
-  OPENVIDU_PRO_ELASTICSEARCH: "{{- .Values.services.openvidu.pro.elasticsearch.enabled }}"  
+  OPENVIDU_PRO_ELASTICSEARCH: "{{- .Values.services.openvidu.pro.elasticsearch.enabled }}" 
+  OPENVIDU_PRO_CLUSTER_RECONNECTION_TIMEOUT: "{{- .Values.services.openvidu.pro.mediaReconnTimeout }}" 
     {{- if .Values.services.openvidu.pro.elasticsearch.enabled }}
   OPENVIDU_PRO_ELASTICSEARCH_HOST: "http://{{ include "openvidu.fullname" . }}-elasticsearch-es-internal-http:9200"
   OPENVIDU_PRO_KIBANA_HOST: "https://{{ index .Values.services.openvidu.pro.elasticsearch.kibanaIngress.hosts 0 }}/kibana"

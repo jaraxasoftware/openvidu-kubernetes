@@ -44,7 +44,8 @@ services:
       loadStrategy: streams
       networkQoS: false      
       masterReplicas: 1
-      mediaNodeReplicas: 1  
+      mediaNodeReplicas: 1
+      mediaReconnTimeout: 5
       browserLogs: disabled
       monitoringInterval: 30
       elasticsearch: 
