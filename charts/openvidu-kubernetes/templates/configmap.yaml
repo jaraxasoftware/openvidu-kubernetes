@@ -160,7 +160,7 @@ data:
           type: kubernetes
           hints.default_config.enabled: "false"
           templates:
-          - condition.contains.kubernetes.pod.name: "openvidu-kubernetes"
+          - condition.contains.kubernetes.labels.app: "openvidu-kubernetes"
             config:
             - paths: ["/var/log/containers/*${data.kubernetes.container.id}.log"]
               type: container
