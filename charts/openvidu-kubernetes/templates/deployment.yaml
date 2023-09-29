@@ -149,16 +149,18 @@ spec:
           secretName: {{ (index .Values.ingress.tls 0).secretName }}
         {{- end }}
       {{- end }}
+    {{- if .Values.services.metricbeat.enabled }}       
       - name: metricbeat-{{ .Chart.Name }}
         configMap:
-          name: {{ include "openvidu.fullname" . }}-metricbeat
-      - name: filebeat-{{ .Chart.Name }}
-        configMap:
-          name: {{ include "openvidu.fullname" . }}-filebeat          
+          name: {{ include "openvidu.fullname" . }}-metricbeat          
       - name: docker-socket
         hostPath:
           path: /var/run/docker.sock
-    {{- if .Values.services.logging.enabled }}          
+    {{- end }}          
+    {{- if .Values.services.logging.enabled }}
+      - name: filebeat-{{ .Chart.Name }}
+        configMap:
+          name: {{ include "openvidu.fullname" . }}-filebeat    
       - name: varlogcontainers
         hostPath:
           path: /var/log/containers
