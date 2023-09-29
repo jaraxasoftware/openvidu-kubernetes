@@ -40,6 +40,7 @@ spec:
           - name: "{{ $val.port }}-{{ $proto | lower }}"
             containerPort: {{ $val.port }}
             protocol: {{ $proto }}
+        {{- if eq $name "openvidu" }}
         livenessProbe:
           httpGet:
             path: /
@@ -58,6 +59,24 @@ spec:
           successThreshold: {{ $.Values.readinessProbe.successThreshold }}
           timeoutSeconds: {{ $.Values.readinessProbe.timeoutSeconds }}
           failureThreshold: {{ $.Values.readinessProbe.failureThreshold }}
+        {{- else if eq $name "kms" }}
+        livenessProbe:
+          tcpSocket:
+            port: {{ $val.port }}
+          initialDelaySeconds: {{ $.Values.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ $.Values.livenessProbe.periodSeconds }}
+          successThreshold: {{ $.Values.livenessProbe.successThreshold }}
+          timeoutSeconds: {{ $.Values.livenessProbe.timeoutSeconds }}
+          failureThreshold: {{ $.Values.livenessProbe.failureThreshold }}
+        readinessProbe:
+          tcpSocket:
+            port: {{ $val.port }}
+          initialDelaySeconds: {{ $.Values.readinessProbe.initialDelaySeconds }}            
+          periodSeconds: {{ $.Values.readinessProbe.periodSeconds }}
+          successThreshold: {{ $.Values.readinessProbe.successThreshold }}
+          timeoutSeconds: {{ $.Values.readinessProbe.timeoutSeconds }}
+          failureThreshold: {{ $.Values.readinessProbe.failureThreshold }}
+        {{- end }}
         resources:
           {{- toYaml $.Values.resources | nindent 12 }}                                            
         {{- else if eq $name "kms" }}
