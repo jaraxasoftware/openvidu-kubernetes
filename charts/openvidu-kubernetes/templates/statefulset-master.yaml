@@ -77,6 +77,13 @@ spec:
           {{- toYaml $.Values.resources | nindent 12 }}        
         {{- end }}
         env:
+        {{- if $.Values.services.openvidu.pro.elasticsearch.enabled }}
+        - name: ELASTICSEARCH_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "openvidu.fullname" $ }}-elasticsearch-es-elastic-user
+              key: elastic
+        {{- end }}
         {{- range $pkey, $pval := $val.env }}
         - name: {{ $pkey }}
           value: {{ quote $pval }}
