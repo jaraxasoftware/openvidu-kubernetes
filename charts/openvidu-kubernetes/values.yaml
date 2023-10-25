@@ -2,32 +2,25 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 replicaCount: 1
-
 # optional list of image pull secrets to use to pull images
 jx:
   # optional image pull secrets
   imagePullSecrets: []
-
   # whether to create a Release CRD when installing charts with Release CRDs included
   releaseCRD: true
-
 serviceAccount:
   create: false
-
 service:
   name: openvidu
   externalPort: 5443
-
 # Mandatory. Can be deployment or distributed
 mode: deployment
-
 updateStrategy: OnDelete
-
 services:
   openvidu:
     enabled: true
     type: master
-    image: 
+    image:
       repository: openvidu/openvidu-server
       tag: 2.27.0
       pullPolicy: IfNotPresent
@@ -42,13 +35,13 @@ services:
       environment: on_premise
       autoscaling: false
       loadStrategy: streams
-      networkQoS: false      
+      networkQoS: false
       masterReplicas: 1
       mediaNodeReplicas: 1
       mediaReconnTimeout: 5
       browserLogs: disabled
       monitoringInterval: 30
-      elasticsearch: 
+      elasticsearch:
         enabled: false
         version: 7.17.9
         nodeCount: 1
@@ -62,21 +55,21 @@ services:
           enabled: false
           annotations: {}
           paths:
-            - /kibana/
+          - /kibana/
           hosts:
-            - openvidu.localhost
+          - openvidu.localhost
           tls:
-            - secretName: openvidu-secret
-              hosts:
-                - openvidu.localhost
+          - secretName: openvidu-secret
+            hosts:
+            - openvidu.localhost
     protocols:
-      - TCP
+    - TCP
     ssl:
       enabled: false
       certType: owncert
     kms:
-      uris: 
-        - "ws://localhost:8888/kurento"
+      uris:
+      - "ws://localhost:8888/kurento"
     coturn:
       ip: localhost.openvidu
       port: 3478
@@ -111,78 +104,71 @@ services:
     gc:
       interval: 900
       threshold: 3600
-    cdr: 
+    cdr:
       enabled: false
       path: /opt/openvidu/cdr
     env: {}
-
   media-node-controller:
     enabled: false
     type: media
-    image: 
+    image:
       repository: openvidu/media-node-controller
       tag: 2.27.0
       pullPolicy: IfNotPresent
     protocols:
-      - TCP        
-    port: 3000      
+    - TCP
+    port: 3000
     env: {}
-
   kms:
     enabled: true
     type: media
-    image: 
+    image:
       repository: kurento/kurento-media-server
       tag: 7.0.1
       pullPolicy: IfNotPresent
     protocols:
-      - TCP        
+    - TCP
     port: 8888
     env:
       KURENTO_LOGS_PATH: "/var/log/kurento-media-server/"
       KMS_MIN_PORT: "40000"
       KMS_MAX_PORT: "45000"
-
   logging:
     enabled: false
     type: monitoring
-    image: 
+    image:
       repository: docker.elastic.co/beats/filebeat-oss
       tag: 7.17.9
       pullPolicy: IfNotPresent
-
   metricbeat:
     enabled: false
     type: monitoring
-    image: 
+    image:
       repository: docker.elastic.co/beats/metricbeat-oss
       tag: 7.17.9
       pullPolicy: IfNotPresent
-
   openvidu-call:
     enabled: false
     type: test
-    image: 
+    image:
       repository: openvidu/openvidu-call
       tag: 2.27.0
       pullPolicy: IfNotPresent
     protocols:
-      - TCP        
+    - TCP
     port: 5442
     env: {}
-
 ingress:
   enabled: false
   annotations: {}
   paths:
-    - /(.*)
+  - /(.*)
   hosts:
-    - openvidu.localhost
+  - openvidu.localhost
   tls:
-    - secretName: openvidu-secret
-      hosts:
-        - openvidu.localhost
-
+  - secretName: openvidu-secret
+    hosts:
+    - openvidu.localhost
 livenessProbe:
   initialDelaySeconds: 60
   periodSeconds: 10
@@ -195,16 +181,14 @@ readinessProbe:
   successThreshold: 1
   timeoutSeconds: 1
   failureThreshold: 3
-
 resourcesPro:
   master: {}
   media: {}
   monitoring: {}
-
 resources: {}
-
 nodeSelector: {}
-
 tolerations: []
-
 affinity: {}
+image:
+  repository: ghcr.io/jaraxasoftware/openvidu-kubernetes
+  tag: 2.27.0-1698264515675
