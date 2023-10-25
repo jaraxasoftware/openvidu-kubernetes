@@ -1,3 +1,4 @@
+{{- if not (eq .Values.mode "distributed") }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -21,3 +22,57 @@ spec:
   selector:
     app.kubernetes.io/name: {{ include "openvidu.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+---
+{{- if eq .Values.mode "distributed" }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "openvidu.fullname" . }}-master
+  labels:
+{{ include "openvidu.labels" . | indent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+  {{- range $name, $val := .Values.services }}
+    {{- range $index, $proto :=  $val.protocols }}
+    {{- if $val.port }}
+    {{- if or (eq $val.type "master") (eq $val.type "monitoring") }}    
+    - port: {{ $val.port }}
+      targetPort: {{ $val.port }}
+      protocol: {{ $proto }}
+      name: "{{ $val.port }}-{{ $proto | lower }}"
+    {{- end }}    
+    {{- end }}
+    {{- end }}
+  {{- end }}  
+  selector:
+    app.kubernetes.io/name: {{ include "openvidu.name" . }}-master
+    app.kubernetes.io/instance: {{ .Release.Name }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "openvidu.fullname" . }}-media-node
+  labels:
+{{ include "openvidu.labels" . | indent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  clusterIP: None
+  ports:
+  {{- range $name, $val := .Values.services }}
+    {{- range $index, $proto :=  $val.protocols }}
+    {{- if $val.port }}
+    {{- if or (eq $val.type "media") (eq $val.type "monitoring") }}    
+    - port: {{ $val.port }}
+      targetPort: {{ $val.port }}
+      protocol: {{ $proto }}
+      name: "{{ $val.port }}-{{ $proto | lower }}"
+    {{- end }}    
+    {{- end }}
+    {{- end }}
+  {{- end }}  
+  selector:
+    app.kubernetes.io/name: {{ include "openvidu.name" . }}-media-node
+    app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}    

@@ -1,0 +1,171 @@
+{{- if .Values.services.openvidu.pro.enabled }}
+{{- if .Values.services.openvidu.pro.elasticsearch.enabled }}
+apiVersion: elasticsearch.k8s.elastic.co/v1
+kind: Elasticsearch
+metadata:
+  name: {{ include "openvidu.fullname" . }}-elasticsearch
+  labels:
+    app.kubernetes.io/name: {{ include "openvidu.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}  
+spec:
+  version: {{ .Values.services.openvidu.pro.elasticsearch.version }}
+  volumeClaimDeletePolicy: DeleteOnScaledownOnly
+  nodeSets:
+  - name: default
+    count: {{ .Values.services.openvidu.pro.elasticsearch.nodeCount }}
+    volumeClaimTemplates:
+    - metadata:
+        name: elasticsearch-data
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: {{ .Values.services.openvidu.pro.elasticsearch.volumeSize }}
+        storageClassName: {{ .Values.services.openvidu.pro.elasticsearch.storageClassName }}
+    podTemplate:
+      spec:
+        initContainers:
+          - name: sysctl
+            securityContext:
+              privileged: true
+              runAsUser: 0
+            command: ['sh', '-c', 'sysctl -w vm.max_map_count=262144']
+  http:
+    service:
+      spec:
+        type: {{ .Values.services.openvidu.pro.elasticsearch.serviceType }}  
+    tls:
+      selfSignedCertificate:
+        disabled: true
+---
+apiVersion: kibana.k8s.elastic.co/v1
+kind: Kibana
+metadata:
+  name: {{ include "openvidu.fullname" . }}-kibana
+  labels:
+    app.kubernetes.io/name: {{ include "openvidu.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}  
+spec:
+  version: {{ .Values.services.openvidu.pro.elasticsearch.version }}
+  count: 1
+  elasticsearchRef:
+    name: {{ include "openvidu.fullname" . }}-elasticsearch
+  config:
+    server.basePath: "/kibana"
+    server.rewriteBasePath: true
+    {{- if .Values.services.openvidu.pro.elasticsearch.kibanaIngress.enabled }}
+    server.publicBaseUrl: "https://{{ index .Values.services.openvidu.pro.elasticsearch.kibanaIngress.hosts 0 }}/kibana"
+    {{- end }}
+  http:
+    tls:
+      selfSignedCertificate:
+        disabled: true
+  podTemplate:
+    spec:
+      containers:
+      - name: kibana        
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /kibana/login
+            port: 5601
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+---
+{{- if .Values.services.openvidu.pro.elasticsearch.kibanaIngress.enabled -}}
+{{- $serviceName := include "openvidu.fullname" . -}}
+{{- $servicePort := 5601 -}}
+{{- $paths := .Values.services.openvidu.pro.elasticsearch.kibanaIngress.paths -}}
+apiVersion: {{ template "openvidu.ingress.apiVersion" . }}
+kind: Ingress
+metadata:
+  name: {{ include "openvidu.fullname" . }}-kibana
+  labels:
+    app: {{ .Chart.Name }}
+    chart: {{ .Chart.Name }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+  {{- range $key, $value := .Values.services.openvidu.pro.elasticsearch.kibanaIngress.labels }}
+    {{ $key }}: {{ $value | quote }}
+  {{- end }}
+{{- if .Values.services.openvidu.pro.elasticsearch.kibanaIngress.annotations }}
+  annotations:
+{{ toYaml .Values.services.openvidu.pro.elasticsearch.kibanaIngress.annotations | indent 4 }}
+{{- end }}
+spec:
+  rules:
+  {{- if .Values.services.openvidu.pro.elasticsearch.kibanaIngress.hosts }}
+  {{- range $host := .Values.services.openvidu.pro.elasticsearch.kibanaIngress.hosts }}
+    - host: {{ $host }}
+      http:
+        paths:
+  {{- range $p := $paths }}
+          - path: {{ $p }}
+            pathType: ImplementationSpecific          
+            backend:
+              service:
+                name:  {{ $serviceName }}-kibana-kb-http
+                port:
+                  number: {{ $servicePort }}
+  {{- end -}}
+  {{- end -}}
+  {{- else }}
+    - http:
+        paths:
+  {{- range $p := $paths }}
+          - path: {{ $p }}
+            pathType: ImplementationSpecific          
+            backend:
+              service:
+                name:  {{ $serviceName }}-kibana-kb-http
+                port:
+                  number: {{ $servicePort }}
+  {{- end -}}
+  {{- end -}}
+  {{- if .Values.services.openvidu.pro.elasticsearch.kibanaIngress.tls }}
+  tls:
+{{ toYaml .Values.services.openvidu.pro.elasticsearch.kibanaIngress.tls | indent 4 }}
+  {{- end -}}
+{{- end -}}
+{{ if .Values.services.logging.enabled }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "openvidu.fullname" . }}-filebeat
+rules:
+- apiGroups: [""] # "" indicates the core API group
+  resources:
+  - namespaces
+  - pods
+  - nodes
+  verbs:
+  - get
+  - watch
+  - list
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "openvidu.fullname" . }}-logging
+  namespace: {{ .Release.Namespace }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "openvidu.fullname" . }}-filebeat
+subjects:
+- kind: ServiceAccount
+  name: {{ include "openvidu.fullname" . }}-logging
+  namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: ClusterRole
+  name: {{ include "openvidu.fullname" . }}-filebeat
+  apiGroup: rbac.authorization.k8s.io
+{{- end }}
+{{- end }}
+{{- end }}
