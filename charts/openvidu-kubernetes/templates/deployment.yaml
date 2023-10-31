@@ -158,7 +158,7 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
     {{- end }}
-      serviceAccountName: {{ include "openvidu.fullname" $ }}-filebeat
+      serviceAccountName: {{ include "openvidu.fullname" $ }}
       automountServiceAccountToken: true
       volumes:
       {{- if .Values.ingress.enabled }}
