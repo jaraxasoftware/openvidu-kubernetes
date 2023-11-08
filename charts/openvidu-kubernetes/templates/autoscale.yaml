@@ -33,7 +33,7 @@ spec:
     name: {{ include "openvidu.fullname" . }}-media-node
   triggers:
   - metadata:
-      desiredReplicas: "0"
+      desiredReplicas: {{ .Values.keda.cron.desiredReplicas }}
       start: {{ .Values.keda.cron.start }}
       end: {{ .Values.keda.cron.end }}
       timezone: {{ .Values.keda.cron.timeZone }}
