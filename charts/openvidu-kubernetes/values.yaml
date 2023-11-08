@@ -171,6 +171,17 @@ services:
     port: 5442
     env: {}
 
+keda:
+  enabled: true
+  coolDown: 30
+  maxReplica: 1
+  minReplica: 0
+  interval: 30
+  cron:
+    start: 00 15 * * *
+    end: 15 15 * * *
+    timeZone: Europe/Madrid 
+
 ingress:
   enabled: false
   annotations: {}
