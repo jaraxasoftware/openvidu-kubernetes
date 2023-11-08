@@ -1,0 +1,20 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{ include "openvidu.fullname" . }}-to-zero
+spec:
+  cooldownPeriod: 300
+  maxReplicaCount: 1
+  minReplicaCount: 0
+  pollingInterval: 30
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: StatefulSet
+    name: {{ include "openvidu.fullname" . }}-master
+  triggers:
+  - metadata:
+      desiredReplicas: "0"
+      start: 20 14 * * *
+      end: 30 14 * * *
+      timezone: Europe/Madrid
+    type: cron
