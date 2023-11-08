@@ -5,8 +5,7 @@ metadata:
   name: {{ include "openvidu.fullname" . }}-master-to-zero
 spec:
   cooldownPeriod: {{ .Values.keda.coolDown }}
-  maxReplicaCount: {{ .Values.services.openvidu.pro.masterReplicas }}
-  minReplicaCount: {{ .Values.keda.cron.desiredReplicas }}
+  minReplicaCount: {{ .Values.services.openvidu.pro.masterReplicas }}
   pollingInterval: {{ .Values.keda.interval }}
   scaleTargetRef:
     apiVersion: apps/v1
@@ -26,8 +25,7 @@ metadata:
   name: {{ include "openvidu.fullname" . }}-media-to-zero
 spec:
   cooldownPeriod: {{ .Values.keda.coolDown }}
-  maxReplicaCount: {{ .Values.services.openvidu.pro.mediaNodeReplicas }}
-  minReplicaCount: {{ .Values.keda.cron.desiredReplicas }}
+  minReplicaCount: {{ .Values.services.openvidu.pro.mediaNodeReplicas }}
   pollingInterval: {{ .Values.keda.interval }}
   scaleTargetRef:
     apiVersion: apps/v1
