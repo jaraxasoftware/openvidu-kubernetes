@@ -179,7 +179,6 @@ keda:
     start: 00 15 * * *
     end: 15 15 * * *
     timeZone: Europe/Madrid
-    desiredReplicas: 0
     
 ingress:
   enabled: false
