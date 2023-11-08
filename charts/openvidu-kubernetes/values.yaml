@@ -19,7 +19,7 @@ service:
   externalPort: 5443
 
 # Mandatory. Can be deployment or distributed
-mode: deployment
+mode: distributed
 
 updateStrategy: OnDelete
 

@@ -1,12 +1,12 @@
-{{- if and (.Values.keda.enabled) (.Capabilities.APIVersions.Has "keda.sh/v1alpha1") }}
+{{ if .Values.keda.enabled }}
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
   name: {{ include "openvidu.fullname" . }}-master-to-zero
 spec:
-  cooldownPeriod: {{- .Values.keda.coolDown }}
-  minReplicaCount: {{- .Values.keda.minReplica }}
-  pollingInterval: {{- .Values.keda.interval }}
+  cooldownPeriod: {{ .Values.keda.coolDown }}
+  minReplicaCount: {{ .Values.keda.minReplica }}
+  pollingInterval: {{ .Values.keda.interval }}
   scaleTargetRef:
     apiVersion: apps/v1
     kind: StatefulSet
@@ -14,9 +14,9 @@ spec:
   triggers:
   - metadata:
       desiredReplicas: "0"
-      start: {{- .Values.keda.cron.start }}
-      end: {{- .Values.keda.cron.end }}
-      timezone: {{- .Values.keda.cron.timeZone }}
+      start: {{ .Values.keda.cron.start }}
+      end: {{ .Values.keda.cron.end }}
+      timezone: {{ .Values.keda.cron.timeZone }}
     type: cron
 ---
 apiVersion: keda.sh/v1alpha1
@@ -24,9 +24,9 @@ kind: ScaledObject
 metadata:
   name: {{ include "openvidu.fullname" . }}-media-to-zero
 spec:
-  cooldownPeriod: {{- .Values.keda.coolDown }}
-  minReplicaCount: {{- .Values.keda.minReplica }}
-  pollingInterval: 30
+  cooldownPeriod: {{ .Values.keda.coolDown }}
+  minReplicaCount: {{ .Values.keda.minReplica }}
+  pollingInterval: {{ .Values.keda.interval }}
   scaleTargetRef:
     apiVersion: apps/v1
     kind: StatefulSet
@@ -34,8 +34,8 @@ spec:
   triggers:
   - metadata:
       desiredReplicas: "0"
-      start: {{- .Values.keda.cron.start }}
-      end: {{- .Values.keda.cron.end }}
-      timezone: {{- .Values.keda.cron.timeZone }}
+      start: {{ .Values.keda.cron.start }}
+      end: {{ .Values.keda.cron.end }}
+      timezone: {{ .Values.keda.cron.timeZone }}
     type: cron    
-{{- end }}
+{{ end }}
