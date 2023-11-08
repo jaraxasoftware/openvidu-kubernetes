@@ -19,7 +19,7 @@ service:
   externalPort: 5443
 
 # Mandatory. Can be deployment or distributed
-mode: distributed
+mode: deployment
 
 updateStrategy: OnDelete
 
@@ -172,16 +172,15 @@ services:
     env: {}
 
 keda:
-  enabled: true
+  enabled: false
   coolDown: 30
-  maxReplica: 1
-  minReplica: 0
   interval: 30
   cron:
     start: 00 15 * * *
     end: 15 15 * * *
-    timeZone: Europe/Madrid 
-
+    timeZone: Europe/Madrid
+    desiredReplicas: 0
+    
 ingress:
   enabled: false
   annotations: {}

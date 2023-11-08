@@ -1,11 +1,11 @@
-{{ if .Values.keda.enabled }}
+{{ if and (.Values.keda.enabled) (.Capabilities.APIVersions.Has "keda.sh/v1alpha1") }}
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
   name: {{ include "openvidu.fullname" . }}-master-to-zero
 spec:
   cooldownPeriod: {{ .Values.keda.coolDown }}
-  minReplicaCount: {{ .Values.keda.minReplica }}
+  minReplicaCount: {{ .Values.services.openvidu.pro.masterReplicas }}
   pollingInterval: {{ .Values.keda.interval }}
   scaleTargetRef:
     apiVersion: apps/v1
@@ -13,7 +13,7 @@ spec:
     name: {{ include "openvidu.fullname" . }}-master
   triggers:
   - metadata:
-      desiredReplicas: "0"
+      desiredReplicas: {{ .Values.keda.cron.desiredReplicas }}
       start: {{ .Values.keda.cron.start }}
       end: {{ .Values.keda.cron.end }}
       timezone: {{ .Values.keda.cron.timeZone }}
@@ -25,7 +25,7 @@ metadata:
   name: {{ include "openvidu.fullname" . }}-media-to-zero
 spec:
   cooldownPeriod: {{ .Values.keda.coolDown }}
-  minReplicaCount: {{ .Values.keda.minReplica }}
+  minReplicaCount: {{ .Values.services.openvidu.pro.mediaNodeReplicas }}
   pollingInterval: {{ .Values.keda.interval }}
   scaleTargetRef:
     apiVersion: apps/v1
