@@ -30,7 +30,6 @@ spec:
 {{- range $pval := .Values.jx.imagePullSecrets }}
       - name: {{ quote $pval }}
 {{- end }}     
-      serviceAccountName: {{ template "openvidu.serviceAccountName" . }}
       containers:
       {{- range $name, $val := .Values.services }}
         {{- if $val.enabled }} 
