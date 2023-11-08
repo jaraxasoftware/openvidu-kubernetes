@@ -6,11 +6,17 @@ metadata:
 spec:
   cooldownPeriod: {{ .Values.keda.coolDown }}
   maxReplicaCount: {{ .Values.services.openvidu.pro.masterReplicas }}
+  minReplicaCount: {{ .Values.keda.minReplicas | default 0 }}
   pollingInterval: {{ .Values.keda.interval }}
   scaleTargetRef:
     apiVersion: apps/v1
     kind: StatefulSet
     name: {{ include "openvidu.fullname" . }}-master
+  fallback:
+    failureThreshold: {{ .Values.keda.failureThreshold | default 3 }}
+    replicas: {{ .Values.services.openvidu.pro.masterReplicas }}
+  advanced:
+    restoreToOriginalReplicaCount: true     
   triggers:
   - metadata:
       desiredReplicas: "{{ .Values.services.openvidu.pro.masterReplicas }}"
@@ -26,11 +32,17 @@ metadata:
 spec:
   cooldownPeriod: {{ .Values.keda.coolDown }}
   maxReplicaCount: {{ .Values.services.openvidu.pro.mediaNodeReplicas }}
+  minReplicaCount: {{ .Values.keda.minReplicas | default 0 }}
   pollingInterval: {{ .Values.keda.interval }}
   scaleTargetRef:
     apiVersion: apps/v1
     kind: StatefulSet
     name: {{ include "openvidu.fullname" . }}-media-node
+  fallback:
+    failureThreshold: {{ .Values.keda.failureThreshold | default 3 }}
+    replicas: {{ .Values.services.openvidu.pro.mediaNodeReplicas }}
+  advanced:
+    restoreToOriginalReplicaCount: true      
   triggers:
   - metadata:
       desiredReplicas: "{{ .Values.services.openvidu.pro.mediaNodeReplicas }}"
