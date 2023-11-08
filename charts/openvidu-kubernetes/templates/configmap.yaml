@@ -100,6 +100,7 @@ data:
         metricbeat.modules:
           - module: system
             metricsets:
+              - cpu
               - diskio
               - memory
               - network
