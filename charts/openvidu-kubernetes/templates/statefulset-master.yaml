@@ -148,11 +148,13 @@ spec:
           name: {{ include "openvidu.fullname" . }}-metricbeat
       - name: filebeat-{{ .Chart.Name }}
         configMap:
-          name: {{ include "openvidu.fullname" . }}-filebeat          
+          name: {{ include "openvidu.fullname" . }}-filebeat
+    {{- end }}
+    {{- if or  (.Values.services.metricbeat.enabled) ((index .Values.services "media-node-controller").enabled)  }}          
       - name: docker-socket
         hostPath:
           path: /var/run/docker.sock
-    {{- end }}                
+    {{- end }}                    
     {{- if .Values.services.logging.enabled }}          
       - name: varlogcontainers
         hostPath:
