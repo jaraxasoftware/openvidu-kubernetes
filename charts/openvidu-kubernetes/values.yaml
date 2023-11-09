@@ -215,6 +215,8 @@ resourcesPro:
 
 resources: {}
 
+securityContext: {}
+
 nodeSelector: {}
 
 tolerations: []

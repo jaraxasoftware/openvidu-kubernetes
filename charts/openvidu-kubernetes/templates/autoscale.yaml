@@ -4,6 +4,8 @@ apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
   name: {{ include "openvidu.fullname" . }}-master-to-zero
+  labels:
+{{ include "openvidu.labels" . | indent 4 }}  
 spec:
   cooldownPeriod: {{ .Values.keda.coolDown }}
   maxReplicaCount: {{ .Values.services.openvidu.pro.masterReplicas }}
@@ -30,6 +32,8 @@ apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
   name: {{ include "openvidu.fullname" . }}-media-to-zero
+  labels:
+{{ include "openvidu.labels" . | indent 4 }}  
 spec:
   cooldownPeriod: {{ .Values.keda.coolDown }}
   maxReplicaCount: {{ .Values.services.openvidu.pro.mediaNodeReplicas }}
@@ -57,6 +61,8 @@ apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
   name: {{ include "openvidu.fullname" . }}-deployment-to-zero
+  labels:
+{{ include "openvidu.labels" . | indent 4 }}  
 spec:
   cooldownPeriod: {{ .Values.keda.coolDown }}
   maxReplicaCount: {{ .Values.replicaCount }}
