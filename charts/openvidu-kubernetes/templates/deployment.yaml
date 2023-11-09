@@ -168,7 +168,7 @@ spec:
           secretName: {{ (index .Values.ingress.tls 0).secretName }}
         {{- end }}
       {{- end }}
-    {{- if .Values.services.metricbeat.enabled }}       
+    {{- if or  (.Values.services.metricbeat.enabled) (index .Values.services "media-node-controller")  }}          
       - name: metricbeat-{{ .Chart.Name }}
         configMap:
           name: {{ include "openvidu.fullname" . }}-metricbeat          

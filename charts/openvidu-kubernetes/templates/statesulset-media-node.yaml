@@ -157,7 +157,7 @@ spec:
         configMap:
           name: {{ include "openvidu.fullname" . }}-filebeat
     {{- end }}
-    {{- if or  (.Values.services.metricbeat.enabled) ((index .Values.services "media-node-controller").enabled)  }}          
+    {{- if or  (.Values.services.metricbeat.enabled) (index .Values.services "media-node-controller")  }}          
       - name: docker-socket
         hostPath:
           path: /var/run/docker.sock
