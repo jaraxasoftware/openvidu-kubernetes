@@ -64,7 +64,7 @@ spec:
   pollingInterval: {{ .Values.keda.interval }}
   scaleTargetRef:
     apiVersion: apps/v1
-    kind: StatefulSet
+    kind: Deployment
     name: {{ include "openvidu.fullname" . }}
   fallback:
     failureThreshold: {{ .Values.keda.failureThreshold | default 3 }}
