@@ -30,7 +30,6 @@ spec:
 {{- range $pval := .Values.jx.imagePullSecrets }}
       - name: {{ quote $pval }}
 {{- end }}     
-      serviceAccountName: {{ template "openvidu.serviceAccountName" . }}
       containers:
       {{- range $name, $val := .Values.services }}
         {{- if $val.enabled }} 
@@ -99,7 +98,11 @@ spec:
         {{- end }}                        
         envFrom:
         - configMapRef:
-            name: {{ include "openvidu.fullname" $ }}          
+            name: {{ include "openvidu.fullname" $ }}
+      {{- with $.Values.securityContext }}
+        securityContext:
+          {{- toYaml . | nindent 10 }}
+      {{- end }}                      
         volumeMounts:
         {{- if eq $name "metricbeat" }}    
         - name: metricbeat-{{ $.Chart.Name }}

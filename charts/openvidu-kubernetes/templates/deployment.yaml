@@ -146,6 +146,10 @@ spec:
         resources:
           {{- toYaml $.Values.resources | nindent 12 }}
       {{- end }}
+      {{- with .Values.securityContext }}
+        securityContext:
+          {{- toYaml . | nindent 10 }}
+      {{- end }}
     {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -158,7 +162,7 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
     {{- end }}
-      serviceAccountName: {{ include "openvidu.fullname" $ }}-filebeat
+      serviceAccountName: {{ include "openvidu.fullname" $ }}
       automountServiceAccountToken: true
       volumes:
       {{- if .Values.ingress.enabled }}
@@ -168,7 +172,7 @@ spec:
           secretName: {{ (index .Values.ingress.tls 0).secretName }}
         {{- end }}
       {{- end }}
-    {{- if .Values.services.metricbeat.enabled }}       
+    {{- if or  (.Values.services.metricbeat.enabled) (index .Values.services "media-node-controller")  }}          
       - name: metricbeat-{{ .Chart.Name }}
         configMap:
           name: {{ include "openvidu.fullname" . }}-metricbeat          

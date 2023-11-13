@@ -11,6 +11,9 @@ jx:
   # whether to create a Release CRD when installing charts with Release CRDs included
   releaseCRD: true
 
+test:
+  enabled: false
+
 serviceAccount:
   create: false
 
@@ -125,7 +128,7 @@ services:
       pullPolicy: IfNotPresent
     protocols:
       - TCP        
-    port: 3000      
+    port: 3000
     env: {}
 
   kms:
@@ -171,6 +174,15 @@ services:
     port: 5442
     env: {}
 
+keda:
+  enabled: false
+  coolDown: 30
+  interval: 30
+  cron:
+    start: 00 15 * * *
+    end: 15 15 * * *
+    timeZone: Europe/Madrid
+    
 ingress:
   enabled: false
   annotations: {}
@@ -202,6 +214,8 @@ resourcesPro:
   monitoring: {}
 
 resources: {}
+
+securityContext: {}
 
 nodeSelector: {}
 
