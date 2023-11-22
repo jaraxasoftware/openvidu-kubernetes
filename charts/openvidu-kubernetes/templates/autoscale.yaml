@@ -5,7 +5,11 @@ kind: ScaledObject
 metadata:
   name: {{ include "openvidu.fullname" . }}-master-to-zero
   labels:
-{{ include "openvidu.labels" . | indent 4 }}  
+{{ include "openvidu.labels" . | indent 4 }}
+{{- with .Values.keda.annotations }}
+  annotations:
+{{- toYaml . | nindent 4 }}
+{{- end }}   
 spec:
   cooldownPeriod: {{ .Values.keda.coolDown }}
   maxReplicaCount: {{ .Values.services.openvidu.pro.masterReplicas }}
