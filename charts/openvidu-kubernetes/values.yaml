@@ -183,6 +183,7 @@ keda:
     end: 15 15 * * *
     timeZone: Europe/Madrid
   annotations: {}
+  extraTriggers: {}
     
 ingress:
   enabled: false
