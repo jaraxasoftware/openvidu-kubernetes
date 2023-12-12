@@ -5,7 +5,11 @@ kind: ScaledObject
 metadata:
   name: {{ include "openvidu.fullname" . }}-master-to-zero
   labels:
-{{ include "openvidu.labels" . | indent 4 }}  
+{{ include "openvidu.labels" . | indent 4 }}
+{{- with .Values.keda.annotations }}
+  annotations:
+{{- toYaml . | nindent 4 }}
+{{- end }}   
 spec:
   cooldownPeriod: {{ .Values.keda.coolDown }}
   maxReplicaCount: {{ .Values.services.openvidu.pro.masterReplicas }}
@@ -27,13 +31,20 @@ spec:
       end: {{ .Values.keda.cron.end }}
       timezone: {{ .Values.keda.cron.timeZone }}
     type: cron
+{{- with .Values.keda.extraTriggers }}
+  {{- . | nindent 2 }}  
+{{- end }}    
 ---
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
   name: {{ include "openvidu.fullname" . }}-media-to-zero
   labels:
-{{ include "openvidu.labels" . | indent 4 }}  
+{{ include "openvidu.labels" . | indent 4 }}
+{{- with .Values.keda.annotations }}
+  annotations:
+{{- toYaml . | nindent 4 }}
+{{- end }}     
 spec:
   cooldownPeriod: {{ .Values.keda.coolDown }}
   maxReplicaCount: {{ .Values.services.openvidu.pro.mediaNodeReplicas }}
@@ -55,6 +66,9 @@ spec:
       end: {{ .Values.keda.cron.end }}
       timezone: {{ .Values.keda.cron.timeZone }}
     type: cron
+{{- with .Values.keda.extraTriggers }}
+  {{- . | nindent 2 }}  
+{{- end }}    
 ---    
 {{- else if eq .Values.mode "deployment" }}
 apiVersion: keda.sh/v1alpha1
@@ -62,7 +76,11 @@ kind: ScaledObject
 metadata:
   name: {{ include "openvidu.fullname" . }}-deployment-to-zero
   labels:
-{{ include "openvidu.labels" . | indent 4 }}  
+{{ include "openvidu.labels" . | indent 4 }}
+{{- with .Values.keda.annotations }}
+  annotations:
+{{- toYaml . | nindent 4 }}
+{{- end }} 
 spec:
   cooldownPeriod: {{ .Values.keda.coolDown }}
   maxReplicaCount: {{ .Values.replicaCount }}
@@ -84,5 +102,8 @@ spec:
       end: {{ .Values.keda.cron.end }}
       timezone: {{ .Values.keda.cron.timeZone }}
     type: cron
+{{- with .Values.keda.extraTriggers }}
+  {{- . | nindent 2 }}  
+{{- end }}    
 {{- end }}
 {{ end }}
