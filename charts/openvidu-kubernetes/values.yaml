@@ -38,7 +38,7 @@ services:
     configDir: /opt/openvidu/
     secret: openvidu
     pro:
-      enabled: false
+      enabled: true
       license: xxxxxx-yyyyyy-zzzzzz-aaaaaa-bbbb
       cluster: true
       mode: manual
@@ -52,7 +52,7 @@ services:
       browserLogs: disabled
       monitoringInterval: 30
       elasticsearch: 
-        enabled: false
+        enabled: true
         version: 7.17.9
         nodeCount: 1
         volumeSize: 10Gi
@@ -72,6 +72,7 @@ services:
             - secretName: openvidu-secret
               hosts:
                 - openvidu.localhost
+        resources: {}          
     protocols:
       - TCP
     ssl:
