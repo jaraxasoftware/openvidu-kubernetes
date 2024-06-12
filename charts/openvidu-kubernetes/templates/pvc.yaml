@@ -1,0 +1,19 @@
+{{- if and .Values.services.openvidu.recording.enabled .Values.services.openvidu.recording.storage.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "openvidu.fullname" . }}
+{{- with .Values.services.openvidu.recording.storage.persistence.annotations  }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
+  labels:
+    {{- include "openvidu.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - {{ .Values.services.openvidu.recording.storage.persistence.accessMode | quote }}
+  resources:
+    requests:
+      storage: {{ .Values.services.openvidu.recording.storage.size | quote }}
+  storageClassName: "{{ .Values.services.openvidu.recording.storage.storageClass }}"
+{{- end }}
