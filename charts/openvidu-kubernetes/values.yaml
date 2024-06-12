@@ -98,13 +98,15 @@ services:
         max: 1000
         min: 300
     recording:
-      enabled: false
+      enabled: true
       debug: false
       path: /opt/openvidu/recordings
       layout: /opt/openvidu/custom-layout
       public: false
       notification: publisher_moderator
       autostop: 120
+      storage:
+        size: 5Gi
     transcoding:
       enabled: false
     webhook:

@@ -117,7 +117,11 @@ spec:
         {{- end }}
         {{- if eq $name "openvidu" }}
         - name: docker-socket
-          mountPath: /var/run/docker.sock      
+          mountPath: /var/run/docker.sock
+          {{- if $.Values.services.openvidu.recording.enabled }}
+        - name: recordings
+          mountPath: {{ $.Values.services.openvidu.recording.path }}
+          {{- end }}          
         {{- else if eq $name "metricbeat" }}
         - name: metricbeat-{{ $.Chart.Name }}
           readOnly: true
@@ -183,6 +187,11 @@ spec:
         hostPath:
           path: /var/run/docker.sock
     {{- end }}
+    {{- if .Values.services.openvidu.recording.enabled }}
+      - name: recordings
+        emptyDir:
+          sizeLimit: {{ .Values.services.openvidu.recording.storage.size }}
+    {{- end }}    
     {{- if .Values.services.logging.enabled }}
       - name: filebeat-{{ .Chart.Name }}
         configMap:
