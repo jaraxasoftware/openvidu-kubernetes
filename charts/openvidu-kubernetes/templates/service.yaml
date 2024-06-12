@@ -15,10 +15,10 @@ spec:
       targetPort: {{ $val.port }}
       protocol: {{ $proto }}
       name: "{{ $val.port }}-{{ $proto | lower }}"
-    {{- else }}    
+    {{- else }}
     {{- end }}
     {{- end }}
-  {{- end }}  
+  {{- end }}
   selector:
     app.kubernetes.io/name: {{ include "openvidu.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
@@ -37,15 +37,15 @@ spec:
   {{- range $name, $val := .Values.services }}
     {{- range $index, $proto :=  $val.protocols }}
     {{- if $val.port }}
-    {{- if or (eq $val.type "master") (eq $val.type "monitoring") }}    
+    {{- if or (eq $val.type "master") (eq $val.type "monitoring") }}
     - port: {{ $val.port }}
       targetPort: {{ $val.port }}
       protocol: {{ $proto }}
       name: "{{ $val.port }}-{{ $proto | lower }}"
-    {{- end }}    
     {{- end }}
     {{- end }}
-  {{- end }}  
+    {{- end }}
+  {{- end }}
   selector:
     app.kubernetes.io/name: {{ include "openvidu.name" . }}-master
     app.kubernetes.io/instance: {{ .Release.Name }}
@@ -63,16 +63,16 @@ spec:
   {{- range $name, $val := .Values.services }}
     {{- range $index, $proto :=  $val.protocols }}
     {{- if $val.port }}
-    {{- if or (eq $val.type "media") (eq $val.type "monitoring") }}    
+    {{- if or (eq $val.type "media") (eq $val.type "monitoring") }}
     - port: {{ $val.port }}
       targetPort: {{ $val.port }}
       protocol: {{ $proto }}
       name: "{{ $val.port }}-{{ $proto | lower }}"
-    {{- end }}    
     {{- end }}
     {{- end }}
-  {{- end }}  
+    {{- end }}
+  {{- end }}
   selector:
     app.kubernetes.io/name: {{ include "openvidu.name" . }}-media-node
     app.kubernetes.io/instance: {{ .Release.Name }}
-{{- end }}    
+{{- end }}

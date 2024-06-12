@@ -13,7 +13,7 @@ spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: {{ include "openvidu.fullname" . }}   
+      app: {{ include "openvidu.fullname" . }}
       app.kubernetes.io/name: {{ include "openvidu.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
   template:
@@ -26,13 +26,13 @@ spec:
       imagePullSecrets:
 {{- range $pval := .Values.jx.imagePullSecrets }}
       - name: {{ quote $pval }}
-{{- end }}     
+{{- end }}
       serviceAccountName: {{ template "openvidu.serviceAccountName" . }}
       containers:
       {{- range $name, $val := .Values.services }}
       {{- if $val.enabled }}
       - name: {{ $name }}
-        image: "{{ $val.image.repository }}:{{ $val.image.tag }}"      
+        image: "{{ $val.image.repository }}:{{ $val.image.tag }}"
         imagePullPolicy: {{ $val.image.pullPolicy }}
         ports:
         {{- range $index, $proto :=  $val.protocols }}
@@ -54,7 +54,7 @@ spec:
           httpGet:
             path: /
             port: {{ $val.port }}
-          initialDelaySeconds: {{ $.Values.readinessProbe.initialDelaySeconds }}            
+          initialDelaySeconds: {{ $.Values.readinessProbe.initialDelaySeconds }}
           periodSeconds: {{ $.Values.readinessProbe.periodSeconds }}
           successThreshold: {{ $.Values.readinessProbe.successThreshold }}
           timeoutSeconds: {{ $.Values.readinessProbe.timeoutSeconds }}
@@ -71,19 +71,19 @@ spec:
         readinessProbe:
           tcpSocket:
             port: {{ $val.port }}
-          initialDelaySeconds: {{ $.Values.readinessProbe.initialDelaySeconds }}            
+          initialDelaySeconds: {{ $.Values.readinessProbe.initialDelaySeconds }}
           periodSeconds: {{ $.Values.readinessProbe.periodSeconds }}
           successThreshold: {{ $.Values.readinessProbe.successThreshold }}
           timeoutSeconds: {{ $.Values.readinessProbe.timeoutSeconds }}
           failureThreshold: {{ $.Values.readinessProbe.failureThreshold }}
         {{- end }}
         resources:
-          {{- toYaml $.Values.resources | nindent 12 }}                                            
+          {{- toYaml $.Values.resources | nindent 12 }}
         {{- else if eq $name "kms" }}
         {{- range untilStep ($val.env.KMS_MIN_PORT|int) ($val.env.KMS_MAX_PORT|int) 1}}
           - containerPort: {{ . }}
             protocol: {{ $proto }}
-        {{- end }} 
+        {{- end }}
         {{- end }}
         {{- end }}
         {{- if $val.env }}
@@ -92,19 +92,19 @@ spec:
         - name: {{ $pkey }}
           value: {{ quote $pval }}
         {{- end }}
-        {{- else if eq $name "logging" }}                
+        {{- else if eq $name "logging" }}
         env:
         - name: NODE_NAME
           valueFrom:
             fieldRef:
-              fieldPath: spec.nodeName      
-        {{- end }}     
+              fieldPath: spec.nodeName
+        {{- end }}
         envFrom:
         - configMapRef:
-            name: {{ include "openvidu.fullname" $ }}              
+            name: {{ include "openvidu.fullname" $ }}
         volumeMounts:
         {{- if $.Values.ingress.enabled }}
-          {{- if $.Values.services.openvidu.ssl.enabled }} 
+          {{- if $.Values.services.openvidu.ssl.enabled }}
             {{- if $val.certDir }}
         - name: tls-{{ .Chart.Name }}
           mountPath: {{ $val.certDir }}certificate.crt
@@ -114,20 +114,23 @@ spec:
           subPath: tls.key
             {{- end }}
           {{- end }}
-        {{- end }}                    
-        {{- if eq $name "metricbeat" }}    
+        {{- end }}
+        {{- if eq $name "openvidu" }}
+        - name: docker-socket
+          mountPath: /var/run/docker.sock      
+        {{- else if eq $name "metricbeat" }}
         - name: metricbeat-{{ $.Chart.Name }}
           readOnly: true
           mountPath: /usr/share/metricbeat/metricbeat.yml
           subPath: metricbeat.yml
         - name: docker-socket
-          mountPath: /var/run/docker.sock 
-          readOnly: true 
+          mountPath: /var/run/docker.sock
+          readOnly: true
         {{- else if eq $name "media-node-controller" }}
         - name: docker-socket
           mountPath: /var/run/docker.sock
-          readOnly: true         
-        {{- else if eq $name "logging" }}    
+          readOnly: true
+        {{- else if eq $name "logging" }}
         - name: filebeat-{{ $.Chart.Name }}
           readOnly: true
           mountPath: /usr/share/filebeat/filebeat.yml
@@ -137,10 +140,10 @@ spec:
         - name: varlogpods
           mountPath: /var/log/pods
         - name: varlibdockercontainers
-          mountPath: /var/lib/docker/containers    
+          mountPath: /var/lib/docker/containers
         - name: docker-socket
-          mountPath: /var/run/docker.sock 
-          readOnly: true               
+          mountPath: /var/run/docker.sock
+          readOnly: true
         {{- end }}
         {{- end }}
         resources:
@@ -166,24 +169,24 @@ spec:
       automountServiceAccountToken: true
       volumes:
       {{- if .Values.ingress.enabled }}
-        {{- if .Values.services.openvidu.ssl.enabled }}   
+        {{- if .Values.services.openvidu.ssl.enabled }}
       - name: tls-{{ .Chart.Name }}
         secret:
           secretName: {{ (index .Values.ingress.tls 0).secretName }}
         {{- end }}
       {{- end }}
-    {{- if or  (.Values.services.metricbeat.enabled) (index .Values.services "media-node-controller")  }}          
+    {{- if or  (.Values.services.metricbeat.enabled) (index .Values.services "media-node-controller")  }}
       - name: metricbeat-{{ .Chart.Name }}
         configMap:
-          name: {{ include "openvidu.fullname" . }}-metricbeat          
+          name: {{ include "openvidu.fullname" . }}-metricbeat
       - name: docker-socket
         hostPath:
           path: /var/run/docker.sock
-    {{- end }}          
+    {{- end }}
     {{- if .Values.services.logging.enabled }}
       - name: filebeat-{{ .Chart.Name }}
         configMap:
-          name: {{ include "openvidu.fullname" . }}-filebeat    
+          name: {{ include "openvidu.fullname" . }}-filebeat
       - name: varlogcontainers
         hostPath:
           path: /var/log/containers

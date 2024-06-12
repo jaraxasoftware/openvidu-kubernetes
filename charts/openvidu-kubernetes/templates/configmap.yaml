@@ -16,7 +16,7 @@ data:
   COTURN_PORT: "{{ .Values.services.openvidu.coturn.port }}"
   COTURN_URIS_LIST: {{ .Values.services.openvidu.coturn.uris }}
   OPENVIDU_WEBRTC_ICE_SERVERS: '{{ .Values.services.openvidu.coturn.iceServers }}'
-  {{- if eq .Values.mode "distributed" }} 
+  {{- if eq .Values.mode "distributed" }}
   KMS_URIS: '[
     {{- $replicas := (.Values.services.openvidu.pro.mediaNodeReplicas | int ) }}
     {{- range $index, $element := until $replicas }}
@@ -42,7 +42,7 @@ data:
   CERTIFICATE_TYPE: "{{ .Values.services.openvidu.ssl.certType }}"
   {{- end }}
   OPENVIDU_RECORDING: "{{ .Values.services.openvidu.recording.enabled }}"
-  {{- if .Values.services.openvidu.recording.enabled }}        
+  {{- if .Values.services.openvidu.recording.enabled }}
   OPENVIDU_RECORDING_DEBUG: "{{ .Values.services.openvidu.recording.debug }}"
   OPENVIDU_RECORDING_PATH: "{{ .Values.services.openvidu.recording.path }}"
   OPENVIDU_RECORDING_CUSTOM_LAYOUT: "{{ .Values.services.openvidu.recording.layout }}"
@@ -60,7 +60,7 @@ data:
   OPENVIDU_WEBHOOK_HEADERS: '{{ .Values.services.openvidu.webhook.headers }}'
   OPENVIDU_WEBHOOK_EVENTS: '{{ .Values.services.openvidu.webhook.events }}'
   {{- end }}
-  OPENVIDU_STREAMS_ALLOW_TRANSCODING:  "{{ .Values.services.openvidu.transcoding.enabled }}"  
+  OPENVIDU_STREAMS_ALLOW_TRANSCODING:  "{{ .Values.services.openvidu.transcoding.enabled }}"
   OPENVIDU_SESSIONS_GARBAGE_INTERVAL: "{{ .Values.services.openvidu.gc.interval }}"
   OPENVIDU_SESSIONS_GARBAGE_THRESHOLD: "{{ .Values.services.openvidu.gc.threshold }}"
   OPENVIDU_CDR: "{{ .Values.services.openvidu.cdr.enabled }}"
@@ -75,8 +75,8 @@ data:
   OPENVIDU_PRO_CLUSTER_ENVIRONMENT: "{{- .Values.services.openvidu.pro.environment }}"
   OPENVIDU_PRO_CLUSTER_LOAD_STRATEGY: "{{- .Values.services.openvidu.pro.loadStrategy }}"
   OPENVIDU_PRO_NETWORK_QUALITY: "{{- .Values.services.openvidu.pro.networkQoS }}"
-  OPENVIDU_PRO_ELASTICSEARCH: "{{- .Values.services.openvidu.pro.elasticsearch.enabled }}" 
-  OPENVIDU_PRO_CLUSTER_RECONNECTION_TIMEOUT: "{{- .Values.services.openvidu.pro.mediaReconnTimeout }}" 
+  OPENVIDU_PRO_ELASTICSEARCH: "{{- .Values.services.openvidu.pro.elasticsearch.enabled }}"
+  OPENVIDU_PRO_CLUSTER_RECONNECTION_TIMEOUT: "{{- .Values.services.openvidu.pro.mediaReconnTimeout }}"
     {{- if .Values.services.openvidu.pro.elasticsearch.enabled }}
   OPENVIDU_PRO_ELASTICSEARCH_HOST: "http://{{ include "openvidu.fullname" . }}-elasticsearch-es-internal-http:9200"
   OPENVIDU_PRO_KIBANA_HOST: "https://{{ index .Values.services.openvidu.pro.elasticsearch.kibanaIngress.hosts 0 }}/kibana"
@@ -135,7 +135,7 @@ data:
             username: "${ELASTICSEARCH_USERNAME}"
             password: "${ELASTICSEARCH_PASSWORD}"
         setup:
-          dashboards: 
+          dashboards:
             enabled: false
           kibana:
             path: /kibana
@@ -165,9 +165,9 @@ data:
               type: container
         processors:
         - add_cloud_metadata: {}
-        - add_host_metadata: {}                
+        - add_host_metadata: {}
         output:
-          elasticsearch:          
+          elasticsearch:
             hosts: ["${OPENVIDU_PRO_ELASTICSEARCH_HOST}"]
             index: "filebeat-%{+yyyy.MM.dd}"
             username: "${ELASTICSEARCH_USERNAME}"
@@ -193,5 +193,5 @@ data:
             enabled: false
           template:
             name: "filebeat"
-            pattern: "filebeat-*"        
+            pattern: "filebeat-*"
 ---

@@ -6,7 +6,7 @@ metadata:
   name: {{ include "openvidu.fullname" . }}-elasticsearch
   labels:
     app.kubernetes.io/name: {{ include "openvidu.name" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}  
+    app.kubernetes.io/instance: {{ .Release.Name }}
 spec:
   version: {{ .Values.services.openvidu.pro.elasticsearch.version }}
   volumeClaimDeletePolicy: DeleteOnScaledownOnly
@@ -38,7 +38,7 @@ spec:
   http:
     service:
       spec:
-        type: {{ .Values.services.openvidu.pro.elasticsearch.serviceType }}  
+        type: {{ .Values.services.openvidu.pro.elasticsearch.serviceType }}
     tls:
       selfSignedCertificate:
         disabled: true
@@ -49,7 +49,7 @@ metadata:
   name: {{ include "openvidu.fullname" . }}-kibana
   labels:
     app.kubernetes.io/name: {{ include "openvidu.name" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}  
+    app.kubernetes.io/instance: {{ .Release.Name }}
 spec:
   version: {{ .Values.services.openvidu.pro.elasticsearch.version }}
   count: 1
@@ -68,7 +68,7 @@ spec:
   podTemplate:
     spec:
       containers:
-      - name: kibana        
+      - name: kibana
         readinessProbe:
           failureThreshold: 3
           httpGet:
@@ -109,7 +109,7 @@ spec:
         paths:
   {{- range $p := $paths }}
           - path: {{ $p }}
-            pathType: ImplementationSpecific          
+            pathType: ImplementationSpecific
             backend:
               service:
                 name:  {{ $serviceName }}-kibana-kb-http
@@ -122,7 +122,7 @@ spec:
         paths:
   {{- range $p := $paths }}
           - path: {{ $p }}
-            pathType: ImplementationSpecific          
+            pathType: ImplementationSpecific
             backend:
               service:
                 name:  {{ $serviceName }}-kibana-kb-http

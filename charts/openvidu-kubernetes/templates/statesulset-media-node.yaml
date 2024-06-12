@@ -13,10 +13,10 @@ spec:
   serviceName: {{ include "openvidu.fullname" . }}-media-node
   replicas: {{ .Values.services.openvidu.pro.mediaNodeReplicas }}
   updateStrategy:
-    type: {{ .Values.updateStrategy }}  
+    type: {{ .Values.updateStrategy }}
   selector:
     matchLabels:
-      app: {{ include "openvidu.fullname" . }}   
+      app: {{ include "openvidu.fullname" . }}
       app.kubernetes.io/name: {{ include "openvidu.name" . }}-media-node
       app.kubernetes.io/instance: {{ .Release.Name }}
   template:
@@ -29,13 +29,13 @@ spec:
       imagePullSecrets:
 {{- range $pval := .Values.jx.imagePullSecrets }}
       - name: {{ quote $pval }}
-{{- end }}     
+{{- end }}
       containers:
       {{- range $name, $val := .Values.services }}
-        {{- if $val.enabled }} 
+        {{- if $val.enabled }}
         {{- if or (eq $val.type "media") (eq $val.type "monitoring") }}
       - name: {{ $name }}
-        image: "{{ $val.image.repository }}:{{ $val.image.tag }}"      
+        image: "{{ $val.image.repository }}:{{ $val.image.tag }}"
         imagePullPolicy: {{ $val.image.pullPolicy }}
         ports:
           {{- range $index, $proto :=  $val.protocols }}
@@ -47,10 +47,10 @@ spec:
             {{- range untilStep ($val.env.KMS_MIN_PORT|int) ($val.env.KMS_MAX_PORT|int) 1}}
           - containerPort: {{ . }}
             protocol: {{ $proto }}
-            {{- end }}          
+            {{- end }}
           {{- end }}
           {{- end }}
-        {{- if eq $name "kms"}}          
+        {{- if eq $name "kms"}}
         livenessProbe:
           tcpSocket:
             port: {{ $val.port }}
@@ -62,22 +62,22 @@ spec:
         readinessProbe:
           tcpSocket:
             port: {{ $val.port }}
-          initialDelaySeconds: {{ $.Values.readinessProbe.initialDelaySeconds }}            
+          initialDelaySeconds: {{ $.Values.readinessProbe.initialDelaySeconds }}
           periodSeconds: {{ $.Values.readinessProbe.periodSeconds }}
           successThreshold: {{ $.Values.readinessProbe.successThreshold }}
           timeoutSeconds: {{ $.Values.readinessProbe.timeoutSeconds }}
           failureThreshold: {{ $.Values.readinessProbe.failureThreshold }}
-        {{- end }}          
+        {{- end }}
         {{- if eq $name "kms" }}
-        resources:        
+        resources:
           {{- toYaml $.Values.resourcesPro.media | nindent 10 }}
         {{- else if or (eq $val.type "monitoring") (eq $name "media-node-controller") }}
         resources:
           {{- toYaml $.Values.resourcesPro.monitoring | nindent 10 }}
         {{- else }}
         resources:
-          {{- toYaml $.Values.resources | nindent 12 }}        
-        {{- end }}     
+          {{- toYaml $.Values.resources | nindent 12 }}
+        {{- end }}
         env:
         {{- if $.Values.services.openvidu.pro.elasticsearch.enabled }}
         - name: ELASTICSEARCH_PASSWORD
@@ -85,7 +85,7 @@ spec:
             secretKeyRef:
               name: {{ include "openvidu.fullname" $ }}-elasticsearch-es-elastic-user
               key: elastic
-        {{- end }}        
+        {{- end }}
         {{- range $pkey, $pval := $val.env }}
         - name: {{ $pkey }}
           value: {{ quote $pval }}
@@ -98,28 +98,28 @@ spec:
         {{- else if eq $name "metricbeat" }}
         - name: NODE_ROLE
           value: medianode
-        {{- end }}                        
+        {{- end }}
         envFrom:
         - configMapRef:
             name: {{ include "openvidu.fullname" $ }}
       {{- with $.Values.securityContext }}
         securityContext:
           {{- toYaml . | nindent 10 }}
-      {{- end }}                      
+      {{- end }}
         volumeMounts:
-        {{- if eq $name "metricbeat" }}    
+        {{- if eq $name "metricbeat" }}
         - name: metricbeat-{{ $.Chart.Name }}
           readOnly: true
           mountPath: /usr/share/metricbeat/metricbeat.yml
           subPath: metricbeat.yml
         - name: docker-socket
-          mountPath: /var/run/docker.sock 
+          mountPath: /var/run/docker.sock
           readOnly: true
-        {{- else if eq $name "media-node-controller" }}    
+        {{- else if eq $name "media-node-controller" }}
         - name: docker-socket
-          mountPath: /var/run/docker.sock 
-          readOnly: true                    
-        {{- else if eq $name "logging" }}    
+          mountPath: /var/run/docker.sock
+          readOnly: true
+        {{- else if eq $name "logging" }}
         - name: filebeat-{{ $.Chart.Name }}
           readOnly: true
           mountPath: /usr/share/filebeat/filebeat.yml
@@ -129,15 +129,15 @@ spec:
         - name: varlogpods
           mountPath: /var/log/pods
         - name: varlibdockercontainers
-          mountPath: /var/lib/docker/containers    
+          mountPath: /var/lib/docker/containers
         - name: docker-socket
-          mountPath: /var/run/docker.sock 
-          readOnly: true               
+          mountPath: /var/run/docker.sock
+          readOnly: true
         {{- end }}
         {{- end }}
-        {{- end }}        
+        {{- end }}
       {{- end }}
-{{/* end of services loop */}}      
+{{/* end of services loop */}}
     {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -151,9 +151,9 @@ spec:
         {{- toYaml . | nindent 8 }}
     {{- end }}
       serviceAccountName: {{ include "openvidu.fullname" $ }}-logging
-      automountServiceAccountToken: true      
+      automountServiceAccountToken: true
       volumes:
-    {{- if .Values.services.metricbeat.enabled }}      
+    {{- if .Values.services.metricbeat.enabled }}
       - name: metricbeat-{{ .Chart.Name }}
         configMap:
           name: {{ include "openvidu.fullname" . }}-metricbeat
@@ -161,12 +161,12 @@ spec:
         configMap:
           name: {{ include "openvidu.fullname" . }}-filebeat
     {{- end }}
-    {{- if or  (.Values.services.metricbeat.enabled) (index .Values.services "media-node-controller")  }}          
+    {{- if or  (.Values.services.metricbeat.enabled) (index .Values.services "media-node-controller")  }}
       - name: docker-socket
         hostPath:
           path: /var/run/docker.sock
-    {{- end }}                
-    {{- if .Values.services.logging.enabled }}          
+    {{- end }}
+    {{- if .Values.services.logging.enabled }}
       - name: varlogcontainers
         hostPath:
           path: /var/log/containers
@@ -176,5 +176,5 @@ spec:
       - name: varlibdockercontainers
         hostPath:
           path: /var/lib/docker/containers
-    {{- end }}      
+    {{- end }}
 {{- end }}
