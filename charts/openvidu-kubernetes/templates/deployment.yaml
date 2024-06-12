@@ -199,8 +199,9 @@ spec:
     {{- end }}
     {{- if .Values.services.openvidu.recording.enabled }}
       - name: recordings
-        persistentVolumeClaim:
-          claimName: {{ include "openvidu.fullname" . }}
+        hostPath:
+          path: {{ .Values.services.openvidu.recording.path }}
+          type: DirectoryOrCreate
     {{- end }}    
     {{- if .Values.services.logging.enabled }}
       - name: filebeat-{{ .Chart.Name }}
