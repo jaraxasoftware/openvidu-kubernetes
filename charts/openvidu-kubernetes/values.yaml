@@ -107,6 +107,11 @@ services:
       autostop: 120
       storage:
         size: 5Gi
+        storageClass: default
+        persistence:
+          enabled: true
+          accessMode: ReadWriteOnce
+          annotations: {}
     transcoding:
       enabled: false
     webhook:
@@ -148,6 +153,14 @@ services:
       KURENTO_LOGS_PATH: "/var/log/kurento-media-server/"
       KMS_MIN_PORT: "40000"
       KMS_MAX_PORT: "45000"
+
+  recording:
+    enabled: false
+    type: media
+    image:
+      repository: openvidu/openvidu-recording
+      tag: 2.27.0
+      pullPolicy: IfNotPresent
 
   logging:
     enabled: false

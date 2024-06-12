@@ -121,7 +121,17 @@ spec:
           {{- if $.Values.services.openvidu.recording.enabled }}
         - name: recordings
           mountPath: {{ $.Values.services.openvidu.recording.path }}
-          {{- end }}          
+          {{- end }}
+        {{- else if eq $name "kms" }}
+          {{- if $.Values.services.openvidu.recording.enabled }}
+        - name: recordings
+          mountPath: {{ $.Values.services.openvidu.recording.path }}
+          {{- end }}
+        {{- else if eq $name "recording" }}
+          {{- if $.Values.services.openvidu.recording.enabled }}
+        - name: recordings
+          mountPath: {{ $.Values.services.openvidu.recording.path }}
+          {{- end }}                       
         {{- else if eq $name "metricbeat" }}
         - name: metricbeat-{{ $.Chart.Name }}
           readOnly: true
@@ -189,8 +199,8 @@ spec:
     {{- end }}
     {{- if .Values.services.openvidu.recording.enabled }}
       - name: recordings
-        emptyDir:
-          sizeLimit: {{ .Values.services.openvidu.recording.storage.size }}
+        persistentVolumeClaim:
+          claimName: {{ include "openvidu.fullname" . }}
     {{- end }}    
     {{- if .Values.services.logging.enabled }}
       - name: filebeat-{{ .Chart.Name }}
