@@ -50,7 +50,9 @@ spec:
           value: "tcp://localhost:2376"
         volumeMounts:
         - name: docker-dind-certs
-          mountPath: /certs/client          
+          mountPath: /certs/client
+        - name: recordings
+          mountPath: {{ $.Values.services.openvidu.recording.path }}                   
       {{- range $name, $val := .Values.services }}
       {{- if $val.enabled }}
       - name: {{ $name }}
@@ -146,8 +148,6 @@ spec:
           {{- end }}
         {{- end }}
         {{- if eq $name "openvidu" }}
-        - name: docker-socket
-          mountPath: /var/run/docker.sock
           {{- if $.Values.services.openvidu.recording.enabled }}
         - name: docker-dind-certs
           mountPath: /certs/client
@@ -233,9 +233,12 @@ spec:
       - name: docker-dind-certs
         emptyDir: {}
       - name: recordings
-        hostPath:
-          path: {{ .Values.services.openvidu.recording.path }}
-          type: DirectoryOrCreate
+        {{- if .Values.services.openvidu.recording.storage.persistence.enabled }}
+        persistentVolumeClaim:
+          claimName: {{ include "openvidu.fullname" . }}-recordings
+        {{- else }}
+        emptyDir: {}
+        {{- end }}
     {{- end }}    
     {{- if .Values.services.logging.enabled }}
       - name: filebeat-{{ .Chart.Name }}

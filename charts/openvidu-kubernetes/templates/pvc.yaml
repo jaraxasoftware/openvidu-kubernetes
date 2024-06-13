@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ include "openvidu.fullname" . }}
+  name: {{ include "openvidu.fullname" . }}-recordings
 {{- with .Values.services.openvidu.recording.storage.persistence.annotations  }}
   annotations:
 {{ toYaml . | indent 4 }}
