@@ -24,6 +24,12 @@ service:
 # Mandatory. Can be deployment or distributed
 mode: deployment
 
+DeploymentUpdate:
+  type: RollingUpdate
+  maxUnavailable: 0
+  maxSurge: 1
+  deploymentDeadline: 180
+
 updateStrategy: OnDelete
 
 services:

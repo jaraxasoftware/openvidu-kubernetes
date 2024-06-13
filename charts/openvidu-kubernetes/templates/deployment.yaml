@@ -11,11 +11,19 @@ metadata:
 {{ include "openvidu.labels" . | indent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
+  progressDeadlineSeconds: {{ .Values.DeploymentUpdate.deploymentDeadline }}
   selector:
     matchLabels:
       app: {{ include "openvidu.fullname" . }}
       app.kubernetes.io/name: {{ include "openvidu.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
+  strategy:
+    type: {{ .Values.DeploymentUpdate.type }}
+    {{- if eq .Values.DeploymentUpdate.type "RollingUpdate" }}
+    rollingUpdate:
+      maxSurge: {{ .Values.DeploymentUpdate.maxSurge }}
+      maxUnavailable: {{ .Values.DeploymentUpdate.maxUnavailable }}
+    {{- end }}      
   template:
     metadata:
       labels:
