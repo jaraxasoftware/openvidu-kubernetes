@@ -120,7 +120,6 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: spec.nodeName
-        {{- end }}
         {{- else if eq $name "openvidu" }}
         env:
         - name: DOCKER_CERT_PATH
