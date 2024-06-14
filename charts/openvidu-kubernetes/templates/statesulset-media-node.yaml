@@ -31,6 +31,30 @@ spec:
       - name: {{ quote $pval }}
 {{- end }}
       containers:
+      - name: docker-dind
+        image: docker:dind
+        ports:
+          - name: dind-con-port
+            containerPort: 2376
+            hostPort: 2376
+            protocol: TCP
+        tty: true
+        securityContext:
+          privileged: true
+        env:
+        - name: DOCKER_TLS_CERTDIR
+          value: /certs
+        - name: DOCKER_CERT_PATH
+          value: /certs/client
+        - name: DOCKER_TLS_VERIFY
+          value: "1"        
+        - name: DOCKER_HOST
+          value: "tcp://localhost:2376"
+        volumeMounts:
+        - name: docker-dind-certs
+          mountPath: /certs/client
+        - name: recordings
+          mountPath: {{ $.Values.services.openvidu.recording.path }}      
       {{- range $name, $val := .Values.services }}
         {{- if $val.enabled }}
         {{- if or (eq $val.type "media") (eq $val.type "monitoring") }}
@@ -95,6 +119,13 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: spec.nodeName
+        {{- else if eq $name "openvidu" }}
+        - name: DOCKER_CERT_PATH
+          value: /certs/client
+        - name: DOCKER_TLS_VERIFY
+          value: "1"
+        - name: DOCKER_HOST
+          value: tcp://localhost:2376                    
         {{- else if eq $name "metricbeat" }}
         - name: NODE_ROLE
           value: medianode
@@ -116,9 +147,12 @@ spec:
           mountPath: /var/run/docker.sock
           readOnly: true
         {{- else if eq $name "media-node-controller" }}
-        - name: docker-socket
-          mountPath: /var/run/docker.sock
-          readOnly: true
+          {{- if $.Values.services.openvidu.recording.enabled }}
+        - name: docker-dind-certs
+          mountPath: /certs/client
+        - name: recordings
+          mountPath: {{ $.Values.services.openvidu.recording.path }}
+          {{- end }}
         {{- else if eq $name "logging" }}
         - name: filebeat-{{ $.Chart.Name }}
           readOnly: true
@@ -161,6 +195,17 @@ spec:
         configMap:
           name: {{ include "openvidu.fullname" . }}-filebeat
     {{- end }}
+    {{- if .Values.services.openvidu.recording.enabled }}
+      - name: docker-dind-certs
+        emptyDir: {}
+      - name: recordings
+        {{- if .Values.services.openvidu.recording.storage.persistence.enabled }}
+        persistentVolumeClaim:
+          claimName: {{ include "openvidu.fullname" . }}-recordings
+        {{- else }}
+        emptyDir: {}
+        {{- end }}
+    {{- end }}    
     {{- if or  (.Values.services.metricbeat.enabled) (index .Values.services "media-node-controller")  }}
       - name: docker-socket
         hostPath:

@@ -43,7 +43,7 @@ spec:
           - name: dind-con-port
             containerPort: 2376
             hostPort: 2376
-            protocol: TCP              
+            protocol: TCP
         tty: true
         securityContext:
           privileged: true
