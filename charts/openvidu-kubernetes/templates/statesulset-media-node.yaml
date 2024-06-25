@@ -47,14 +47,14 @@ spec:
         - name: DOCKER_CERT_PATH
           value: /certs/client
         - name: DOCKER_TLS_VERIFY
-          value: "1"        
+          value: "1"
         - name: DOCKER_HOST
           value: "tcp://localhost:2376"
         volumeMounts:
         - name: docker-dind-certs
           mountPath: /certs/client
-        - name: recordings
-          mountPath: {{ $.Values.services.openvidu.recording.path }}              
+        - name: {{ include "openvidu.fullname" . }}-recordings-media-node
+          mountPath: {{ $.Values.services.openvidu.recording.path }}
       {{- range $name, $val := .Values.services }}
         {{- if $val.enabled }}
         {{- if or (eq $val.type "media") (eq $val.type "monitoring") }}
@@ -125,7 +125,7 @@ spec:
         - name: DOCKER_TLS_VERIFY
           value: "1"
         - name: DOCKER_HOST
-          value: tcp://localhost:2376                    
+          value: tcp://localhost:2376
         {{- else if eq $name "metricbeat" }}
         - name: NODE_ROLE
           value: medianode
@@ -150,8 +150,8 @@ spec:
           {{- if $.Values.services.openvidu.recording.enabled }}
         - name: docker-dind-certs
           mountPath: /certs/client
-        - name: recordings
-          mountPath: {{ $.Values.services.openvidu.recording.path }}          
+        - name: {{ include "openvidu.fullname" . }}-recordings-media-node
+          mountPath: {{ $.Values.services.openvidu.recording.path }}
           {{- end }}
         {{- else if eq $name "logging" }}
         - name: filebeat-{{ $.Chart.Name }}
@@ -186,6 +186,26 @@ spec:
     {{- end }}
       serviceAccountName: {{ include "openvidu.fullname" $ }}-logging
       automountServiceAccountToken: true
+      {{- if .Values.services.openvidu.recording.enabled }}
+        {{- if .Values.services.openvidu.recording.storage.persistence.enabled }}
+      volumeClaimTemplates:
+      - metadata:
+          name: {{ include "openvidu.fullname" . }}-recordings-media-node
+        {{- with .Values.services.openvidu.recording.storage.persistence.annotations  }}
+          annotations:
+        {{ toYaml . | indent 4 }}
+        {{- end }}
+          labels:
+            {{- include "openvidu.labels" . | nindent 4 }}
+        spec:
+          accessModes:
+            - {{ .Values.services.openvidu.recording.storage.persistence.accessMode | quote }}
+          resources:
+            requests:
+              storage: {{ .Values.services.openvidu.recording.storage.size | quote }}
+          storageClassName: "{{ .Values.services.openvidu.recording.storage.storageClass }}"
+        {{- end }}
+      {{- end }}
       volumes:
     {{- if .Values.services.metricbeat.enabled }}
       - name: metricbeat-{{ .Chart.Name }}
@@ -198,14 +218,7 @@ spec:
     {{- if .Values.services.openvidu.recording.enabled }}
       - name: docker-dind-certs
         emptyDir: {}
-      - name: recordings
-        {{- if .Values.services.openvidu.recording.storage.persistence.enabled }}
-        persistentVolumeClaim:
-          claimName: {{ include "openvidu.fullname" . }}-recordings
-        {{- else }}
-        emptyDir: {}
-        {{- end }}
-    {{- end }}     
+    {{- end }}
     {{- if or  (.Values.services.metricbeat.enabled) (index .Values.services "media-node-controller")  }}
       - name: docker-socket
         hostPath:

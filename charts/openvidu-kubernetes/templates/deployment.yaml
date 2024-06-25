@@ -23,7 +23,7 @@ spec:
     rollingUpdate:
       maxSurge: {{ .Values.DeploymentUpdate.maxSurge }}
       maxUnavailable: {{ .Values.DeploymentUpdate.maxUnavailable }}
-    {{- end }}      
+    {{- end }}
   template:
     metadata:
       labels:
@@ -53,14 +53,14 @@ spec:
         - name: DOCKER_CERT_PATH
           value: /certs/client
         - name: DOCKER_TLS_VERIFY
-          value: "1"        
+          value: "1"
         - name: DOCKER_HOST
           value: "tcp://localhost:2376"
         volumeMounts:
         - name: docker-dind-certs
           mountPath: /certs/client
         - name: recordings
-          mountPath: {{ $.Values.services.openvidu.recording.path }}                   
+          mountPath: {{ $.Values.services.openvidu.recording.path }}
       {{- range $name, $val := .Values.services }}
       {{- if $val.enabled }}
       - name: {{ $name }}
@@ -138,7 +138,7 @@ spec:
           value: "1"
         - name: DOCKER_HOST
           value: tcp://localhost:2376
-        {{- end }}        
+        {{- end }}
         envFrom:
         - configMapRef:
             name: {{ include "openvidu.fullname" $ }}
@@ -171,7 +171,7 @@ spec:
           {{- if $.Values.services.openvidu.recording.enabled }}
         - name: recordings
           mountPath: {{ $.Values.services.openvidu.recording.path }}
-          {{- end }}                       
+          {{- end }}
         {{- else if eq $name "metricbeat" }}
         - name: metricbeat-{{ $.Chart.Name }}
           readOnly: true
@@ -247,7 +247,7 @@ spec:
         {{- else }}
         emptyDir: {}
         {{- end }}
-    {{- end }}    
+    {{- end }}
     {{- if .Values.services.logging.enabled }}
       - name: filebeat-{{ .Chart.Name }}
         configMap:
