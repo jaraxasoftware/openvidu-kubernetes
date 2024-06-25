@@ -150,7 +150,7 @@ spec:
           {{- if $.Values.services.openvidu.recording.enabled }}
         - name: docker-dind-certs
           mountPath: /certs/client
-        - name: {{ include "openvidu.fullname" . }}-recordings-media-node
+        - name: {{ include "openvidu.fullname" $ }}-recordings-media-node
           mountPath: {{ $.Values.services.openvidu.recording.path }}
           {{- end }}
         {{- else if eq $name "logging" }}
