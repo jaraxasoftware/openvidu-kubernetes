@@ -190,10 +190,10 @@ spec:
           name: {{ include "openvidu.fullname" . }}-recordings-master
         {{- with .Values.services.openvidu.recording.storage.persistence.annotations  }}
           annotations:
-        {{ toYaml . | indent 4 }}
+        {{ toYaml . | indent 12 }}
         {{- end }}
           labels:
-            {{- include "openvidu.labels" . | nindent 4 }}
+            {{- include "openvidu.labels" . | nindent 12 }}
         spec:
           accessModes:
             - {{ .Values.services.openvidu.recording.storage.persistence.accessMode | quote }}
