@@ -52,7 +52,9 @@ spec:
           value: "tcp://localhost:2376"
         volumeMounts:
         - name: docker-dind-certs
-          mountPath: /certs/client    
+          mountPath: /certs/client
+        - name: recordings
+          mountPath: {{ $.Values.services.openvidu.recording.path }}              
       {{- range $name, $val := .Values.services }}
         {{- if $val.enabled }}
         {{- if or (eq $val.type "media") (eq $val.type "monitoring") }}
@@ -148,6 +150,8 @@ spec:
           {{- if $.Values.services.openvidu.recording.enabled }}
         - name: docker-dind-certs
           mountPath: /certs/client
+        - name: recordings
+          mountPath: {{ $.Values.services.openvidu.recording.path }}          
           {{- end }}
         {{- else if eq $name "logging" }}
         - name: filebeat-{{ $.Chart.Name }}
@@ -194,7 +198,14 @@ spec:
     {{- if .Values.services.openvidu.recording.enabled }}
       - name: docker-dind-certs
         emptyDir: {}
-    {{- end }}    
+      - name: recordings
+        {{- if .Values.services.openvidu.recording.storage.persistence.enabled }}
+        persistentVolumeClaim:
+          claimName: {{ include "openvidu.fullname" . }}-recordings
+        {{- else }}
+        emptyDir: {}
+        {{- end }}
+    {{- end }}     
     {{- if or  (.Values.services.metricbeat.enabled) (index .Values.services "media-node-controller")  }}
       - name: docker-socket
         hostPath:
