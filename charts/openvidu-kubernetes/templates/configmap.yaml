@@ -49,6 +49,16 @@ data:
   OPENVIDU_RECORDING_PUBLIC_ACCESS: "{{ .Values.services.openvidu.recording.public }}"
   OPENVIDU_RECORDING_NOTIFICATION: "{{ .Values.services.openvidu.recording.notification }}"
   OPENVIDU_RECORDING_AUTOSTOP_TIMEOUT: "{{ .Values.services.openvidu.recording.autostop }}"
+    {{- if .Values.services.openvidu.recording.storage.s3.enabled }}
+  OPENVIDU_PRO_RECORDING_STORAGE: s3
+  OPENVIDU_PRO_AWS_S3_BUCKET: "{{ .Values.services.openvidu.recording.storage.s3.bucket }}"
+  OPENVIDU_PRO_AWS_S3_HEADERS: '{{ .Values.services.openvidu.recording.storage.s3.headers }}'
+  OPENVIDU_PRO_AWS_S3_SERVICE_ENDPOINT: '{{ .Values.services.openvidu.recording.storage.s3.endpoint }}'
+  OPENVIDU_PRO_AWS_S3_WITH_PATH_STYLE_ACCESS: false
+  OPENVIDU_PRO_AWS_ACCESS_KEY: "{{ .Values.services.openvidu.recording.storage.s3.accessKey }}"
+  OPENVIDU_PRO_AWS_SECRET_KEY: "{{ .Values.services.openvidu.recording.storage.s3.secretKey }}"
+  OPENVIDU_PRO_AWS_REGION: "{{ .Values.services.openvidu.recording.storage.s3.region }}"
+    {{- end }}
   {{- end }}
   OPENVIDU_STREAMS_VIDEO_MAX_RECV_BANDWIDTH: "{{ .Values.services.openvidu.bandwidth.received.max }}"
   OPENVIDU_STREAMS_VIDEO_MIN_RECV_BANDWIDTH: "{{ .Values.services.openvidu.bandwidth.received.min }}"

@@ -44,7 +44,7 @@ services:
     configDir: /opt/openvidu/
     secret: openvidu
     pro:
-      enabled: true
+      enabled: false
       license: xxxxxx-yyyyyy-zzzzzz-aaaaaa-bbbb
       cluster: true
       mode: manual
@@ -58,7 +58,7 @@ services:
       browserLogs: disabled
       monitoringInterval: 30
       elasticsearch:
-        enabled: true
+        enabled: false
         version: 7.17.9
         nodeCount: 1
         volumeSize: 10Gi
@@ -118,6 +118,12 @@ services:
           enabled: false
           accessMode: ReadWriteOnce
           annotations: {}
+        s3:
+          enabled: false
+          bucket: jaraxa-openvidu-recordings
+          accessKey: ACCESSKEY
+          secretKey: SECRETKEY
+          region: eu-west-1
     transcoding:
       enabled: false
     webhook:
