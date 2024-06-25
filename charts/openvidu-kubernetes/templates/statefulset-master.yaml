@@ -19,6 +19,26 @@ spec:
       app: {{ include "openvidu.fullname" . }}
       app.kubernetes.io/name: {{ include "openvidu.name" . }}-master
       app.kubernetes.io/instance: {{ .Release.Name }}
+  {{- if .Values.services.openvidu.recording.enabled }}
+    {{- if .Values.services.openvidu.recording.storage.persistence.enabled }}
+  volumeClaimTemplates:
+  - metadata:
+      name: {{ include "openvidu.fullname" . }}-recordings-master
+    {{- with .Values.services.openvidu.recording.storage.persistence.annotations  }}
+      annotations:
+    {{ toYaml . | indent 8 }}
+    {{- end }}
+      labels:
+        {{- include "openvidu.labels" . | nindent 8 }}
+    spec:
+      accessModes:
+        - {{ .Values.services.openvidu.recording.storage.persistence.accessMode | quote }}
+      resources:
+        requests:
+          storage: {{ .Values.services.openvidu.recording.storage.size | quote }}
+      storageClassName: "{{ .Values.services.openvidu.recording.storage.storageClass }}"
+    {{- end }}
+  {{- end }}      
   template:
     metadata:
       labels:
@@ -183,26 +203,6 @@ spec:
     {{- end }}
       serviceAccountName: {{ include "openvidu.fullname" $ }}-logging
       automountServiceAccountToken: true
-      {{- if .Values.services.openvidu.recording.enabled }}
-        {{- if .Values.services.openvidu.recording.storage.persistence.enabled }}
-      volumeClaimTemplates:
-      - metadata:
-          name: {{ include "openvidu.fullname" . }}-recordings-master
-        {{- with .Values.services.openvidu.recording.storage.persistence.annotations  }}
-          annotations:
-        {{ toYaml . | indent 12 }}
-        {{- end }}
-          labels:
-            {{- include "openvidu.labels" . | nindent 12 }}
-        spec:
-          accessModes:
-            - {{ .Values.services.openvidu.recording.storage.persistence.accessMode | quote }}
-          resources:
-            requests:
-              storage: {{ .Values.services.openvidu.recording.storage.size | quote }}
-          storageClassName: "{{ .Values.services.openvidu.recording.storage.storageClass }}"
-        {{- end }}
-      {{- end }}
       volumes:
     {{- if .Values.services.metricbeat.enabled }}
       - name: metricbeat-{{ .Chart.Name }}
