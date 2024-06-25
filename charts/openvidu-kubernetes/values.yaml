@@ -104,7 +104,7 @@ services:
         max: 1000
         min: 300
     recording:
-      enabled: false
+      enabled: true
       debug: false
       path: /opt/openvidu/recordings
       layout: /opt/openvidu/custom-layout
@@ -119,7 +119,7 @@ services:
           accessMode: ReadWriteOnce
           annotations: {}
         s3:
-          enabled: false
+          enabled: true
           bucket: jaraxa-openvidu-recordings
           accessKey: ACCESSKEY
           secretKey: SECRETKEY
