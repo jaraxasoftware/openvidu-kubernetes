@@ -54,7 +54,7 @@ data:
   OPENVIDU_PRO_AWS_S3_BUCKET: "{{ .Values.services.openvidu.recording.storage.s3.bucket }}"
   OPENVIDU_PRO_AWS_S3_HEADERS: '{{ .Values.services.openvidu.recording.storage.s3.headers }}'
   OPENVIDU_PRO_AWS_S3_SERVICE_ENDPOINT: '{{ .Values.services.openvidu.recording.storage.s3.endpoint }}'
-  OPENVIDU_PRO_AWS_S3_WITH_PATH_STYLE_ACCESS: "false"
+  OPENVIDU_PRO_AWS_S3_WITH_PATH_STYLE_ACCESS: "{{ .Values.services.openvidu.recording.storage.s3.pathStyle }}"
   OPENVIDU_PRO_AWS_ACCESS_KEY: "{{ .Values.services.openvidu.recording.storage.s3.accessKey }}"
   OPENVIDU_PRO_AWS_SECRET_KEY: "{{ .Values.services.openvidu.recording.storage.s3.secretKey }}"
   OPENVIDU_PRO_AWS_REGION: "{{ .Values.services.openvidu.recording.storage.s3.region }}"
