@@ -50,6 +50,7 @@ spec:
 {{- range $pval := .Values.jx.imagePullSecrets }}
       - name: {{ quote $pval }}
 {{- end }}
+      automountServiceAccountToken: {{ .Values.serviceAccount.tokenAutomount }}
       containers:
       - name: docker-dind
         image: docker:dind
@@ -202,7 +203,7 @@ spec:
         {{- toYaml . | nindent 8 }}
     {{- end }}
       serviceAccountName: {{ include "openvidu.fullname" $ }}-logging
-      automountServiceAccountToken: true
+      automountServiceAccountToken: {{ .Values.serviceAccount.tokenAutomount }}
       volumes:
     {{- if .Values.services.metricbeat.enabled }}
       - name: metricbeat-{{ .Chart.Name }}

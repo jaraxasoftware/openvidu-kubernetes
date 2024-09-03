@@ -16,6 +16,7 @@ test:
 
 serviceAccount:
   create: false
+  tokenAutomount: false  
 
 service:
   name: openvidu
