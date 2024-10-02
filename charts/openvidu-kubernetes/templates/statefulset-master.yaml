@@ -38,7 +38,7 @@ spec:
           storage: {{ .Values.services.openvidu.recording.storage.size | quote }}
       storageClassName: "{{ .Values.services.openvidu.recording.storage.storageClass }}"
     {{- end }}
-  {{- end }}      
+  {{- end }}
   template:
     metadata:
       labels:
@@ -52,6 +52,7 @@ spec:
 {{- end }}
       automountServiceAccountToken: {{ .Values.serviceAccount.tokenAutomount }}
       containers:
+      {{- if .Values.services.openvidu.recording.enabled }}
       - name: docker-dind
         image: docker:dind
         ports:
@@ -76,6 +77,7 @@ spec:
           mountPath: /certs/client
         - name: {{ include "openvidu.fullname" . }}-recordings-master
           mountPath: {{ $.Values.services.openvidu.recording.path }}
+      {{- end }}
       {{- range $name, $val := .Values.services }}
         {{- if $val.enabled }}
         {{- if or (eq $val.type "master") (eq $val.type "monitoring") }}
