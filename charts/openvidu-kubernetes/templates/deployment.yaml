@@ -37,6 +37,7 @@ spec:
 {{- end }}
       serviceAccountName: {{ template "openvidu.serviceAccountName" . }}
       containers:
+      {{- if .Values.services.openvidu.recording.enabled }}
       - name: docker-dind
         image: docker:dind
         ports:
@@ -61,6 +62,7 @@ spec:
           mountPath: /certs/client
         - name: recordings
           mountPath: {{ $.Values.services.openvidu.recording.path }}
+      {{- end }}
       {{- range $name, $val := .Values.services }}
       {{- if $val.enabled }}
       - name: {{ $name }}
