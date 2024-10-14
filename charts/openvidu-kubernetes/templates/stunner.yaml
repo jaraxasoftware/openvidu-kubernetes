@@ -25,7 +25,7 @@ metadata:
 type: Opaque
 stringData:
   type: static
-  username: {{ .Values.stunner.username }}  
+  username: {{ .Values.stunner.username }}
   password: {{ .Values.stunner.password }}
 ---
 apiVersion: stunner.l7mp.io/v1
@@ -63,7 +63,7 @@ spec:
       protocol: TURN-UDP
       allowedRoutes:
         namespaces:
-          from: {{ .Release.Namespace }}      
+          from: Same
     - name: dtls-listener
       port: 5349
       protocol: TURN-DTLS
@@ -75,13 +75,13 @@ spec:
             name: stunner-{{ include "openvidu.fullname" . }}-tls
       allowedRoutes:
         namespaces:
-          from: {{ .Release.Namespace }}            
+          from: Same
     - name: tcp-listener
       port: 3478
       protocol: TURN-tcp
       allowedRoutes:
         namespaces:
-          from: {{ .Release.Namespace }}      
+          from: Same
     - name: tls-listener
       port: 5349
       protocol: TURN-TLS
@@ -93,7 +93,7 @@ spec:
             name: stunner-{{ include "openvidu.fullname" . }}-tls
       allowedRoutes:
         namespaces:
-          from: {{ .Release.Namespace }}            
+          from: Same
     - name: tls-listener-alt
       port: 443
       protocol: TURN-TLS
@@ -105,7 +105,7 @@ spec:
             name: stunner-{{ include "openvidu.fullname" . }}-tls
       allowedRoutes:
         namespaces:
-          from: {{ .Release.Namespace }}
+          from: Same
 ---
 apiVersion: stunner.l7mp.io/v1
 kind: UDPRoute
@@ -123,5 +123,5 @@ spec:
   rules:
     - backendRefs:
         - name: {{ include "openvidu.fullname" . }}
-          namespace: {{ .Release.Namespace }}     
+          namespace: {{ .Release.Namespace }}
 {{- end }}
