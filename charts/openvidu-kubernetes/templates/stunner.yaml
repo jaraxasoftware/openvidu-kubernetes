@@ -63,7 +63,7 @@ spec:
       protocol: TURN-UDP
       allowedRoutes:
         namespaces:
-          from: Same
+          from: {{ .Values.stunner.routesNamespaces }}
     - name: dtls-listener
       port: 5349
       protocol: TURN-DTLS
@@ -75,13 +75,13 @@ spec:
             name: stunner-{{ include "openvidu.fullname" . }}-tls
       allowedRoutes:
         namespaces:
-          from: Same
+          from: {{ .Values.stunner.routesNamespaces }}
     - name: tcp-listener
       port: 3478
       protocol: TURN-tcp
       allowedRoutes:
         namespaces:
-          from: Same
+          from: {{ .Values.stunner.routesNamespaces }}
     - name: tls-listener
       port: 5349
       protocol: TURN-TLS
@@ -93,7 +93,7 @@ spec:
             name: stunner-{{ include "openvidu.fullname" . }}-tls
       allowedRoutes:
         namespaces:
-          from: Same
+          from: {{ .Values.stunner.routesNamespaces }}
     - name: tls-listener-alt
       port: 443
       protocol: TURN-TLS
@@ -105,7 +105,7 @@ spec:
             name: stunner-{{ include "openvidu.fullname" . }}-tls
       allowedRoutes:
         namespaces:
-          from: Same
+          from: {{ .Values.stunner.routesNamespaces }}
 ---
 apiVersion: stunner.l7mp.io/v1
 kind: UDPRoute
