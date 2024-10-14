@@ -1,0 +1,50 @@
+{{ if and (.Values.stunner.enabled) (.Values.stunner.zerossl.enabled) }}
+apiVersion: v1
+kind: Secret
+metadata:
+  namespace: cert-manager
+  name: zero-ssl-eabsecret
+data:
+  secret: {{ .Values.stunner.zerossl.eabSecret | b64enc }}
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: stunner-{{ .Chart.Name }}-zerossl
+spec:
+  acme:
+    externalAccountBinding:
+      keyID: {{ .Values.stunner.zerossl.eabKey }}
+      keySecretRef:
+        name: zero-ssl-eabsecret
+        key: secret
+      keyAlgorithm: HS256
+    privateKeySecretRef:
+      name: zerossl-{{ .Chart.Name }}
+    server: https://acme.zerossl.com/v2/DV90
+    solvers:
+    - dns01:
+        route53:
+          accessKeyID:  {{ .Values.stunner.zerossl.route53.accessKey }}
+          hostedZoneID: {{ .Values.stunner.zerossl.route53.hostedZone }}
+          region: us-west-1
+          secretAccessKeySecretRef:
+              name: {{ .Values.stunner.zerossl.route53.secret }}
+              key: secretkey
+---
+# Source: certs/templates/cert-manager-prod-certificate.yaml
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: stunner-{{ include "openvidu.fullname" . }}-tls
+spec:
+  secretName: stunner-{{ include "openvidu.fullname" . }}-tls
+  issuerRef:
+    group: cert-manager.io
+    kind: Issuer
+    name: stunner-{{ .Chart.Name }}-zerossl
+  {{- with .Values.stunner.zerossl.dnsNames }}
+  dnsNames:
+  {{- toYaml . | nindent 2 }}
+  {{- end -}}
+{{- end }}
