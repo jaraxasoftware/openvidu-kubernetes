@@ -101,7 +101,7 @@ spec:
         mode: Terminate
         certificateRefs:
           - kind: Secret
-            namespace: stunner
+            namespace: {{ .Release.Namespace }}
             name: stunner-{{ include "openvidu.fullname" . }}-tls
       allowedRoutes:
         namespaces:
