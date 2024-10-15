@@ -32,7 +32,6 @@ spec:
               name: {{ .Values.stunner.zerossl.route53.secret }}
               key: secretkey
 ---
-# Source: certs/templates/cert-manager-prod-certificate.yaml
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
@@ -46,7 +45,7 @@ spec:
   {{- with .Values.stunner.zerossl.dnsNames }}
   dnsNames:
   {{- toYaml . | nindent 2 }}
-  {{- end -}}
+  {{- end }}
 ---  
 {{- else if and .Values.stunner.enabled (not .Values.stunner.zerossl.enabled) (not .Values.stunner.owncert.enabled) }}
 apiVersion: cert-manager.io/v1
