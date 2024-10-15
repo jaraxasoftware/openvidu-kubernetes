@@ -15,13 +15,7 @@ spec:
 apiVersion: v1
 kind: Secret
 metadata:
-{{- if .Values.annotations }}
-  annotations:
-{{ toYaml .Values.annotations | indent 8 }}
-{{- end }}
   name: stunner-{{ include "openvidu.fullname" . }}-auth-secret
-  labels:
-{{ include "openvidu.labels" . | indent 4 }}
 type: Opaque
 stringData:
   type: static
@@ -31,13 +25,7 @@ stringData:
 apiVersion: stunner.l7mp.io/v1
 kind: GatewayConfig
 metadata:
-{{- if .Values.annotations }}
-  annotations:
-{{ toYaml .Values.annotations | indent 8 }}
-{{- end }}
   name: stunner-{{ include "openvidu.fullname" . }}-gatewayconfig
-  labels:
-{{ include "openvidu.labels" . | indent 4 }}
 spec:
   logLevel: {{ .Values.stunner.logLevel }}
   realm: {{ .Values.stunner.realm }}
@@ -53,8 +41,6 @@ metadata:
 {{ toYaml .Values.stunner.annotations | indent 8 }}
 {{- end }}
   name: stunner-{{ include "openvidu.fullname" . }}-server
-  labels:
-{{ include "openvidu.labels" . | indent 4 }}
 spec:
   gatewayClassName: stunner-{{ include "openvidu.fullname" . }}-gatewayclass
   listeners:
@@ -122,13 +108,7 @@ spec:
 apiVersion: stunner.l7mp.io/v1
 kind: UDPRoute
 metadata:
-{{- if .Values.annotations }}
-  annotations:
-{{ toYaml .Values.annotations | indent 8 }}
-{{- end }}
   name: stunner-{{ include "openvidu.fullname" . }}-server
-  labels:
-{{ include "openvidu.labels" . | indent 4 }}
 spec:
   parentRefs:
     - name: stunner-{{ include "openvidu.fullname" . }}-server
