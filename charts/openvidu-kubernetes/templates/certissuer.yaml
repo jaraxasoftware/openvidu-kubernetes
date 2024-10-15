@@ -1,4 +1,4 @@
-{{ if and (.Values.stunner.enabled) (.Values.stunner.zerossl.enabled) }}
+{{ if and (.Values.stunner.enabled) (.Values.stunner.zerossl.enabled) (not .Values.stunner.owncert.enabled) }}
 apiVersion: v1
 kind: Secret
 metadata:
@@ -43,6 +43,22 @@ spec:
     group: cert-manager.io
     kind: Issuer
     name: stunner-{{ .Chart.Name }}-zerossl
+  {{- with .Values.stunner.zerossl.dnsNames }}
+  dnsNames:
+  {{- toYaml . | nindent 2 }}
+  {{- end -}}
+---  
+{{- else if and .Values.stunner.enabled (not .Values.stunner.zerossl.enabled) (not .Values.stunner.owncert.enabled) }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: stunner-{{ include "openvidu.fullname" . }}-tls
+spec:
+  secretName: stunner-{{ include "openvidu.fullname" . }}-tls
+  issuerRef:
+    group: cert-manager.io
+    kind: Issuer  
+    name: letsencrypt-prod
   {{- with .Values.stunner.zerossl.dnsNames }}
   dnsNames:
   {{- toYaml . | nindent 2 }}

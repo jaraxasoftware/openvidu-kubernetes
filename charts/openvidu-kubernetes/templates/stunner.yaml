@@ -72,7 +72,11 @@ spec:
         certificateRefs:
           - kind: Secret
             namespace: {{ .Release.Namespace }}
+          {{- if .Values.stunner.owncert.enabled }}
+            name: {{ .Values.stunner.owncert.secret }}
+          {{- else }}
             name: stunner-{{ include "openvidu.fullname" . }}-tls
+          {{- end }}
       allowedRoutes:
         namespaces:
           from: {{ .Values.stunner.routesNamespaces }}
@@ -90,7 +94,11 @@ spec:
         certificateRefs:
           - kind: Secret
             namespace: {{ .Release.Namespace }}
+          {{- if .Values.stunner.owncert.enabled }}
+            name: {{ .Values.stunner.owncert.secret }}
+          {{- else }}
             name: stunner-{{ include "openvidu.fullname" . }}-tls
+          {{- end }}
       allowedRoutes:
         namespaces:
           from: {{ .Values.stunner.routesNamespaces }}
@@ -102,7 +110,11 @@ spec:
         certificateRefs:
           - kind: Secret
             namespace: {{ .Release.Namespace }}
+          {{- if .Values.stunner.owncert.enabled }}
+            name: {{ .Values.stunner.owncert.secret }}
+          {{- else }}
             name: stunner-{{ include "openvidu.fullname" . }}-tls
+          {{- end }}
       allowedRoutes:
         namespaces:
           from: {{ .Values.stunner.routesNamespaces }}
@@ -122,6 +134,10 @@ spec:
     - name: stunner-{{ include "openvidu.fullname" . }}-server
   rules:
     - backendRefs:
+      {{- if eq .Values.mode "deployment" }}
         - name: {{ include "openvidu.fullname" . }}
+      {{- else if eq .Values.mode "distributed" }}
+        - name: {{ include "openvidu.fullname" . }}
+      {{- end }}
           namespace: {{ .Release.Namespace }}
 {{- end }}
