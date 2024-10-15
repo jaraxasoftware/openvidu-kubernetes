@@ -117,8 +117,9 @@ services:
     coturn:
       ip: localhost.openvidu
       port: 3478
-      uris: "turn:localhost:3478?transport=tcp"
-      iceServers: '["url=turn:localhost:3478,username=turn,credential=nknk"]'
+      uris: "turn:localhost:3478"
+      iceServers: 
+        - turn:localhost:3478,username=turn,credential=nknk
       redis:
         ip: localhost-redis-master
         db: 1

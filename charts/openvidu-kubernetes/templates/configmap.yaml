@@ -15,7 +15,12 @@ data:
   COTURN_IP: {{ .Values.services.openvidu.coturn.ip }}
   COTURN_PORT: "{{ .Values.services.openvidu.coturn.port }}"
   COTURN_URIS_LIST: {{ .Values.services.openvidu.coturn.uris }}
-  OPENVIDU_WEBRTC_ICE_SERVERS: '{{ .Values.services.openvidu.coturn.iceServers }}'
+  OPENVIDU_WEBRTC_ICE_SERVERS: '[{{- $uris := .Values.services.openvidu.coturn.iceServers }}
+    {{- if gt (len $uris) 1 -}}
+    "url={{- join "\", \"url=" $uris }}"
+    {{- else -}}
+    "url={{ $uris | first }}"
+    {{- end -}}]'
   {{- if eq .Values.mode "distributed" }}
   KMS_URIS: '[
     {{- $replicas := (.Values.services.openvidu.pro.mediaNodeReplicas | int ) }}
