@@ -124,21 +124,8 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    meta.helm.sh/release-name: openvidu-kubernetes
-    stunner.l7mp.io/enable-mixed-protocol-lb: "true"
-    stunner.l7mp.io/related-gateway-name: jx-dkv-develop/stunner-openvidu-kubernetes-server
-  labels:
-    gitops.jenkins-x.io/pipeline: namespaces
-    stunner.l7mp.io/owned-by: stunner
-    stunner.l7mp.io/related-gateway-name: stunner-openvidu-kubernetes-server
-    stunner.l7mp.io/related-gateway-namespace: jx-dkv-develop
-  name: stunner-openvidu-kubernetes-server
-  namespace: jx-dkv-develop
+  name: stunner-{{ include "openvidu.fullname" . }}-server
 spec:
-  progressDeadlineSeconds: 600
-  replicas: 1
-  revisionHistoryLimit: 10
   selector:
     matchExpressions:
     - key: app
@@ -148,25 +135,20 @@ spec:
     - key: stunner.l7mp.io/related-gateway-name
       operator: In
       values:
-      - stunner-openvidu-kubernetes-server
+      - stunner-{{ include "openvidu.fullname" . }}-server
     - key: stunner.l7mp.io/related-gateway-namespace
       operator: In
       values:
-      - jx-dkv-develop
-  strategy:
-    rollingUpdate:
-      maxSurge: 25%
-      maxUnavailable: 25%
-    type: RollingUpdate
+      - {{ .Release.Namespace }}
   template:
     metadata:
       annotations:
-        stunner.l7mp.io/related-gateway-name: jx-dkv-develop/stunner-openvidu-kubernetes-server
+        stunner.l7mp.io/related-gateway-name: {{ .Release.Namespace }}/stunner-{{ include "openvidu.fullname" . }}-server
       creationTimestamp: null
       labels:
         app: stunner
-        stunner.l7mp.io/related-gateway-name: stunner-openvidu-kubernetes-server
-        stunner.l7mp.io/related-gateway-namespace: jx-dkv-develop
+        stunner.l7mp.io/related-gateway-name: stunner-{{ include "openvidu.fullname" . }}-server
+        stunner.l7mp.io/related-gateway-namespace: {{ .Release.Namespace }}
     spec:
       containers:
       - args:
@@ -181,11 +163,9 @@ spec:
               apiVersion: v1
               fieldPath: status.podIP
         - name: STUNNER_NAME
-          value: stunner-openvidu-kubernetes-server
+          value: stunner-{{ include "openvidu.fullname" . }}-server
         - name: STUNNER_NAMESPACE
-          value: jx-dkv-develop
-        - name: STUNNER_CONFIG_ORIGIN
-          value: http://10.244.5.202:13478
+          value: {{ .Release.Namespace }}
         image: docker.io/l7mp/stunnerd:0.21.0
         imagePullPolicy: Always
         livenessProbe:
@@ -207,13 +187,6 @@ spec:
           periodSeconds: 15
           successThreshold: 1
           timeoutSeconds: 1
-        resources:
-          limits:
-            cpu: "2"
-            memory: 512Mi
-          requests:
-            cpu: 500m
-            memory: 128Mi
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
       dnsPolicy: ClusterFirst

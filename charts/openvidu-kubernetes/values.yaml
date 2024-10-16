@@ -43,7 +43,6 @@ stunner:
       - "turn.develop.jaraxa.systems"
       - "stunner.develop.jaraxa.systems"
 
-
 service:
   name: openvidu
   externalPort: 5443
