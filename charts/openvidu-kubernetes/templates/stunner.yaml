@@ -130,20 +130,7 @@ metadata:
 {{ toYaml .Values.stunner.annotations | indent 8 }}
 {{- end }}
 spec:
-  selector:
-    matchExpressions:
-    - key: app
-      operator: In
-      values:
-      - stunner
-    - key: stunner.l7mp.io/related-gateway-name
-      operator: In
-      values:
-      - stunner-{{ include "openvidu.fullname" . }}-server
-    - key: stunner.l7mp.io/related-gateway-namespace
-      operator: In
-      values:
-      - {{ .Release.Namespace }}
+  replicas: 0
   template:
     metadata:
       annotations:
@@ -157,10 +144,5 @@ spec:
       - name: {{ .Values.stunner.deployment.container.stunnerd.name }}
         image: "{{ .Values.stunner.deployment.container.stunnerd.image.name }}:{{ .Values.stunner.deployment.container.stunnerd.image.tag | default .Chart.AppVersion }}"
         imagePullPolicy: {{ .Values.stunner.deployment.container.stunnerd.image.pullPolicy }}
-        args:
-        - -w
-        - --udp-thread-num=16
-        command:
-        - stunnerd
 ---
 {{- end }}
