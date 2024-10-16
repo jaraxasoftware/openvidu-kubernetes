@@ -125,6 +125,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: stunner-{{ include "openvidu.fullname" . }}-server
+{{- if .Values.stunner.annotations }}
+  annotations:
+{{ toYaml .Values.stunner.annotations | indent 8 }}
+{{- end }}
 spec:
   selector:
     matchExpressions:
@@ -144,54 +148,19 @@ spec:
     metadata:
       annotations:
         stunner.l7mp.io/related-gateway-name: {{ .Release.Namespace }}/stunner-{{ include "openvidu.fullname" . }}-server
-      creationTimestamp: null
       labels:
         app: stunner
         stunner.l7mp.io/related-gateway-name: stunner-{{ include "openvidu.fullname" . }}-server
         stunner.l7mp.io/related-gateway-namespace: {{ .Release.Namespace }}
     spec:
       containers:
-      - args:
+      - name: {{ .Values.stunner.deployment.container.stunnerd.name }}
+        image: "{{ .Values.stunner.deployment.container.stunnerd.image.name }}:{{ .Values.stunner.deployment.container.stunnerd.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.stunner.deployment.container.stunnerd.image.pullPolicy }}
+        args:
         - -w
         - --udp-thread-num=16
         command:
         - stunnerd
-        env:
-        - name: STUNNER_ADDR
-          valueFrom:
-            fieldRef:
-              apiVersion: v1
-              fieldPath: status.podIP
-        - name: STUNNER_NAME
-          value: stunner-{{ include "openvidu.fullname" . }}-server
-        - name: STUNNER_NAMESPACE
-          value: {{ .Release.Namespace }}
-        image: docker.io/l7mp/stunnerd:0.21.0
-        imagePullPolicy: Always
-        livenessProbe:
-          failureThreshold: 3
-          httpGet:
-            path: /live
-            port: 8086
-            scheme: HTTP
-          periodSeconds: 15
-          successThreshold: 1
-          timeoutSeconds: 1
-        name: stunner-daemon
-        readinessProbe:
-          failureThreshold: 3
-          httpGet:
-            path: /ready
-            port: 8086
-            scheme: HTTP
-          periodSeconds: 15
-          successThreshold: 1
-          timeoutSeconds: 1
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
-      dnsPolicy: ClusterFirst
-      restartPolicy: Always
-      schedulerName: default-scheduler
-      securityContext: {}
-      terminationGracePeriodSeconds: 3600
+---
 {{- end }}

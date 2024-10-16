@@ -42,6 +42,64 @@ stunner:
       - "turns.develop.jaraxa.systems"
       - "turn.develop.jaraxa.systems"
       - "stunner.develop.jaraxa.systems"
+  deployment:
+    container:
+      stunnerd:
+        name: stunnerd
+        image:
+          name: docker.io/l7mp/stunnerd
+          pullPolicy: IfNotPresent
+          tag: 0.21.0
+        udpMultithreading:
+          enabled: true
+          readLoopsPerUDPListener: 16
+        resources:
+          limits:
+            cpu: 2
+            memory: 512Mi
+          requests:
+            cpu: 500m
+            memory: 128Mi
+        livenessProbe:
+          httpGet:
+            path: /live
+            port: 8086
+          initialDelaySeconds: 0
+          periodSeconds: 15
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8086
+          initialDelaySeconds: 0
+          periodSeconds: 15
+        terminationGracePeriodSeconds: 3600
+      configWatcher:
+        enabled: true
+        serviceAccountName: stunner-config-watcher-serviceaccount
+        roleName: stunner-config-watcher-role
+        roleBindName: stunner-config-watcher-rolebind
+        env:
+        - name: LABEL
+          value: "stunner.l7mp.io/owned-by"
+        - name: LABEL_VALUE
+          value: "stunner"
+        - name: FOLDER
+          value: /etc/stunnerd
+        - name: RESOURCE
+          value: configmap
+        resources:
+          limits:
+            cpu: 500m
+            memory: 500Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+      netdebug:
+        enabled: false
+    monitoring:
+      enabled: true
+      portName: web
+      containerPort: 8080      
 
 service:
   name: openvidu
