@@ -130,7 +130,6 @@ metadata:
 {{ toYaml .Values.stunner.annotations | indent 8 }}
 {{- end }}
 spec:
-  replicas: 0
   selector:
     matchExpressions:
     - key: app
