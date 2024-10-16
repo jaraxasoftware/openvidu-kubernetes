@@ -136,13 +136,21 @@ spec:
     - key: app
       operator: In
       values:
-      - stunner
+      - stunner-dummy-deployment
+    - key: stunner.l7mp.io/related-gateway-name
+      operator: In
+      values:
+      - stunner-{{ include "openvidu.fullname" . }}-server
+    - key: stunner.l7mp.io/related-gateway-namespace
+      operator: In
+      values:
+      - {{ .Release.Namespace }}
   template:
     metadata:
       annotations:
         stunner.l7mp.io/related-gateway-name: {{ .Release.Namespace }}/stunner-{{ include "openvidu.fullname" . }}-server
       labels:
-        app: stunner
+        app: stunner-dummy-deployment
     spec:
       containers:
       - name: {{ .Values.stunner.deployment.container.stunnerd.name }}
