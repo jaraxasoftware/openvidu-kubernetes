@@ -131,6 +131,20 @@ metadata:
 {{- end }}
 spec:
   replicas: 0
+  selector:
+    matchExpressions:
+    - key: app
+      operator: In
+      values:
+      - stunner
+    - key: stunner.l7mp.io/related-gateway-name
+      operator: In
+      values:
+      - stunner-{{ include "openvidu.fullname" . }}-server
+    - key: stunner.l7mp.io/related-gateway-namespace
+      operator: In
+      values:
+      - {{ .Release.Namespace }}
   template:
     metadata:
       annotations:
