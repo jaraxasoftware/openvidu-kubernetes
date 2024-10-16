@@ -42,7 +42,14 @@ stunner:
       - "turns.develop.jaraxa.systems"
       - "turn.develop.jaraxa.systems"
       - "stunner.develop.jaraxa.systems"
-
+  deployment:
+    container:
+      stunnerd:
+        name: stunnerd
+        image:
+          name: docker.io/l7mp/stunnerd
+          pullPolicy: IfNotPresent
+          tag: 0.21.0
 
 service:
   name: openvidu

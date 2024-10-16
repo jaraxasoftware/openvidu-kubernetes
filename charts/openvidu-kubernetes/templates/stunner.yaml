@@ -120,4 +120,47 @@ spec:
         - name: {{ include "openvidu.fullname" . }}
       {{- end }}
           namespace: {{ .Release.Namespace }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stunner-{{ include "openvidu.fullname" . }}-server
+{{- if .Values.stunner.annotations }}
+  annotations:
+{{ toYaml .Values.stunner.annotations | indent 8 }}
+{{- end }}
+spec:
+  selector:
+    matchExpressions:
+    - key: app
+      operator: In
+      values:
+      - stunner
+    - key: stunner.l7mp.io/related-gateway-name
+      operator: In
+      values:
+      - stunner-{{ include "openvidu.fullname" . }}-server
+    - key: stunner.l7mp.io/related-gateway-namespace
+      operator: In
+      values:
+      - {{ .Release.Namespace }}
+  template:
+    metadata:
+      annotations:
+        stunner.l7mp.io/related-gateway-name: {{ .Release.Namespace }}/stunner-{{ include "openvidu.fullname" . }}-server
+      labels:
+        app: stunner
+        stunner.l7mp.io/related-gateway-name: stunner-{{ include "openvidu.fullname" . }}-server
+        stunner.l7mp.io/related-gateway-namespace: {{ .Release.Namespace }}
+    spec:
+      containers:
+      - name: {{ .Values.stunner.deployment.container.stunnerd.name }}
+        image: "{{ .Values.stunner.deployment.container.stunnerd.image.name }}:{{ .Values.stunner.deployment.container.stunnerd.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.stunner.deployment.container.stunnerd.image.pullPolicy }}
+        args:
+        - -w
+        - --udp-thread-num=16
+        command:
+        - stunnerd
+---
 {{- end }}
