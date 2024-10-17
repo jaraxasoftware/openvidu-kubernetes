@@ -27,3 +27,4 @@ nbactions.xml
 */.tscache/*
 
 .factorypath
+/openvidu-server/deployments/ce/docker-compose/coturn/*
