@@ -9,7 +9,7 @@ metadata:
 {{- with .Values.keda.annotations }}
   annotations:
 {{- toYaml . | nindent 4 }}
-{{- end }}   
+{{- end }}
 spec:
   cooldownPeriod: {{ .Values.keda.coolDown }}
   maxReplicaCount: {{ .Values.services.openvidu.pro.masterReplicas }}
@@ -23,7 +23,7 @@ spec:
     failureThreshold: {{ .Values.keda.failureThreshold | default 3 }}
     replicas: {{ .Values.services.openvidu.pro.masterReplicas }}
   advanced:
-    restoreToOriginalReplicaCount: true     
+    restoreToOriginalReplicaCount: true
   triggers:
   - metadata:
       desiredReplicas: "{{ .Values.services.openvidu.pro.masterReplicas }}"
@@ -32,8 +32,8 @@ spec:
       timezone: {{ .Values.keda.cron.timeZone }}
     type: cron
 {{- with .Values.keda.extraTriggers }}
-  {{- . | nindent 2 }}  
-{{- end }}    
+  {{- . | nindent 2 }}
+{{- end }}
 ---
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
@@ -44,7 +44,7 @@ metadata:
 {{- with .Values.keda.annotations }}
   annotations:
 {{- toYaml . | nindent 4 }}
-{{- end }}     
+{{- end }}
 spec:
   cooldownPeriod: {{ .Values.keda.coolDown }}
   maxReplicaCount: {{ .Values.services.openvidu.pro.mediaNodeReplicas }}
@@ -58,7 +58,7 @@ spec:
     failureThreshold: {{ .Values.keda.failureThreshold | default 3 }}
     replicas: {{ .Values.services.openvidu.pro.mediaNodeReplicas }}
   advanced:
-    restoreToOriginalReplicaCount: true      
+    restoreToOriginalReplicaCount: true
   triggers:
   - metadata:
       desiredReplicas: "{{ .Values.services.openvidu.pro.mediaNodeReplicas }}"
@@ -67,9 +67,9 @@ spec:
       timezone: {{ .Values.keda.cron.timeZone }}
     type: cron
 {{- with .Values.keda.extraTriggers }}
-  {{- . | nindent 2 }}  
-{{- end }}    
----    
+  {{- . | nindent 2 }}
+{{- end }}
+---
 {{- else if eq .Values.mode "deployment" }}
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
@@ -80,7 +80,7 @@ metadata:
 {{- with .Values.keda.annotations }}
   annotations:
 {{- toYaml . | nindent 4 }}
-{{- end }} 
+{{- end }}
 spec:
   cooldownPeriod: {{ .Values.keda.coolDown }}
   maxReplicaCount: {{ .Values.replicaCount }}
@@ -94,7 +94,7 @@ spec:
     failureThreshold: {{ .Values.keda.failureThreshold | default 3 }}
     replicas: {{ .Values.replicaCount }}
   advanced:
-    restoreToOriginalReplicaCount: true      
+    restoreToOriginalReplicaCount: true
   triggers:
   - metadata:
       desiredReplicas: "{{ .Values.replicaCount }}"
@@ -103,7 +103,7 @@ spec:
       timezone: {{ .Values.keda.cron.timeZone }}
     type: cron
 {{- with .Values.keda.extraTriggers }}
-  {{- . | nindent 2 }}  
-{{- end }}    
+  {{- . | nindent 2 }}
+{{- end }}
 {{- end }}
 {{ end }}

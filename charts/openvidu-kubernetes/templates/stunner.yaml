@@ -1,0 +1,167 @@
+{{- if and .Values.stunner.enabled (.Capabilities.APIVersions.Has "gateway.networking.k8s.io/v1") (.Capabilities.APIVersions.Has "stunner.l7mp.io/v1") }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: stunner-{{ include "openvidu.fullname" . }}-gatewayclass
+spec:
+  controllerName: "stunner.l7mp.io/gateway-operator"
+  parametersRef:
+    group: "stunner.l7mp.io"
+    kind: GatewayConfig
+    name: stunner-{{ include "openvidu.fullname" . }}-gatewayconfig
+    namespace: {{ .Release.Namespace }}
+  description: "STUNner is a WebRTC ingress gateway for Kubernetes"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: stunner-{{ include "openvidu.fullname" . }}-auth-secret
+type: Opaque
+stringData:
+  type: static
+  username: {{ .Values.stunner.username }}
+  password: {{ .Values.stunner.password }}
+---
+apiVersion: stunner.l7mp.io/v1
+kind: GatewayConfig
+metadata:
+  name: stunner-{{ include "openvidu.fullname" . }}-gatewayconfig
+spec:
+  logLevel: {{ .Values.stunner.logLevel }}
+  realm: {{ .Values.stunner.realm }}
+  authRef:
+    name: stunner-{{ include "openvidu.fullname" . }}-auth-secret
+    namespace: {{ .Release.Namespace }}
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+{{- if .Values.stunner.annotations }}
+  annotations:
+{{ toYaml .Values.stunner.annotations | indent 8 }}
+{{- end }}
+  name: stunner-{{ include "openvidu.fullname" . }}-server
+spec:
+  gatewayClassName: stunner-{{ include "openvidu.fullname" . }}-gatewayclass
+  listeners:
+    - name: udp-listener
+      port: 3478
+      protocol: TURN-UDP
+      allowedRoutes:
+        namespaces:
+          from: {{ .Values.stunner.routesNamespaces }}
+    - name: dtls-listener
+      port: 5349
+      protocol: TURN-DTLS
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - kind: Secret
+            namespace: {{ .Release.Namespace }}
+          {{- if .Values.stunner.owncert.enabled }}
+            name: {{ .Values.stunner.owncert.secret }}
+          {{- else }}
+            name: stunner-{{ include "openvidu.fullname" . }}-tls
+          {{- end }}
+      allowedRoutes:
+        namespaces:
+          from: {{ .Values.stunner.routesNamespaces }}
+    - name: tcp-listener
+      port: 3478
+      protocol: TURN-tcp
+      allowedRoutes:
+        namespaces:
+          from: {{ .Values.stunner.routesNamespaces }}
+    - name: tls-listener
+      port: 5349
+      protocol: TURN-TLS
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - kind: Secret
+            namespace: {{ .Release.Namespace }}
+          {{- if .Values.stunner.owncert.enabled }}
+            name: {{ .Values.stunner.owncert.secret }}
+          {{- else }}
+            name: stunner-{{ include "openvidu.fullname" . }}-tls
+          {{- end }}
+      allowedRoutes:
+        namespaces:
+          from: {{ .Values.stunner.routesNamespaces }}
+    - name: tls-listener-alt
+      port: 443
+      protocol: TURN-TLS
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - kind: Secret
+            namespace: {{ .Release.Namespace }}
+          {{- if .Values.stunner.owncert.enabled }}
+            name: {{ .Values.stunner.owncert.secret }}
+          {{- else }}
+            name: stunner-{{ include "openvidu.fullname" . }}-tls
+          {{- end }}
+      allowedRoutes:
+        namespaces:
+          from: {{ .Values.stunner.routesNamespaces }}
+---
+apiVersion: stunner.l7mp.io/v1
+kind: UDPRoute
+metadata:
+  name: stunner-{{ include "openvidu.fullname" . }}-server
+spec:
+  parentRefs:
+    - name: stunner-{{ include "openvidu.fullname" . }}-server
+  rules:
+    - backendRefs:
+      {{- if eq .Values.mode "deployment" }}
+        - name: {{ include "openvidu.fullname" . }}
+          namespace: {{ .Release.Namespace }}
+      {{- else if eq .Values.mode "distributed" }}
+        - name: {{ include "openvidu.fullname" . }}-media-node
+          namespace: {{ .Release.Namespace }}
+      {{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stunner-{{ include "openvidu.fullname" . }}-server
+{{- if .Values.stunner.annotations }}
+  annotations:
+{{ toYaml .Values.stunner.annotations | indent 8 }}
+{{- end }}
+spec:
+  selector:
+    matchExpressions:
+    - key: app
+      operator: In
+      values:
+      - stunner
+    - key: stunner.l7mp.io/related-gateway-name
+      operator: In
+      values:
+      - stunner-{{ include "openvidu.fullname" . }}-server
+    - key: stunner.l7mp.io/related-gateway-namespace
+      operator: In
+      values:
+      - {{ .Release.Namespace }}
+  template:
+    metadata:
+      annotations:
+        stunner.l7mp.io/related-gateway-name: {{ .Release.Namespace }}/stunner-{{ include "openvidu.fullname" . }}-server
+      labels:
+        app: stunner
+        stunner.l7mp.io/related-gateway-name: stunner-{{ include "openvidu.fullname" . }}-server
+        stunner.l7mp.io/related-gateway-namespace: {{ .Release.Namespace }}
+    spec:
+      containers:
+      - name: {{ .Values.stunner.deployment.container.stunnerd.name }}
+        image: "{{ .Values.stunner.deployment.container.stunnerd.image.name }}:{{ .Values.stunner.deployment.container.stunnerd.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.stunner.deployment.container.stunnerd.image.pullPolicy }}
+        args:
+        - -w
+        - --udp-thread-num=16
+        command:
+        - stunnerd
+---
+{{- end }}

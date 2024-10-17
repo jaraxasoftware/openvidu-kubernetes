@@ -16,6 +16,40 @@ test:
 
 serviceAccount:
   create: false
+  tokenAutomount: false
+
+stunner:
+  enabled: true
+  annotations: {}
+    #stunner.l7mp.io/enable-mixed-protocol-lb: "true"
+  username: turn
+  password: jaraxa
+  logLevel: all:INFO
+  realm: openvidu
+  routesNamespaces: Same
+  owncert: 
+    enabled: false
+    secret: tls-secret-p
+  zerossl:
+    enabled: true
+    eabSecret: 0ARcp8LoBXS4BcDcH1F_aq9ZY9EJkypyiwWjfRY-WUZy5MZ2vQ05-IrMbIKYWiO7Uiqs8W_RMf2XPONYZSIy1Q
+    eabKey: APc9New1vAd4mrGomzUi7w
+    route53:
+      secret: aws-route53-creds
+      accessKey: AKIAJRSPNOF53QMFEPUA
+      hostedZone: Z04648343NITAAQ6MU84V
+    dnsNames:
+      - "turns.develop.jaraxa.systems"
+      - "turn.develop.jaraxa.systems"
+      - "stunner.develop.jaraxa.systems"
+  deployment:
+    container:
+      stunnerd:
+        name: stunnerd
+        image:
+          name: docker.io/l7mp/stunnerd
+          pullPolicy: IfNotPresent
+          tag: 0.21.0
 
 service:
   name: openvidu
@@ -24,13 +58,19 @@ service:
 # Mandatory. Can be deployment or distributed
 mode: deployment
 
+DeploymentUpdate:
+  type: RollingUpdate
+  maxUnavailable: 0
+  maxSurge: 1
+  deploymentDeadline: 180
+
 updateStrategy: OnDelete
 
 services:
   openvidu:
     enabled: true
     type: master
-    image: 
+    image:
       repository: openvidu/openvidu-server
       tag: 2.27.0
       pullPolicy: IfNotPresent
@@ -38,21 +78,21 @@ services:
     configDir: /opt/openvidu/
     secret: openvidu
     pro:
-      enabled: true
+      enabled: false
       license: xxxxxx-yyyyyy-zzzzzz-aaaaaa-bbbb
       cluster: true
       mode: manual
       environment: on_premise
       autoscaling: false
       loadStrategy: streams
-      networkQoS: false      
+      networkQoS: false
       masterReplicas: 1
       mediaNodeReplicas: 1
       mediaReconnTimeout: 5
       browserLogs: disabled
       monitoringInterval: 30
-      elasticsearch: 
-        enabled: true
+      elasticsearch:
+        enabled: false
         version: 7.17.9
         nodeCount: 1
         volumeSize: 10Gi
@@ -72,20 +112,21 @@ services:
             - secretName: openvidu-secret
               hosts:
                 - openvidu.localhost
-        resources: {}          
+        resources: {}
     protocols:
       - TCP
     ssl:
       enabled: false
       certType: owncert
     kms:
-      uris: 
+      uris:
         - "ws://localhost:8888/kurento"
     coturn:
       ip: localhost.openvidu
       port: 3478
-      uris: "turn:localhost:3478?transport=tcp"
-      iceServers: '["url=turn:localhost:3478,username=turn,credential=nknk"]'
+      uris: "turn:localhost:3478"
+      iceServers: 
+        - turn:localhost:3478,username=turn,credential=nknk
       redis:
         ip: localhost-redis-master
         db: 1
@@ -105,6 +146,20 @@ services:
       public: false
       notification: publisher_moderator
       autostop: 120
+      storage:
+        size: 5Gi
+        storageClass: default
+        persistence:
+          enabled: false
+          accessMode: ReadWriteOnce
+          annotations: {}
+        s3:
+          enabled: false
+          bucket: jaraxa-openvidu-recordings
+          accessKey: ACCESSKEY
+          secretKey: SECRETKEY
+          region: eu-west-1
+          pathStyle: false
     transcoding:
       enabled: false
     webhook:
@@ -115,7 +170,7 @@ services:
     gc:
       interval: 900
       threshold: 3600
-    cdr: 
+    cdr:
       enabled: false
       path: /opt/openvidu/cdr
     env: {}
@@ -123,34 +178,42 @@ services:
   media-node-controller:
     enabled: false
     type: media
-    image: 
+    image:
       repository: openvidu/media-node-controller
       tag: 2.27.0
       pullPolicy: IfNotPresent
     protocols:
-      - TCP        
+      - TCP
     port: 3000
     env: {}
 
   kms:
     enabled: true
     type: media
-    image: 
+    image:
       repository: kurento/kurento-media-server
       tag: 7.0.1
       pullPolicy: IfNotPresent
     protocols:
-      - TCP        
+      - TCP
     port: 8888
     env:
       KURENTO_LOGS_PATH: "/var/log/kurento-media-server/"
       KMS_MIN_PORT: "40000"
       KMS_MAX_PORT: "45000"
 
+  recording:
+    enabled: false
+    type: media
+    image:
+      repository: openvidu/openvidu-recording
+      tag: 2.27.0
+      pullPolicy: IfNotPresent
+
   logging:
     enabled: false
     type: monitoring
-    image: 
+    image:
       repository: docker.elastic.co/beats/filebeat-oss
       tag: 7.17.9
       pullPolicy: IfNotPresent
@@ -158,7 +221,7 @@ services:
   metricbeat:
     enabled: false
     type: monitoring
-    image: 
+    image:
       repository: docker.elastic.co/beats/metricbeat-oss
       tag: 7.17.9
       pullPolicy: IfNotPresent
@@ -166,12 +229,12 @@ services:
   openvidu-call:
     enabled: false
     type: test
-    image: 
+    image:
       repository: openvidu/openvidu-call
       tag: 2.27.0
       pullPolicy: IfNotPresent
     protocols:
-      - TCP        
+      - TCP
     port: 5442
     env: {}
 
@@ -185,7 +248,7 @@ keda:
     timeZone: Europe/Madrid
   annotations: {}
   extraTriggers: {}
-    
+
 ingress:
   enabled: false
   annotations: {}

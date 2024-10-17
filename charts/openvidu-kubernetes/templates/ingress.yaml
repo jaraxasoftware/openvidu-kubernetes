@@ -27,14 +27,14 @@ spec:
         paths:
   {{- range $p := $paths }}
           - path: {{ $p }}
-            pathType: ImplementationSpecific          
+            pathType: ImplementationSpecific
             backend:
               service:
               {{- if eq $.Values.mode "distributed" }}
                 name:  {{ $serviceName }}-master
               {{- else }}
                 name:  {{ $serviceName }}
-              {{- end }}              
+              {{- end }}
                 port:
                   number: {{ $servicePort }}
   {{- end -}}
@@ -44,14 +44,14 @@ spec:
         paths:
   {{- range $p := $paths }}
           - path: {{ $p }}
-            pathType: ImplementationSpecific          
+            pathType: ImplementationSpecific
             backend:
               service:
               {{- if eq $.Values.mode "distributed" }}
                 name:  {{ $serviceName }}-master
               {{- else }}
                 name:  {{ $serviceName }}
-              {{- end }}  
+              {{- end }}
                 port:
                   number: {{ $servicePort }}
   {{- end -}}

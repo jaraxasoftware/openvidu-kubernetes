@@ -13,29 +13,77 @@ spec:
   serviceName: {{ include "openvidu.fullname" . }}-media-node
   replicas: {{ .Values.services.openvidu.pro.masterReplicas }}
   updateStrategy:
-    type: {{ .Values.updateStrategy }}  
+    type: {{ .Values.updateStrategy }}
   selector:
     matchLabels:
       app: {{ include "openvidu.fullname" . }}
       app.kubernetes.io/name: {{ include "openvidu.name" . }}-master
       app.kubernetes.io/instance: {{ .Release.Name }}
+  {{- if .Values.services.openvidu.recording.enabled }}
+    {{- if .Values.services.openvidu.recording.storage.persistence.enabled }}
+  volumeClaimTemplates:
+  - metadata:
+      name: {{ include "openvidu.fullname" . }}-recordings-master
+    {{- with .Values.services.openvidu.recording.storage.persistence.annotations  }}
+      annotations:
+    {{ toYaml . | indent 8 }}
+    {{- end }}
+      labels:
+        {{- include "openvidu.labels" . | nindent 8 }}
+    spec:
+      accessModes:
+        - {{ .Values.services.openvidu.recording.storage.persistence.accessMode | quote }}
+      resources:
+        requests:
+          storage: {{ .Values.services.openvidu.recording.storage.size | quote }}
+      storageClassName: "{{ .Values.services.openvidu.recording.storage.storageClass }}"
+    {{- end }}
+  {{- end }}
   template:
     metadata:
       labels:
         app: {{ include "openvidu.fullname" . }}
         app.kubernetes.io/name: {{ include "openvidu.name" . }}-master
         app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/version: {{ .Chart.Version }}
     spec:
       imagePullSecrets:
 {{- range $pval := .Values.jx.imagePullSecrets }}
       - name: {{ quote $pval }}
-{{- end }}     
+{{- end }}
+      automountServiceAccountToken: {{ .Values.serviceAccount.tokenAutomount }}
       containers:
+      {{- if .Values.services.openvidu.recording.enabled }}
+      - name: docker-dind
+        image: docker:dind
+        ports:
+          - name: dind-con-port
+            containerPort: 2376
+            hostPort: 2376
+            protocol: TCP
+        tty: true
+        securityContext:
+          privileged: true
+        env:
+        - name: DOCKER_TLS_CERTDIR
+          value: /certs
+        - name: DOCKER_CERT_PATH
+          value: /certs/client
+        - name: DOCKER_TLS_VERIFY
+          value: "1"
+        - name: DOCKER_HOST
+          value: "tcp://localhost:2376"
+        volumeMounts:
+        - name: docker-dind-certs
+          mountPath: /certs/client
+        - name: {{ include "openvidu.fullname" . }}-recordings-master
+          mountPath: {{ $.Values.services.openvidu.recording.path }}
+      {{- end }}
       {{- range $name, $val := .Values.services }}
-        {{- if $val.enabled }} 
+        {{- if $val.enabled }}
         {{- if or (eq $val.type "master") (eq $val.type "monitoring") }}
       - name: {{ $name }}
-        image: "{{ $val.image.repository }}:{{ $val.image.tag }}"      
+        image: "{{ $val.image.repository }}:{{ $val.image.tag }}"
         imagePullPolicy: {{ $val.image.pullPolicy }}
         ports:
           {{- range $index, $proto :=  $val.protocols }}
@@ -59,21 +107,21 @@ spec:
           httpGet:
             path: /
             port: {{ $val.port }}
-          initialDelaySeconds: {{ $.Values.readinessProbe.initialDelaySeconds }}            
+          initialDelaySeconds: {{ $.Values.readinessProbe.initialDelaySeconds }}
           periodSeconds: {{ $.Values.readinessProbe.periodSeconds }}
           successThreshold: {{ $.Values.readinessProbe.successThreshold }}
           timeoutSeconds: {{ $.Values.readinessProbe.timeoutSeconds }}
           failureThreshold: {{ $.Values.readinessProbe.failureThreshold }}
         {{- end }}
         {{- if eq $name "openvidu" }}
-        resources:        
+        resources:
           {{- toYaml $.Values.resourcesPro.master | nindent 10 }}
         {{- else if eq $val.type "monitoring" }}
         resources:
           {{- toYaml $.Values.resourcesPro.monitoring | nindent 10 }}
         {{- else }}
         resources:
-          {{- toYaml $.Values.resources | nindent 12 }}        
+          {{- toYaml $.Values.resources | nindent 12 }}
         {{- end }}
         env:
         {{- if $.Values.services.openvidu.pro.elasticsearch.enabled }}
@@ -92,27 +140,41 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: spec.nodeName
+        {{- else if eq $name "openvidu" }}
+        - name: DOCKER_CERT_PATH
+          value: /certs/client
+        - name: DOCKER_TLS_VERIFY
+          value: "1"
+        - name: DOCKER_HOST
+          value: tcp://localhost:2376
         {{- else if eq $name "metricbeat" }}
         - name: NODE_ROLE
-          value: masternode                   
-        {{- end }}                        
+          value: masternode
+        {{- end }}
         envFrom:
         - configMapRef:
             name: {{ include "openvidu.fullname" $ }}
       {{- with $.Values.securityContext }}
         securityContext:
           {{- toYaml . | nindent 10 }}
-      {{- end }}                      
+      {{- end }}
         volumeMounts:
-        {{- if eq $name "metricbeat" }}    
+        {{- if eq $name "metricbeat" }}
         - name: metricbeat-{{ $.Chart.Name }}
           readOnly: true
           mountPath: /usr/share/metricbeat/metricbeat.yml
           subPath: metricbeat.yml
         - name: docker-socket
-          mountPath: /var/run/docker.sock 
-          readOnly: true      
-        {{- else if eq $name "logging" }}    
+          mountPath: /var/run/docker.sock
+          readOnly: true
+        {{- else if eq $name "openvidu" }}
+          {{- if $.Values.services.openvidu.recording.enabled }}
+        - name: docker-dind-certs
+          mountPath: /certs/client
+        - name: {{ include "openvidu.fullname" $ }}-recordings-master
+          mountPath: {{ $.Values.services.openvidu.recording.path }}
+          {{- end }}
+        {{- else if eq $name "logging" }}
         - name: filebeat-{{ $.Chart.Name }}
           readOnly: true
           mountPath: /usr/share/filebeat/filebeat.yml
@@ -122,15 +184,15 @@ spec:
         - name: varlogpods
           mountPath: /var/log/pods
         - name: varlibdockercontainers
-          mountPath: /var/lib/docker/containers    
+          mountPath: /var/lib/docker/containers
         - name: docker-socket
-          mountPath: /var/run/docker.sock 
-          readOnly: true               
+          mountPath: /var/run/docker.sock
+          readOnly: true
         {{- end }}
         {{- end }}
-        {{- end }}        
+        {{- end }}
       {{- end }}
-{{/* end of services loop */}}      
+{{/* end of services loop */}}
     {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -144,20 +206,24 @@ spec:
         {{- toYaml . | nindent 8 }}
     {{- end }}
       serviceAccountName: {{ include "openvidu.fullname" $ }}-logging
-      automountServiceAccountToken: true      
+      automountServiceAccountToken: {{ .Values.serviceAccount.tokenAutomount }}
       volumes:
-    {{- if .Values.services.metricbeat.enabled }}      
+    {{- if .Values.services.metricbeat.enabled }}
       - name: metricbeat-{{ .Chart.Name }}
         configMap:
           name: {{ include "openvidu.fullname" . }}-metricbeat
       - name: filebeat-{{ .Chart.Name }}
         configMap:
-          name: {{ include "openvidu.fullname" . }}-filebeat          
+          name: {{ include "openvidu.fullname" . }}-filebeat
       - name: docker-socket
         hostPath:
           path: /var/run/docker.sock
-    {{- end }}                
-    {{- if .Values.services.logging.enabled }}          
+    {{- end }}
+    {{- if .Values.services.openvidu.recording.enabled }}
+      - name: docker-dind-certs
+        emptyDir: {}
+    {{- end }}
+    {{- if .Values.services.logging.enabled }}
       - name: varlogcontainers
         hostPath:
           path: /var/log/containers
@@ -167,5 +233,5 @@ spec:
       - name: varlibdockercontainers
         hostPath:
           path: /var/lib/docker/containers
-    {{- end }}      
+    {{- end }}
 {{- end }}
