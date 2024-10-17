@@ -148,11 +148,7 @@ spec:
         - name: DOCKER_TLS_VERIFY
           value: "1"
         - name: DOCKER_HOST
-          value: tcp://localhost:2376
-          {{- else }}
-        - name: docker-socket
-          mountPath: /var/run/docker.sock 
-          readOnly: true          
+          value: tcp://localhost:2376        
           {{- end }}
         {{- else if eq $name "metricbeat" }}
         - name: NODE_ROLE
