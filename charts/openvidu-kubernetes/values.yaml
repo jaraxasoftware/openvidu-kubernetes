@@ -2,32 +2,27 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 replicaCount: 1
-
 # optional list of image pull secrets to use to pull images
 jx:
   # optional image pull secrets
   imagePullSecrets: []
-
   # whether to create a Release CRD when installing charts with Release CRDs included
   releaseCRD: true
-
 test:
   enabled: false
-
 serviceAccount:
   create: false
   tokenAutomount: false
-
 stunner:
   enabled: true
   annotations: {}
-    #stunner.l7mp.io/enable-mixed-protocol-lb: "true"
+  #stunner.l7mp.io/enable-mixed-protocol-lb: "true"
   username: turn
   password: jaraxa
   logLevel: all:INFO
   realm: openvidu
   routesNamespaces: Same
-  owncert: 
+  owncert:
     enabled: false
     secret: tls-secret-p
   zerossl:
@@ -39,9 +34,9 @@ stunner:
       accessKey: AKIAJRSPNOF53QMFEPUA
       hostedZone: Z04648343NITAAQ6MU84V
     dnsNames:
-      - "turns.develop.jaraxa.systems"
-      - "turn.develop.jaraxa.systems"
-      - "stunner.develop.jaraxa.systems"
+    - "turns.develop.jaraxa.systems"
+    - "turn.develop.jaraxa.systems"
+    - "stunner.develop.jaraxa.systems"
   deployment:
     container:
       stunnerd:
@@ -50,22 +45,17 @@ stunner:
           name: docker.io/l7mp/stunnerd
           pullPolicy: IfNotPresent
           tag: 0.21.0
-
 service:
   name: openvidu
   externalPort: 5443
-
 # Mandatory. Can be deployment or distributed
 mode: deployment
-
 DeploymentUpdate:
   type: RollingUpdate
   maxUnavailable: 0
   maxSurge: 1
   deploymentDeadline: 180
-
 updateStrategy: OnDelete
-
 services:
   openvidu:
     enabled: true
@@ -105,28 +95,28 @@ services:
           enabled: false
           annotations: {}
           paths:
-            - /kibana/
+          - /kibana/
           hosts:
-            - openvidu.localhost
+          - openvidu.localhost
           tls:
-            - secretName: openvidu-secret
-              hosts:
-                - openvidu.localhost
+          - secretName: openvidu-secret
+            hosts:
+            - openvidu.localhost
         resources: {}
     protocols:
-      - TCP
+    - TCP
     ssl:
       enabled: false
       certType: owncert
     kms:
       uris:
-        - "ws://localhost:8888/kurento"
+      - "ws://localhost:8888/kurento"
     coturn:
       ip: localhost.openvidu
       port: 3478
       uris: "turn:localhost:3478"
-      iceServers: 
-        - turn:localhost:3478,username=turn,credential=nknk
+      iceServers:
+      - turn:localhost:3478,username=turn,credential=nknk
       redis:
         ip: localhost-redis-master
         db: 1
@@ -174,7 +164,6 @@ services:
       enabled: false
       path: /opt/openvidu/cdr
     env: {}
-
   media-node-controller:
     enabled: false
     type: media
@@ -183,10 +172,9 @@ services:
       tag: 2.27.0
       pullPolicy: IfNotPresent
     protocols:
-      - TCP
+    - TCP
     port: 3000
     env: {}
-
   kms:
     enabled: true
     type: media
@@ -195,13 +183,12 @@ services:
       tag: 7.0.1
       pullPolicy: IfNotPresent
     protocols:
-      - TCP
+    - TCP
     port: 8888
     env:
       KURENTO_LOGS_PATH: "/var/log/kurento-media-server/"
       KMS_MIN_PORT: "40000"
       KMS_MAX_PORT: "45000"
-
   recording:
     enabled: false
     type: media
@@ -209,7 +196,6 @@ services:
       repository: openvidu/openvidu-recording
       tag: 2.27.0
       pullPolicy: IfNotPresent
-
   logging:
     enabled: false
     type: monitoring
@@ -217,7 +203,6 @@ services:
       repository: docker.elastic.co/beats/filebeat-oss
       tag: 7.17.9
       pullPolicy: IfNotPresent
-
   metricbeat:
     enabled: false
     type: monitoring
@@ -225,7 +210,6 @@ services:
       repository: docker.elastic.co/beats/metricbeat-oss
       tag: 7.17.9
       pullPolicy: IfNotPresent
-
   openvidu-call:
     enabled: false
     type: test
@@ -234,10 +218,9 @@ services:
       tag: 2.27.0
       pullPolicy: IfNotPresent
     protocols:
-      - TCP
+    - TCP
     port: 5442
     env: {}
-
 keda:
   enabled: false
   coolDown: 30
@@ -248,19 +231,17 @@ keda:
     timeZone: Europe/Madrid
   annotations: {}
   extraTriggers: {}
-
 ingress:
   enabled: false
   annotations: {}
   paths:
-    - /(.*)
+  - /(.*)
   hosts:
-    - openvidu.localhost
+  - openvidu.localhost
   tls:
-    - secretName: openvidu-secret
-      hosts:
-        - openvidu.localhost
-
+  - secretName: openvidu-secret
+    hosts:
+    - openvidu.localhost
 livenessProbe:
   initialDelaySeconds: 60
   periodSeconds: 10
@@ -273,18 +254,15 @@ readinessProbe:
   successThreshold: 1
   timeoutSeconds: 1
   failureThreshold: 3
-
 resourcesPro:
   master: {}
   media: {}
   monitoring: {}
-
 resources: {}
-
 securityContext: {}
-
 nodeSelector: {}
-
 tolerations: []
-
 affinity: {}
+image:
+  repository: ghcr.io/jaraxasoftware/openvidu-kubernetes
+  tag: 2.27.0-1729167210551
