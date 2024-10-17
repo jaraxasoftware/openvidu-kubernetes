@@ -116,10 +116,11 @@ spec:
     - backendRefs:
       {{- if eq .Values.mode "deployment" }}
         - name: {{ include "openvidu.fullname" . }}
-      {{- else if eq .Values.mode "distributed" }}
-        - name: {{ include "openvidu.fullname" . }}
-      {{- end }}
           namespace: {{ .Release.Namespace }}
+      {{- else if eq .Values.mode "distributed" }}
+        - name: {{ include "openvidu.fullname" . }}-media-node
+          namespace: {{ .Release.Namespace }}
+      {{- end }}
 ---
 apiVersion: apps/v1
 kind: Deployment
