@@ -56,7 +56,7 @@ service:
   externalPort: 5443
 
 # Mandatory. Can be deployment or distributed
-mode: deployment
+mode: distributed
 
 DeploymentUpdate:
   type: RollingUpdate
@@ -176,7 +176,7 @@ services:
     env: {}
 
   media-node-controller:
-    enabled: false
+    enabled: true
     type: media
     image:
       repository: openvidu/media-node-controller
@@ -211,7 +211,7 @@ services:
       pullPolicy: IfNotPresent
 
   logging:
-    enabled: false
+    enabled: true
     type: monitoring
     image:
       repository: docker.elastic.co/beats/filebeat-oss
@@ -219,7 +219,7 @@ services:
       pullPolicy: IfNotPresent
 
   metricbeat:
-    enabled: false
+    enabled: true
     type: monitoring
     image:
       repository: docker.elastic.co/beats/metricbeat-oss

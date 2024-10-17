@@ -142,12 +142,18 @@ spec:
             fieldRef:
               fieldPath: spec.nodeName
         {{- else if eq $name "media-node-controller" }}
+          {{- if $.Values.services.openvidu.recording.enabled }}
         - name: DOCKER_CERT_PATH
           value: /certs/client
         - name: DOCKER_TLS_VERIFY
           value: "1"
         - name: DOCKER_HOST
           value: tcp://localhost:2376
+          {{- else }}
+        - name: docker-socket
+          mountPath: /var/run/docker.sock 
+          readOnly: true          
+          {{- end }}
         {{- else if eq $name "metricbeat" }}
         - name: NODE_ROLE
           value: medianode
@@ -174,6 +180,10 @@ spec:
           mountPath: /certs/client
         - name: {{ include "openvidu.fullname" $ }}-recordings-media-node
           mountPath: {{ $.Values.services.openvidu.recording.path }}
+          {{- else }}
+        - name: docker-socket
+          mountPath: /var/run/docker.sock 
+          readOnly: true            
           {{- end }}
         {{- else if eq $name "logging" }}
         - name: filebeat-{{ $.Chart.Name }}
