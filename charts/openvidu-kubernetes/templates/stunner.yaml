@@ -121,6 +121,8 @@ spec:
         - name: {{ include "openvidu.fullname" . }}-media-node
           namespace: {{ .Release.Namespace }}
       {{- end }}
+        - name: stunner-{{ include "openvidu.fullname" . }}-server
+          namespace: {{ .Release.Namespace }}      
 ---
 apiVersion: apps/v1
 kind: Deployment
