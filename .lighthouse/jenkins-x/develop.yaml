@@ -15,9 +15,7 @@ spec:
           - name: BUILD_VERSION
             value: -DEVELOP
           - name: ENVIRONMENT
-            value: dkv-develop
-          - name: PET3-ENVIRONMENT
-            value: pet3-develop
+            value: dkv-develop,pet3-develop
           - name: NPM_CONFIG_USERCONFIG
             value: /tekton/home/npm/.npmrc            
           image: uses:jaraxasoftware/jaraxa-pipeline-catalog/tasks/javascript/release.yaml@versionStream
@@ -80,9 +78,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             source .jx/variables.sh
-            jx promote -b --env $ENVIRONMENT --timeout 1h --no-poll --version $VERSION &
-            jx promote -b --env $PET3-ENVIRONMENT --timeout 1h --no-poll --version $VERSION &
-            wait
+            jx promote -b --env $ENVIRONMENT --timeout 1h --no-poll --version $VERSION
         volumes:
         - name: npmrc
           secret:
