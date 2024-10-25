@@ -80,7 +80,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             source .jx/variables.sh
-            jx promote -b --env $ENVIRONMENT,$PET3-ENVIRONMENT --timeout 1h --no-poll --version $VERSION          
+            jx promote -b --env $ENVIRONMENT --env $PET3-ENVIRONMENT --timeout 1h --no-poll --version $VERSION          
         volumes:
         - name: npmrc
           secret:
