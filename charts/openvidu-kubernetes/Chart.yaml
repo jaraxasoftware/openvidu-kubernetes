@@ -9,4 +9,4 @@ maintainers:
 - email: sergio.jurado@jaraxa.com
   name: Sergio Jurado
 sources:
-- https://github.com/openvidu/openvidu/
+- https://github.com/jaraxasoftware/openvidu-kubernetes
