@@ -77,8 +77,6 @@ spec:
           resources: {}
         - name: promote-jx-promote
           resources: {}
-        - name: promote-jx-updatebot-sync
-          resources: {}
         volumes:
         - name: npmrc
           secret:
