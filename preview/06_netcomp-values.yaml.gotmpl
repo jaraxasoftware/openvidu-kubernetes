@@ -10,7 +10,7 @@ service:
     pool_size: 10
     replicas: 0
     pool_overflow: 0
-    main: "nkobjects_dkv_v09_pr"
+    main: "nkobjects_dkv_v09_{{ requiredEnv "APP_NAME" }}_pr{{ requiredEnv "PULL_NUMBER" }}"
     bypass_mapping_update: false # bypass ES mapping update if the mapping didn't change
   db_reconnect:
     retries: 20
