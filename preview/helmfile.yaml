@@ -76,7 +76,7 @@ releases:
     args:
     - '-c'
     - "kubectl exec -ti deploy/netcomp -n '{{ requiredEnv "PREVIEW_NAMESPACE" }}' -- /opt/code/netcomp/bin/netcomp eval 'dkv_telemed_svc:load_coaches().'"
-    - events: ["postsync"]
+  - events: ["postsync"]
     showlogs: false
     command: "bash"
     args:
