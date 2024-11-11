@@ -4,6 +4,7 @@ env:
   DKV_PET_PATH: /_api
   DKV_PET_SCHEME: http
   DKV_PET_PROXY_SLACK_ENABLED: false
+  DKV_PET_PROXY_OPENVIDU_HOSTNAME: "{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"
 
 ingress:
   enabled: true
