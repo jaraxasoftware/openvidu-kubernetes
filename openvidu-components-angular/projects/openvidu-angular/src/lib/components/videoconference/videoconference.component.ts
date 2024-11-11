@@ -39,6 +39,7 @@ import { OpenViduService } from '../../services/openvidu/openvidu.service';
 import { ParticipantService } from '../../services/participant/participant.service';
 import { StorageService } from '../../services/storage/storage.service';
 import { TranslateService } from '../../services/translate/translate.service';
+import { LangOption } from '../../models/lang.model';
 
 /**
  * The **VideoconferenceComponent** is the parent of all OpenVidu components.
@@ -55,12 +56,14 @@ import { TranslateService } from '../../services/translate/translate.service';
  * | :----------------------------: | :-------: | :---------------------------------------------: |
  * | **minimal**                        | `boolean` | {@link MinimalDirective}                        |
  * | **lang**                           | `string`  | {@link LangDirective}                           |
+ * | **langOptions**            		| `LangOption []`  | {@link LangOptionsDirective}             |
  * | **captionsLang**                   | `string`  | {@link CaptionsLangDirective}                   |
- * | **captionsLangOprions**            | `CaptionsLangOption []`  | {@link CaptionsLangOptionsDirective}                   |
+ * | **captionsLangOptions**            | `CaptionsLangOption []`  | {@link CaptionsLangOptionsDirective}                   |
  * | **prejoin**                        | `boolean` | {@link PrejoinDirective}                        |
  * | **participantName**                | `string`  | {@link ParticipantNameDirective}                |
  * | **videoMuted**                     | `boolean` | {@link VideoMutedDirective}                     |
  * | **audioMuted**                     | `boolean` | {@link AudioMutedDirective}                     |
+   | **simulcast**                      | `boolean` | {@link SimulcastDirective}                      |
  * | **toolbarScreenshareButton**       | `boolean` | {@link ToolbarScreenshareButtonDirective}       |
  * | **toolbarFullscreenButton**        | `boolean` | {@link ToolbarFullscreenButtonDirective}        |
  * | **toolbarCaptionsButton** 			| `boolean` | {@link ToolbarCaptionsButtonDirective} 		  |
@@ -73,6 +76,8 @@ import { TranslateService } from '../../services/translate/translate.service';
  * | **streamDisplayParticipantName**   | `boolean` | {@link StreamDisplayParticipantNameDirective}   |
  * | **streamDisplayAudioDetection**    | `boolean` | {@link StreamDisplayAudioDetectionDirective}    |
  * | **streamSettingsButton**           | `boolean` | {@link StreamSettingsButtonDirective}           |
+ * | **streamFrameRate**                | `number` | {@link StreamFrameRateDirective}           |
+ * | **streamResolution**               | `string` | {@link StreamResolutionDirective}           |
  * | **participantPanelItemMuteButton** | `boolean` | {@link ParticipantPanelItemMuteButtonDirective} |
  * | **recordingActivityRecordingList** | `{@link RecordingInfo}[]` | {@link RecordingActivityRecordingsListDirective} |
  * | **recordingActivityRecordingError** | `any` | {@link RecordingActivityRecordingErrorDirective} |
@@ -403,6 +408,11 @@ export class VideoconferenceComponent implements OnInit, OnDestroy, AfterViewIni
 	/**
 	 * Provides event notifications that fire when start broadcasting button is clicked from {@link ToolbarComponent}.
 	 */
+	@Output() onToolbarStartBroadcastingClicked: EventEmitter<void> = new EventEmitter<void>();
+
+	/**
+	 * Provides event notifications that fire when start broadcasting button is clicked from {@link ToolbarComponent}.
+	 */
 	@Output() onToolbarStopBroadcastingClicked: EventEmitter<void> = new EventEmitter<void>();
 
 	/**
@@ -422,6 +432,11 @@ export class VideoconferenceComponent implements OnInit, OnDestroy, AfterViewIni
 	 * See {@link https://docs.openvidu.io/en/stable/openvidu-pro/fault-tolerance/ OpenVidu Pro Fault tolerance}.
 	 */
 	@Output() onNodeCrashed: EventEmitter<void> = new EventEmitter<void>();
+
+	/**
+	 * Provides event notifications that fire when the application language has changed.
+	 */
+	@Output() onLangChanged: EventEmitter<LangOption> = new EventEmitter<LangOption>();
 
 	/**
 	 * @internal
@@ -458,6 +473,7 @@ export class VideoconferenceComponent implements OnInit, OnDestroy, AfterViewIni
 	private externalParticipantName: string;
 	private prejoinSub: Subscription;
 	private participantNameSub: Subscription;
+	private langSub: Subscription;
 	private log: ILogger;
 
 	/**
@@ -483,6 +499,7 @@ export class VideoconferenceComponent implements OnInit, OnDestroy, AfterViewIni
 	async ngOnDestroy() {
 		if (this.prejoinSub) this.prejoinSub.unsubscribe();
 		if (this.participantNameSub) this.participantNameSub.unsubscribe();
+		if (this.langSub) this.langSub.unsubscribe();
 		this.deviceSrv.clear();
 		await this.openviduService.clear();
 	}
@@ -594,14 +611,26 @@ export class VideoconferenceComponent implements OnInit, OnDestroy, AfterViewIni
 	private async initwebcamPublisher(): Promise<void> {
 		return new Promise(async (resolve, reject) => {
 			try {
-				const publisher = await this.openviduService.initDefaultPublisher();
+				const pp = {
+					resolution: this.libService.getStreamResolution(),
+					frameRate: this.libService.getStreamFrameRate(),
+					videoSimulcast: this.libService.isSimulcastEnabled()
+				};
+				const publisher = await this.openviduService.initDefaultPublisher(pp);
 
 				if (publisher) {
 					publisher.once('accessDenied', async (e: any) => {
 						await this.handlePublisherError(e);
 						resolve();
 					});
-					publisher.once('accessAllowed', () => resolve());
+					publisher.once('accessAllowed', () => {
+						this.participantService.setMyCameraPublisher(publisher);
+						this.participantService.updateLocalParticipant();
+						resolve();
+					});
+				} else {
+					this.participantService.setMyCameraPublisher(undefined);
+					this.participantService.updateLocalParticipant();
 				}
 			} catch (error) {
 				this.actionService.openDialog(error.name.replace(/_/g, ' '), error.message, true);
@@ -768,6 +797,10 @@ export class VideoconferenceComponent implements OnInit, OnDestroy, AfterViewIni
 
 		this.participantNameSub = this.libService.participantName.subscribe((nickname: string) => {
 			this.externalParticipantName = nickname;
+		});
+
+		this.langSub = this.translateService.langSelectedObs.subscribe((lang: LangOption) => {
+			this.onLangChanged.emit(lang);
 		});
 	}
 }

@@ -472,6 +472,15 @@ export class Publisher extends StreamManager {
                         };
 
                         if (this.stream.isSendScreen()) {
+
+                            if(this.stream.isSendAudio() && mediaStream.getAudioTracks().length === 0){
+                                // If sending audio is enabled and there are no audio tracks in the mediaStream, disable audio for screen sharing.
+                                this.stream.audioActive = false;
+                                this.stream.hasAudio = false;
+                                this.stream.outboundStreamOpts.publisherProperties.publishAudio = false;
+                                this.stream.outboundStreamOpts.publisherProperties.audioSource = false;
+                            }
+
                             // Set interval to listen for screen resize events
                             this.screenShareResizeInterval = setInterval(() => {
                                 const settings: MediaTrackSettings = mediaStream.getVideoTracks()[0].getSettings();
@@ -506,7 +515,7 @@ export class Publisher extends StreamManager {
 
             const getMediaSuccess = async (mediaStream: MediaStream, definedAudioConstraint) => {
                 this.clearPermissionDialogTimer(startTime, timeForDialogEvent);
-                if (this.stream.isSendScreen() && this.stream.isSendAudio()) {
+                if (this.stream.isSendScreen() && this.properties.audioSource !== 'screen' && this.stream.isSendAudio()) {
                     // When getting desktop as user media audio constraint must be false. Now we can ask for it if required
                     constraintsAux.audio = definedAudioConstraint;
                     constraintsAux.video = false;
@@ -647,19 +656,16 @@ export class Publisher extends StreamManager {
                         startTime = Date.now();
                         this.setPermissionDialogTimer(timeForDialogEvent);
 
-                        try {
-                            if (this.stream.isSendScreen() && navigator.mediaDevices['getDisplayMedia'] && !platform.isElectron()) {
-                                const mediaStream = await navigator.mediaDevices['getDisplayMedia']({ video: true });
-                                this.openvidu.addAlreadyProvidedTracks(myConstraints, mediaStream);
-                                await getMediaSuccess(mediaStream, definedAudioConstraint);
-                            } else {
-                                this.stream.lastVideoTrackConstraints = constraintsAux.video;
-                                const mediaStream = await navigator.mediaDevices.getUserMedia(constraintsAux);
-                                this.openvidu.addAlreadyProvidedTracks(myConstraints, mediaStream, this.stream);
-                                await getMediaSuccess(mediaStream, definedAudioConstraint);
-                            }
-                        } catch (error) {
-                            await getMediaError(error);
+                    try {
+                        if (this.stream.isSendScreen() && navigator.mediaDevices['getDisplayMedia'] && !platform.isElectron()) {
+                            const mediaStream = await navigator.mediaDevices['getDisplayMedia']({ video: true, audio: this.properties.audioSource === 'screen' });
+                            this.openvidu.addAlreadyProvidedTracks(myConstraints, mediaStream);
+                            await getMediaSuccess(mediaStream, definedAudioConstraint);
+                        } else {
+                            this.stream.lastVideoTrackConstraints = constraintsAux.video;
+                            const mediaStream = await navigator.mediaDevices.getUserMedia(constraintsAux);
+                            this.openvidu.addAlreadyProvidedTracks(myConstraints, mediaStream, this.stream);
+                            await getMediaSuccess(mediaStream, definedAudioConstraint);
                         }
                     }
                 }
@@ -706,7 +712,7 @@ export class Publisher extends StreamManager {
     getVideoDimensions(): Promise<{ width: number; height: number }> {
         return new Promise((resolve, reject) => {
             // Ionic iOS and Safari iOS supposedly require the video element to actually exist inside the DOM
-            const requiresDomInsertion: boolean = platform.isIonicIos() || platform.isIOSWithSafari();
+            const requiresDomInsertion: boolean = (platform.isIonicIos() || platform.isIOSWithSafari()) && (this.videoReference.readyState < 1);
 
             let loadedmetadataListener;
             const resolveDimensions = () => {

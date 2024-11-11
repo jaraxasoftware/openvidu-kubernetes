@@ -791,11 +791,21 @@ export class Stream {
      * @hidden
      */
     isSendScreen(): boolean {
-        let screen = this.outboundStreamOpts.publisherProperties.videoSource === 'screen';
-        if (platform.isElectron()) {
+        let screen = false
+        if (typeof MediaStreamTrack !== 'undefined' &&
+            this.outboundStreamOpts.publisherProperties.videoSource instanceof MediaStreamTrack) {
+            let trackSettings: any = this.outboundStreamOpts.publisherProperties.videoSource.getSettings();
+            if (trackSettings.displaySurface) {
+                screen = ["monitor", "window", "browser"].includes(trackSettings.displaySurface);
+            }
+        }
+        if (!screen && platform.isElectron()) {
             screen =
                 typeof this.outboundStreamOpts.publisherProperties.videoSource === 'string' &&
                 this.outboundStreamOpts.publisherProperties.videoSource.startsWith('screen:');
+        }
+        if (!screen) {
+            screen = this.outboundStreamOpts.publisherProperties.videoSource === 'screen';
         }
         return !!this.outboundStreamOpts && screen;
     }
@@ -1063,15 +1073,16 @@ export class Stream {
         if (!this.getWebRtcPeer() || !this.getRTCPeerConnection()) {
             return false;
         }
-        if (this.isLocal() && !!this.session.openvidu.advancedConfiguration.forceMediaReconnectionAfterNetworkDrop) {
+        if (!!this.session.openvidu.advancedConfiguration.forceMediaReconnectionAfterNetworkDrop) {
             logger.warn(
                 `OpenVidu Browser advanced configuration option "forceMediaReconnectionAfterNetworkDrop" is enabled. Stream ${this.streamId
                 } (${this.isLocal() ? 'Publisher' : 'Subscriber'}) will force a reconnection`
             );
             return true;
+        } else {
+            const iceConnectionState: RTCIceConnectionState = this.getRTCPeerConnection().iceConnectionState;
+            return iceConnectionState !== 'connected' && iceConnectionState !== 'completed';
         }
-        const iceConnectionState: RTCIceConnectionState = this.getRTCPeerConnection().iceConnectionState;
-        return iceConnectionState !== 'connected' && iceConnectionState !== 'completed';
     }
 
     /* Private methods */
