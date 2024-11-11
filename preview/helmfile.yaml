@@ -63,4 +63,22 @@ releases:
     - --name
     - tls-develop-jaraxa-systems-p
     - --to
-    - '{{ requiredEnv "PREVIEW_NAMESPACE" }}'    
+    - '{{ requiredEnv "PREVIEW_NAMESPACE" }}'
+  - events: ["postsync"]
+    showlogs: false
+    command: "bash"
+    args:
+    - '-c'
+    - "kubectl exec -ti deploy/netcomp -n '{{ requiredEnv "PREVIEW_NAMESPACE" }}' -- /opt/code/netcomp/bin/netcomp eval 'dkv_telemed_svc:load_objs(),dkv_shp_svc:load_objs(),dkv_collab_svc:load_objs().'"
+  - events: ["postsync"]
+    showlogs: false
+    command: "bash"
+    args:
+    - '-c'
+    - "kubectl exec -ti deploy/netcomp -n '{{ requiredEnv "PREVIEW_NAMESPACE" }}' -- /opt/code/netcomp/bin/netcomp eval 'dkv_telemed_svc:load_coaches().'"
+    - events: ["postsync"]
+    showlogs: false
+    command: "bash"
+    args:
+    - '-c'
+    - "kubectl exec -ti deploy/netcomp -n '{{ requiredEnv "PREVIEW_NAMESPACE" }}' -- /opt/code/netcomp/bin/netcomp eval 'dkv_telemed_import:import_all().'"
