@@ -83,17 +83,21 @@ services:
       collab_url: "https://{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}/dkv/"
       opet_admin_base_url: "https://{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}/admin/"
       oauth_url: "https://ci.develop.jaraxa.systems/mock/oauth"
+      pav_create_encounter_started_msg: true
+      pav_events_enabled: true
+      pav_sync_encounters_lobby_waiting_minutes: 5      
       pet_cole_sso_base_url: "https://ci.develop.jaraxa.systems/mock/cole/access"
       pet_cole_sso_callback_base: "https://{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}/pet"
       pet_gd_base_url: "https://ci.develop.jaraxa.systems/mock/gd"
       pet_health_diary_url: "https://ci.develop.jaraxa.systems/mock/qcmas/health_diary/"
       pet_health_folder_url: "https://ci.develop.jaraxa.systems/mock/qcmas/health_folder/"
+      pet_openvidu_check_status: true      
   nkchat:
     extra:
       openvidu_uri: "https://{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}/openvidu/api"
       openvidu_proxy_config:
         - key: "{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"
-          value: "dkv-pet-proxy-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"      
+          value: "{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"      
 
 elastic:
   username: elastic

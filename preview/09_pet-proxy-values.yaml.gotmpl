@@ -20,6 +20,7 @@ ingress:
       rewrite ^(/pet)$ $1/ redirect;
   paths:
     - /pet(/|$)(.*)
+    - /openvidu(/|$)(.*)
   hosts:
     - "{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"
   tls:
