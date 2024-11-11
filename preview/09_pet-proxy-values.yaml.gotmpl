@@ -1,0 +1,38 @@
+env:
+  DKV_PET_HOST: netcomp-shp
+  DKV_PET_PORT: 9003
+  DKV_PET_PATH: /_api
+  DKV_PET_SCHEME: http
+  DKV_PET_PROXY_SLACK_ENABLED: false
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: "nginx" 
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "360"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "360"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "360"
+    nginx.ingress.kubernetes.io/send-timeout: "360"
+    nginx.ingress.kubernetes.io/proxy-body-size: 50m
+    nginx.ingress.kubernetes.io/client-body-buffer-size: 16k    
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      rewrite ^(/pet)$ $1/ redirect;
+  paths:
+    - /pet(/|$)(.*)
+  hosts:
+    - "{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"
+  tls:
+{{- if and (.Values.jxRequirements.ingress.tls.enabled) (hasKey .Values.jxRequirements.ingress "tls") (hasKey .Values.jxRequirements.ingress.tls "secretName") }} 
+    - secretName: "{{ .Values.jxRequirements.ingress.tls.secretName }}"
+      hosts:
+        - "{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"
+{{- else if .Values.jxRequirements.ingress.tls.production }}
+    - secretName: "tls-{{ .Values.jxRequirements.ingress.domain | replace "." "-" }}-p"
+      hosts:
+        - "{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"
+{{- else }}
+    - secretName: "tls-{{ .Values.jxRequirements.ingress.domain | replace "." "-" }}-s"
+      hosts:
+        - "{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"
+{{- end }}
