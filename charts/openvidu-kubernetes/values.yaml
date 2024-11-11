@@ -19,7 +19,7 @@ serviceAccount:
   tokenAutomount: false
 
 stunner:
-  enabled: true
+  enabled: false
   annotations: {}
     #stunner.l7mp.io/enable-mixed-protocol-lb: "true"
   username: turn

@@ -3,37 +3,7 @@ serviceAccount:
   tokenAutomount: false
 
 stunner:
-  enabled: true
-  annotations: {}
-    #stunner.l7mp.io/enable-mixed-protocol-lb: "true"
-  username: turn
-  password: jaraxa
-  logLevel: all:INFO
-  realm: openvidu
-  routesNamespaces: Same
-  owncert: 
-    enabled: false
-    secret: tls-secret-p
-  zerossl:
-    enabled: false
-    eabSecret: 0ARcp8LoBXS4BcDcH1F_aq9ZY9EJkypyiwWjfRY-WUZy5MZ2vQ05-IrMbIKYWiO7Uiqs8W_RMf2XPONYZSIy1Q
-    eabKey: APc9New1vAd4mrGomzUi7w
-    route53:
-      secret: aws-route53-creds
-      accessKey: AKIAJRSPNOF53QMFEPUA
-      hostedZone: Z04648343NITAAQ6MU84V
-    dnsNames:
-      - "turns.{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"
-      - "turn.{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"
-      - "stunner.{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"
-  deployment:
-    container:
-      stunnerd:
-        name: stunnerd
-        image:
-          name: docker.io/l7mp/stunnerd
-          pullPolicy: IfNotPresent
-          tag: 0.21.0
+  enabled: false
 
 # Mandatory. Can be deployment or distributed
 mode: deployment
@@ -59,6 +29,14 @@ services:
     kms:
       uris:
         - "ws://localhost:8888/kurento"
+    coturn:
+      ip: "turn.develop.jaraxa.systems"
+      port: 3478
+      uris: "turns:turns.develop.jaraxa.systems:443"
+      iceServers: 
+        - turns:turns.develop.jaraxa.systems:443,username=turn,credential=jaraxa
+        - turns:turns.develop.jaraxa.systems:5349,username=turn,credential=jaraxa 
+        - turn:turns.develop.jaraxa.systems:3478,username=turn,credential=jaraxa        
     transcoding:
       enabled: false
     webhook:
