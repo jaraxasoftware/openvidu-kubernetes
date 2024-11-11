@@ -28,6 +28,13 @@ releases:
   namespace: '{{ requiredEnv "PREVIEW_NAMESPACE" }}'
   values:
   - 05_dkv-client-values.yaml.gotmpl
+  - jx-values.yaml
+- chart: gh/dkv-pet-admin
+  version: 0.0.0-DEVELOP-1725463425259
+  name: dkv-pet-admin
+  namespace: '{{ requiredEnv "PREVIEW_NAMESPACE" }}'  
+  values:
+  - 04_dkv-pet-admin-values.yaml.gotmpl
   - jx-values.yaml  
 - chart: jx3/jx-verify
   name: jx-verify
