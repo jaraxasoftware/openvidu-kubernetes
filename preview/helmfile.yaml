@@ -5,6 +5,8 @@ environments:
 repositories:
 - name: jx3
   url: https://jenkins-x-charts.github.io/repo
+- name: gh
+  url: https://chartmuseum-jx3.develop.jaraxa.systems  
 releases:
 - chart: gh/netcomp
   version: 0.0.0-DEVELOP-1730989481491
