@@ -1,3 +1,87 @@
+stunner:
+  enabled: true
+  annotations: {}
+    #stunner.l7mp.io/enable-mixed-protocol-lb: "true"
+  username: turn
+  password: jaraxa
+  logLevel: all:INFO
+  realm: openvidu
+  routesNamespaces: Same
+  owncert: 
+    enabled: false
+    secret: tls-secret-p
+  zerossl:
+    enabled: true
+    eabSecret: 0ARcp8LoBXS4BcDcH1F_aq9ZY9EJkypyiwWjfRY-WUZy5MZ2vQ05-IrMbIKYWiO7Uiqs8W_RMf2XPONYZSIy1Q
+    eabKey: APc9New1vAd4mrGomzUi7w
+    route53:
+      secret: aws-route53-creds
+      accessKey: AKIAJRSPNOF53QMFEPUA
+      hostedZone: Z04648343NITAAQ6MU84V
+    dnsNames:
+      - "turns.{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"
+      - "turn.{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"
+      - "stunner.{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"
+  deployment:
+    container:
+      stunnerd:
+        name: stunnerd
+        image:
+          name: docker.io/l7mp/stunnerd
+          pullPolicy: IfNotPresent
+          tag: 0.21.0
+
+# Mandatory. Can be deployment or distributed
+mode: deployment
+
+services:
+  openvidu:
+    enabled: true
+    type: master
+    image:
+      repository: openvidu/openvidu-server
+      tag: 2.30.0
+      pullPolicy: IfNotPresent
+    port: 443
+    configDir: /opt/openvidu/
+    secret: openvidu
+    pro:
+      enabled: false
+    protocols:
+      - TCP
+    ssl:
+      enabled: false
+      certType: owncert
+    kms:
+      uris:
+        - "ws://localhost:8888/kurento"
+    transcoding:
+      enabled: false
+    webhook:
+      enabled: true
+      endpoint: "https://develop.jaraxa.systems/pet/api/v1/webhooks/openvidu"
+      headers: '["Brand: DKV", "Product: Openvidu", "x-pet-app-id: dfcd90b3", "x-pet-app-secret: 3a7e1ecf-59d0-4432-a322-8add3cf3c914"]'
+      events: '["sessionCreated", "sessionDestroyed", "participantJoined", "participantLeft", "webrtcConnectionCreated", "webrtcConnectionDestroyed", "recordingStatusChanged", "filterEventDispatched", "signalSent"]'
+    cdr:
+      enabled: false
+      path: /opt/openvidu/cdr
+    env: {}
+
+  kms:
+    enabled: true
+    type: media
+    image:
+      repository: kurento/kurento-media-server
+      tag: 7.0.1
+      pullPolicy: IfNotPresent
+    protocols:
+      - TCP
+    port: 8888
+    env:
+      KURENTO_LOGS_PATH: "/var/log/kurento-media-server/"
+      KMS_MIN_PORT: "40000"
+      KMS_MAX_PORT: "45000"
+
 ingress:
   enabled: true
   class: nginx
@@ -21,8 +105,3 @@ ingress:
       hosts:
         - "{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"
 {{- end }}
-
-image:
-  repository: "{{ requiredEnv "DOCKER_REGISTRY" }}/{{ requiredEnv "DOCKER_REGISTRY_ORG" }}/{{ requiredEnv "APP_NAME" }}"
-  tag: "{{ requiredEnv "VERSION" }}"
-  pullPolicy: "Always"
