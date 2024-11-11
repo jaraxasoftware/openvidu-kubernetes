@@ -56,7 +56,7 @@ services:
       enabled: false
     webhook:
       enabled: true
-      endpoint: "https://develop.jaraxa.systems/pet/api/v1/webhooks/openvidu"
+      endpoint: "https://{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}/pet/api/v1/webhooks/openvidu"
       headers: '["Brand: DKV", "Product: Openvidu", "x-pet-app-id: dfcd90b3", "x-pet-app-secret: 3a7e1ecf-59d0-4432-a322-8add3cf3c914"]'
       events: '["sessionCreated", "sessionDestroyed", "participantJoined", "participantLeft", "webrtcConnectionCreated", "webrtcConnectionDestroyed", "recordingStatusChanged", "filterEventDispatched", "signalSent"]'
     cdr:
