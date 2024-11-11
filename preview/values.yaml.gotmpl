@@ -3,7 +3,19 @@ serviceAccount:
   tokenAutomount: false
 
 stunner:
-  enabled: false
+  enabled: true
+  annotations:
+    stunner.l7mp.io/enable-mixed-protocol-lb: "true"
+  username: turn
+  password: jaraxa
+  logLevel: all:INFO
+  realm: openvidu
+  routesNamespaces: Same
+  owncert: 
+    enabled: true
+    secret: tls-develop-jaraxa-systems-p
+  zerossl:
+    enabled: false
 
 # Mandatory. Can be deployment or distributed
 mode: deployment
@@ -30,13 +42,13 @@ services:
       uris:
         - "ws://localhost:8888/kurento"
     coturn:
-      ip: "turn.develop.jaraxa.systems"
+      ip: "turn.{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"
       port: 3478
-      uris: "turns:turns.develop.jaraxa.systems:443"
+      uris: "turns:turns.{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}:443"
       iceServers: 
-        - turns:turns.develop.jaraxa.systems:443,username=turn,credential=jaraxa
-        - turns:turns.develop.jaraxa.systems:5349,username=turn,credential=jaraxa 
-        - turn:turns.develop.jaraxa.systems:3478,username=turn,credential=jaraxa        
+        - turns:turns.{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}:443,username=turn,credential=jaraxa
+        - turns:turns.{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}:5349,username=turn,credential=jaraxa 
+        - turn:turns.{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}:3478,username=turn,credential=jaraxa        
     transcoding:
       enabled: false
     webhook:
@@ -68,6 +80,7 @@ ingress:
   enabled: true
   class: nginx
   annotations:
+    kubernetes.io/ingress.class: nginx  
     nginx.ingress.kubernetes.io/rewrite-target: /$1
   paths:
     - /(.*)
