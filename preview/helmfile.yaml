@@ -6,6 +6,27 @@ repositories:
 - name: jx3
   url: https://jenkins-x-charts.github.io/repo
 releases:
+- chart: gh/netcomp
+  version: 0.0.0-DEVELOP-1730989481491
+  name: netcomp
+  namespace: '{{ requiredEnv "PREVIEW_NAMESPACE" }}'
+  values:
+  - jx-values.yaml
+  - 06_netcomp-values.yaml.gotmpl
+- chart: gh/dkv-pet-proxy
+  version: 0.0.0-DEVELOP-1730989222713
+  name: dkv-pet-proxy
+  namespace: '{{ requiredEnv "PREVIEW_NAMESPACE" }}'
+  values:
+  - jx-values.yaml
+  - 09_pet-proxy-values.yaml.gotmpl
+- chart: gh/dkv-client
+  version: 0.0.0-DEVELOP-1730297188271
+  name: dkv-client
+  namespace: '{{ requiredEnv "PREVIEW_NAMESPACE" }}'
+  values:
+  - 05_dkv-client-values.yaml.gotmpl
+  - jx-values.yaml  
 - chart: jx3/jx-verify
   name: jx-verify
   namespace: '{{ requiredEnv "PREVIEW_NAMESPACE" }}'
