@@ -95,6 +95,7 @@ services:
   nkchat:
     extra:
       openvidu_uri: "https://{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}/openvidu/api"
+      openvidu_basic_auth: "T1BFTlZJRFVBUFA6b3BlbnZpZHU="      
       openvidu_proxy_config:
         - key: "{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"
           value: "{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"      
