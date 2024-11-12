@@ -9,14 +9,14 @@ env:
 ingress:
   enabled: true
   annotations:
-    kubernetes.io/ingress.class: "nginx" 
+    kubernetes.io/ingress.class: "nginx"
     nginx.ingress.kubernetes.io/rewrite-target: /$2
     nginx.ingress.kubernetes.io/proxy-connect-timeout: "360"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "360"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "360"
     nginx.ingress.kubernetes.io/send-timeout: "360"
     nginx.ingress.kubernetes.io/proxy-body-size: 50m
-    nginx.ingress.kubernetes.io/client-body-buffer-size: 16k    
+    nginx.ingress.kubernetes.io/client-body-buffer-size: 16k
     nginx.ingress.kubernetes.io/configuration-snippet: |
       rewrite ^(/pet)$ $1/ redirect;
   paths:
@@ -24,7 +24,7 @@ ingress:
   hosts:
     - "{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"
   tls:
-{{- if and (.Values.jxRequirements.ingress.tls.enabled) (hasKey .Values.jxRequirements.ingress "tls") (hasKey .Values.jxRequirements.ingress.tls "secretName") }} 
+{{- if and (.Values.jxRequirements.ingress.tls.enabled) (hasKey .Values.jxRequirements.ingress "tls") (hasKey .Values.jxRequirements.ingress.tls "secretName") }}
     - secretName: "{{ .Values.jxRequirements.ingress.tls.secretName }}"
       hosts:
         - "{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"

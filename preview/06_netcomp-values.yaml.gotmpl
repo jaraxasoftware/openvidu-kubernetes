@@ -31,7 +31,7 @@ ingress:
   hosts:
     - "{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"
   tls:
-{{- if and (.Values.jxRequirements.ingress.tls.enabled) (hasKey .Values.jxRequirements.ingress "tls") (hasKey .Values.jxRequirements.ingress.tls "secretName") }} 
+{{- if and (.Values.jxRequirements.ingress.tls.enabled) (hasKey .Values.jxRequirements.ingress "tls") (hasKey .Values.jxRequirements.ingress.tls "secretName") }}
     - secretName: "{{ .Values.jxRequirements.ingress.tls.secretName }}"
       hosts:
         - "{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"
@@ -65,7 +65,7 @@ services:
   collab:
     extra:
       external_push:
-        url: "http://dkv-notifications.jx-dkv-develop.svc.cluster.local:8090/api/v1"    
+        url: "http://dkv-notifications.jx-dkv-develop.svc.cluster.local:8090/api/v1"
       ice_servers:
         url: "stun:stun.l.google.com:19302"
         credential: "jaraxa"
@@ -85,20 +85,20 @@ services:
       oauth_url: "https://ci.develop.jaraxa.systems/mock/oauth"
       pav_create_encounter_started_msg: true
       pav_events_enabled: true
-      pav_sync_encounters_lobby_waiting_minutes: 5      
+      pav_sync_encounters_lobby_waiting_minutes: 5
       pet_cole_sso_base_url: "https://ci.develop.jaraxa.systems/mock/cole/access"
       pet_cole_sso_callback_base: "https://{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}/pet"
       pet_gd_base_url: "https://ci.develop.jaraxa.systems/mock/gd"
       pet_health_diary_url: "https://ci.develop.jaraxa.systems/mock/qcmas/health_diary/"
       pet_health_folder_url: "https://ci.develop.jaraxa.systems/mock/qcmas/health_folder/"
-      pet_openvidu_check_status: true      
+      pet_openvidu_check_status: true
   nkchat:
     extra:
       openvidu_uri: "https://{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}/openvidu/api"
-      openvidu_basic_auth: "T1BFTlZJRFVBUFA6b3BlbnZpZHU="      
+      openvidu_basic_auth: "T1BFTlZJRFVBUFA6b3BlbnZpZHU="
       openvidu_proxy_config:
         - key: "{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"
-          value: "{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"      
+          value: "{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"
 
 elastic:
   username: elastic

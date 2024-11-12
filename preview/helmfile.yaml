@@ -6,7 +6,7 @@ repositories:
 - name: jx3
   url: https://jenkins-x-charts.github.io/repo
 - name: gh
-  url: https://chartmuseum-jx3.develop.jaraxa.systems  
+  url: https://chartmuseum-jx3.develop.jaraxa.systems
 releases:
 - chart: gh/netcomp
   version: 0.0.0-DEVELOP-1730989481491
@@ -32,17 +32,17 @@ releases:
 - chart: gh/dkv-pet-admin
   version: 0.0.0-DEVELOP-1725463425259
   name: dkv-pet-admin
-  namespace: '{{ requiredEnv "PREVIEW_NAMESPACE" }}'  
+  namespace: '{{ requiredEnv "PREVIEW_NAMESPACE" }}'
   values:
   - 04_dkv-pet-admin-values.yaml.gotmpl
   - jx-values.yaml
 - chart: gh/dkv-pav-ui
   version: 0.0.0-DEVELOP-1730995078219
   name: dkv-pav-ui
-  namespace: '{{ requiredEnv "PREVIEW_NAMESPACE" }}'   
+  namespace: '{{ requiredEnv "PREVIEW_NAMESPACE" }}'
   values:
   - 18_dkv-pav-ui-values.yaml.gotmpl
-  - jx-values.yaml  
+  - jx-values.yaml
 - chart: jx3/jx-verify
   name: jx-verify
   namespace: '{{ requiredEnv "PREVIEW_NAMESPACE" }}'

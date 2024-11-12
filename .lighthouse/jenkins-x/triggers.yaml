@@ -17,7 +17,7 @@ spec:
     context: "staging"
     source: "staging.yaml"
     branches:
-    - ^staging$ 
+    - ^staging$
   - name: release
     context: "release"
     source: "release.yaml"

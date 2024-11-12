@@ -13,17 +13,17 @@ spec:
         stepTemplate:
           env:
           - name: BUILD_VERSION
-            value: -PRE          
+            value: -PRE
           - name: ENVIRONMENT
             value: dkv-staging
           - name: NPM_CONFIG_USERCONFIG
-            value: /tekton/home/npm/.npmrc                              
+            value: /tekton/home/npm/.npmrc
           image: uses:jaraxasoftware/jaraxa-pipeline-catalog/tasks/javascript/release.yaml@versionStream
           name: ""
           resources: {}
           volumeMounts:
             - mountPath: /tekton/home/npm
-              name: npmrc          
+              name: npmrc
           workingDir: /workspace/source
         steps:
         - image: uses:jaraxasoftware/jaraxa-pipeline-catalog/tasks/git-clone/git-clone.yaml@versionStream
@@ -32,7 +32,7 @@ spec:
         - name: next-version
           script: |
             #!/usr/bin/env sh
-            echo $BUILD_VERSION-$BUILD_ID >> VERSION          
+            echo $BUILD_VERSION-$BUILD_ID >> VERSION
         - name: jx-variables
           resources: {}
         - image: node:14-slim
@@ -42,7 +42,7 @@ spec:
             source .jx/variables.sh
             cd openvidu-browser
             npm install
-            npm --no-git-tag-version version $VERSION           
+            npm --no-git-tag-version version $VERSION
         - image: node:14-slim
           name: openvidu-browser-build
           script: |
@@ -58,9 +58,9 @@ spec:
             #!/bin/bash
             source .jx/variables.sh
             cd openvidu-browser
-            npm publish            
+            npm publish
         - name: chart-docs
-          resources: {}    
+          resources: {}
         - name: promote-changelog-uat
           resources: {}
           script: |
@@ -79,7 +79,7 @@ spec:
         - name: npmrc
           secret:
             optional: true
-            secretName: npmrc-nexus          
+            secretName: npmrc-nexus
   podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 12h0m0s

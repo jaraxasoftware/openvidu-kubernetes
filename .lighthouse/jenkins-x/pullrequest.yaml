@@ -24,18 +24,14 @@ spec:
         - image: uses:jaraxasoftware/jaraxa-pipeline-catalog/tasks/git-clone/git-clone-pr.yaml@versionStream
           name: ""
           resources: {}
-        - name: jx-variables
-          resources:
-            # override requests for the pod here
-            requests:
-              cpu: 400m
-              memory: 512Mi
         - image: ghcr.io/jenkins-x/jx-release-version:2.6.10
           name: next-version
           resources: {}
           script: |
             #!/usr/bin/env sh
-            echo $BUILD_VERSION-$BUILD_ID >> VERSION              
+            echo $BUILD_VERSION-$BUILD_ID >> VERSION
+        - name: jx-variables
+          resources: {}
         - image: node:14-slim
           name: build-npm-version
           script: |
@@ -52,7 +48,7 @@ spec:
             cd openvidu-browser
             echo "Building openvidu-browser"
             npm run build
-            npm run browserify                          
+            npm run browserify
         - name: promote-jx-preview
           resources: {}
   podTemplate: {}
