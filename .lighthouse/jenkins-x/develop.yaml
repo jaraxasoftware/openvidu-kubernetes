@@ -17,9 +17,9 @@ spec:
           - name: ENVIRONMENT
             value: dkv-develop
           - name: PREVIEW_ENV
-            value: pet3-develop            
+            value: pet3-develop
           - name: NPM_CONFIG_USERCONFIG
-            value: /tekton/home/npm/.npmrc            
+            value: /tekton/home/npm/.npmrc
           image: uses:jaraxasoftware/jaraxa-pipeline-catalog/tasks/javascript/release.yaml@versionStream
           name: ""
           resources: {}
@@ -44,7 +44,7 @@ spec:
             source .jx/variables.sh
             cd openvidu-browser
             npm install
-            npm --no-git-tag-version version $VERSION           
+            npm --no-git-tag-version version $VERSION
         - image: node:14-slim
           name: openvidu-browser-build
           script: |
@@ -60,9 +60,9 @@ spec:
             #!/bin/bash
             source .jx/variables.sh
             cd openvidu-browser
-            npm publish               
+            npm publish
         - name: chart-docs
-          resources: {}    
+          resources: {}
         - name: promote-changelog-uat
           resources: {}
           script: |
@@ -72,7 +72,7 @@ spec:
             if [ -d "charts/$REPO_NAME" ]; then
             jx gitops yset -p version -v "$VERSION" -f ./charts/$REPO_NAME/Chart.yaml
             jx gitops yset -p appVersion -v "$VERSION" -f ./charts/$REPO_NAME/Chart.yaml
-            else echo no charts; fi       
+            else echo no charts; fi
         - name: promote-helm-release
           resources: {}
         - name: promote-jx-promote
@@ -81,7 +81,7 @@ spec:
         - name: npmrc
           secret:
             optional: true
-            secretName: npmrc-nexus          
+            secretName: npmrc-nexus
   podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 12h0m0s

@@ -1,0 +1,113 @@
+deployAnnotations:
+  wave.pusher.com/update-on-config-change: "true"
+
+service:
+  db:
+    es_svc: http://elastic:JHPke6DVRS3mJ55M@netcomp-elastic-develop.jx-dkv-develop.svc.cluster.local
+    es_svc_port: 9200
+    es: svc
+    store_id: es_local
+    pool_size: 10
+    replicas: 0
+    pool_overflow: 0
+    main: "nkobjects_dkv_v09_{{ requiredEnv "APP_NAME" }}_pr{{ requiredEnv "PULL_NUMBER" }}"
+    bypass_mapping_update: false # bypass ES mapping update if the mapping didn't change
+  db_reconnect:
+    retries: 20
+    sleep: 3
+  annotations: {}
+
+ingress:
+  enable: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    nginx.ingress.kubernetes.io/send-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-body-size: 50m
+    nginx.ingress.kubernetes.io/client-body-buffer-size: 16k
+  hosts:
+    - "{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"
+  tls:
+{{- if and (.Values.jxRequirements.ingress.tls.enabled) (hasKey .Values.jxRequirements.ingress "tls") (hasKey .Values.jxRequirements.ingress.tls "secretName") }}
+    - secretName: "{{ .Values.jxRequirements.ingress.tls.secretName }}"
+      hosts:
+        - "{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"
+{{- else if .Values.jxRequirements.ingress.tls.production }}
+    - secretName: "tls-{{ .Values.jxRequirements.ingress.domain | replace "." "-" }}-p"
+      hosts:
+        - "{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"
+{{- else }}
+    - secretName: "tls-{{ .Values.jxRequirements.ingress.domain | replace "." "-" }}-s"
+      hosts:
+        - "{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"
+{{- end }}
+
+resources:
+  limits:
+    cpu: 2
+    memory: 1Gi
+  requests:
+    cpu: 400m
+    memory: 500Mi
+
+services:
+  prometheus:
+    path: "prom"
+    port: 9001
+    public: no
+  admin:
+    path: "admin"
+    port: 9000
+    public: yes
+  collab:
+    extra:
+      external_push:
+        url: "http://dkv-notifications.jx-dkv-develop.svc.cluster.local:8090/api/v1"
+      ice_servers:
+        url: "stun:stun.l.google.com:19302"
+        credential: "jaraxa"
+        username: "turn"
+        urls:
+          - "turn:turns.{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}:3478"
+          - "turns:turns.{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}:5349"
+          - "turns:turns.{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}:443"
+  dkv-telemed:
+    extra:
+      collab_conversation_path: "#conv/~s"
+      collab_recovery_enabled: true
+      collab_recovery_path: "#recovery/~s"
+      collab_recovery_ttl_secs: 3600
+      collab_url: "https://{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}/dkv/"
+      opet_admin_base_url: "https://{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}/admin/"
+      oauth_url: "https://ci.develop.jaraxa.systems/mock/oauth"
+      pav_create_encounter_started_msg: true
+      pav_events_enabled: true
+      pav_sync_encounters_lobby_waiting_minutes: 5
+      pet_cole_sso_base_url: "https://ci.develop.jaraxa.systems/mock/cole/access"
+      pet_cole_sso_callback_base: "https://{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}/pet"
+      pet_gd_base_url: "https://ci.develop.jaraxa.systems/mock/gd"
+      pet_health_diary_url: "https://ci.develop.jaraxa.systems/mock/qcmas/health_diary/"
+      pet_health_folder_url: "https://ci.develop.jaraxa.systems/mock/qcmas/health_folder/"
+      pet_openvidu_check_status: true
+  nkchat:
+    extra:
+      openvidu_uri: "https://{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}/openvidu/api"
+      openvidu_basic_auth: "T1BFTlZJRFVBUFA6b3BlbnZpZHU="
+      openvidu_proxy_config:
+        - key: "{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"
+          value: "{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"
+
+elastic:
+  username: elastic
+  password: JHPke6DVRS3mJ55M
+  kibanaEnc: y3HKPC4slbeZ8Jr6ktgTgvjWCON0FDZ9WPvGKwfw2fERLVeflb
+
+azure:
+  storage_account: ncstorageblobmanagement
+  storage_key: GLBRocUqQB3rWS9xIGwVVox/sV2yNVYQ9eqRe5uQHd8Blg11kclMgbectrUVGCUYSZ/BcjG0AFQVFo/u/nfjEg==
+
+cronjobs:
+  enabled: false
