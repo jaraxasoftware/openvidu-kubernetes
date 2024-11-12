@@ -50,7 +50,6 @@ import hark = require('hark');
  * @hidden
  */
 import EventEmitter = require('wolfy87-eventemitter');
-import { SubscriberProperties } from '../OpenViduInternal/Interfaces/Public/SubscriberProperties';
 /**
  * @hidden
  */
@@ -791,11 +790,21 @@ export class Stream {
      * @hidden
      */
     isSendScreen(): boolean {
-        let screen = this.outboundStreamOpts.publisherProperties.videoSource === 'screen';
-        if (platform.isElectron()) {
+        let screen = false
+        if (typeof MediaStreamTrack !== 'undefined' &&
+            this.outboundStreamOpts.publisherProperties.videoSource instanceof MediaStreamTrack) {
+            let trackSettings: any = this.outboundStreamOpts.publisherProperties.videoSource.getSettings();
+            if (trackSettings.displaySurface) {
+                screen = ["monitor", "window", "browser"].includes(trackSettings.displaySurface);
+            }
+        }
+        if (!screen && platform.isElectron()) {
             screen =
                 typeof this.outboundStreamOpts.publisherProperties.videoSource === 'string' &&
                 this.outboundStreamOpts.publisherProperties.videoSource.startsWith('screen:');
+        }
+        if (!screen) {
+            screen = this.outboundStreamOpts.publisherProperties.videoSource === 'screen';
         }
         return !!this.outboundStreamOpts && screen;
     }
@@ -1063,15 +1072,16 @@ export class Stream {
         if (!this.getWebRtcPeer() || !this.getRTCPeerConnection()) {
             return false;
         }
-        if (this.isLocal() && !!this.session.openvidu.advancedConfiguration.forceMediaReconnectionAfterNetworkDrop) {
+        if (!!this.session.openvidu.advancedConfiguration.forceMediaReconnectionAfterNetworkDrop) {
             logger.warn(
                 `OpenVidu Browser advanced configuration option "forceMediaReconnectionAfterNetworkDrop" is enabled. Stream ${this.streamId
                 } (${this.isLocal() ? 'Publisher' : 'Subscriber'}) will force a reconnection`
             );
             return true;
+        } else {
+            const iceConnectionState: RTCIceConnectionState = this.getRTCPeerConnection().iceConnectionState;
+            return iceConnectionState !== 'connected' && iceConnectionState !== 'completed';
         }
-        const iceConnectionState: RTCIceConnectionState = this.getRTCPeerConnection().iceConnectionState;
-        return iceConnectionState !== 'connected' && iceConnectionState !== 'completed';
     }
 
     /* Private methods */
@@ -1084,16 +1094,7 @@ export class Stream {
                     : this.session.openvidu.advancedConfiguration.publisherSpeakingEventsOptions || {};
                 harkOptions.interval = typeof harkOptions.interval === 'number' ? harkOptions.interval : 100;
                 harkOptions.threshold = typeof harkOptions.threshold === 'number' ? harkOptions.threshold : -50;
-                try {
-                    this.speechEvent = hark(this.mediaStream, harkOptions);
-                } catch (e) {
-                    logger.warn("Unable to add hark to existing stream");
-                    this.speechEvent = new EventEmitter();
-                    this.speechEvent.stop = function() {};
-                    this.speechEvent.setInterval = function() {};
-                    this.speechEvent.setThreshold = function() {};
-                    return false;
-                }
+                this.speechEvent = hark(this.mediaStream, harkOptions);
             }
             return true;
         }
@@ -1474,15 +1475,11 @@ export class Stream {
             this.disposeMediaStream();
         }
 
-        if ((this.streamManager as Subscriber).properties.useStreamEvent) {
-            this.mediaStream = this.webRtcPeer.eventMediaStream;
-        } else {
-            this.mediaStream = new MediaStream();
-            let receiver: RTCRtpReceiver;
-            for (receiver of this.webRtcPeer.pc.getReceivers()) {
-                if (!!receiver.track) {
-                    this.mediaStream.addTrack(receiver.track);
-                }
+        this.mediaStream = new MediaStream();
+        let receiver: RTCRtpReceiver;
+        for (receiver of this.webRtcPeer.pc.getReceivers()) {
+            if (!!receiver.track) {
+                this.mediaStream.addTrack(receiver.track);
             }
         }
         logger.debug('Peer remote stream', this.mediaStream);

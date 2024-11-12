@@ -163,6 +163,17 @@ Parameters:
       - c5.12xlarge
       - c5.18xlarge
       - c5.24xlarge
+      - c6a.large
+      - c6a.xlarge
+      - c6a.2xlarge
+      - c6a.4xlarge
+      - c6a.8xlarge
+      - c6a.12xlarge
+      - c6a.16xlarge
+      - c6a.24xlarge
+      - c6a.32xlarge
+      - c6a.48xlarge
+      - c6a.metal
     ConstraintDescription: "Must be a valid EC2 instance type"
 
   AwsInstanceTypeKMS:
@@ -203,6 +214,17 @@ Parameters:
       - c5.12xlarge
       - c5.18xlarge
       - c5.24xlarge
+      - c6a.large
+      - c6a.xlarge
+      - c6a.2xlarge
+      - c6a.4xlarge
+      - c6a.8xlarge
+      - c6a.12xlarge
+      - c6a.16xlarge
+      - c6a.24xlarge
+      - c6a.32xlarge
+      - c6a.48xlarge
+      - c6a.metal
     ConstraintDescription: "Must be a valid EC2 instance type"
 
   KeyName:
@@ -525,6 +547,16 @@ Resources:
     UpdateReplacePolicy: Retain
     Condition: CreateS3Bucket
 
+  LaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+        LaunchTemplateName: IMDSV2
+        LaunchTemplateData:
+          MetadataOptions:
+            HttpEndpoint: enabled
+            HttpPutResponseHopLimit: 1
+            HttpTokens: required
+
   OpenViduServer:
     Type: AWS::EC2::Instance
     Metadata:
@@ -551,6 +583,7 @@ Resources:
                 #!/bin/bash -xe
 
                 WORKINGDIR=/opt/openvidu
+                TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
 
                 # Pro License
                 sed -i "s/OPENVIDU_PRO_LICENSE=/OPENVIDU_PRO_LICENSE=${OpenViduLicense}/" $WORKINGDIR/.env
@@ -568,7 +601,7 @@ Resources:
                   sed -i "s/DOMAIN_OR_PUBLIC_IP=/DOMAIN_OR_PUBLIC_IP=${PublicElasticIP}/" $WORKINGDIR/.env
                 else
                   [ ! -d "/usr/share/openvidu" ] && mkdir -p /usr/share/openvidu
-                  PublicHostname=$(curl http://169.254.169.254/latest/meta-data/public-hostname)
+                  PublicHostname=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/public-hostname)
                   sed -i "s/DOMAIN_OR_PUBLIC_IP=/DOMAIN_OR_PUBLIC_IP=$PublicHostname/" $WORKINGDIR/.env
                   echo $PublicHostname > /usr/share/openvidu/old-host-name
                 fi
@@ -601,7 +634,7 @@ Resources:
                 fi
 
                 # Replace vars AWS
-                INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
+                INSTANCE_ID=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id)
                 sed -i "s/#AWS_DEFAULT_REGION=/AWS_DEFAULT_REGION=${AWS::Region}/" $WORKINGDIR/.env
                 sed -i "s/#AWS_IMAGE_ID=/AWS_IMAGE_ID=${kmsAmi}/" $WORKINGDIR/.env
                 sed -i "s/#AWS_INSTANCE_TYPE=/AWS_INSTANCE_TYPE=${AwsInstanceTypeKMS}/" $WORKINGDIR/.env
@@ -673,7 +706,8 @@ Resources:
 
                 # Get new amazon URL
                 OldPublicHostname=$(cat /usr/share/openvidu/old-host-name)
-                PublicHostname=$(curl http://169.254.169.254/latest/meta-data/public-hostname)
+                TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+                PublicHostname=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/public-hostname)
                 sed -i "s/$OldPublicHostname/$PublicHostname/" $WORKINGDIR/.env
                 echo $PublicHostname > /usr/share/openvidu/old-host-name
 
@@ -1073,7 +1107,7 @@ Resources:
       Handler: index.handler
       Role:
         !GetAtt CloudformationLambdaRole.Arn
-      Runtime: python3.7
+      Runtime: python3.11
       Timeout: 900
 
   CloudformationLambdaInvoke:

@@ -157,6 +157,12 @@ public class OpenViduServer implements JsonRpcConfigurer {
 
 	@Bean
 	@ConditionalOnMissingBean
+	public RpcNotificationService notificationService() {
+		return new RpcNotificationService();
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
 	@DependsOn("openviduConfig")
 	public SessionEventsHandler sessionEventsHandler() {
 		return new KurentoSessionEventsHandler();
@@ -187,12 +193,6 @@ public class OpenViduServer implements JsonRpcConfigurer {
 	@ConditionalOnMissingBean
 	public LoadManager loadManager() {
 		return new DummyLoadManager();
-	}
-
-	@Bean
-	@ConditionalOnMissingBean
-	public RpcNotificationService notificationService() {
-		return new RpcNotificationService();
 	}
 
 	@Bean

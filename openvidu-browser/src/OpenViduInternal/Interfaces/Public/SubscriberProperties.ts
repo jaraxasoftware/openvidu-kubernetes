@@ -38,10 +38,4 @@ export interface SubscriberProperties {
      * @default true
      */
     subscribeToVideo?: boolean;
-
-    /**
-     * Wheter to use stream events
-     * @default false
-     */
-    useStreamEvent?: boolean;
 }

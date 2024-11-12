@@ -5,7 +5,44 @@ environments:
 repositories:
 - name: jx3
   url: https://jenkins-x-charts.github.io/repo
+- name: gh
+  url: https://chartmuseum-jx3.develop.jaraxa.systems
 releases:
+- chart: gh/netcomp
+  version: 0.0.0-DEVELOP-1730989481491
+  name: netcomp
+  namespace: '{{ requiredEnv "PREVIEW_NAMESPACE" }}'
+  values:
+  - jx-values.yaml
+  - 06_netcomp-values.yaml.gotmpl
+- chart: gh/dkv-pet-proxy
+  version: 0.0.0-DEVELOP-1730989222713
+  name: dkv-pet-proxy
+  namespace: '{{ requiredEnv "PREVIEW_NAMESPACE" }}'
+  values:
+  - jx-values.yaml
+  - 09_pet-proxy-values.yaml.gotmpl
+- chart: gh/dkv-client
+  version: 0.0.0-DEVELOP-1730297188271
+  name: dkv-client
+  namespace: '{{ requiredEnv "PREVIEW_NAMESPACE" }}'
+  values:
+  - 05_dkv-client-values.yaml.gotmpl
+  - jx-values.yaml
+- chart: gh/dkv-pet-admin
+  version: 0.0.0-DEVELOP-1725463425259
+  name: dkv-pet-admin
+  namespace: '{{ requiredEnv "PREVIEW_NAMESPACE" }}'
+  values:
+  - 04_dkv-pet-admin-values.yaml.gotmpl
+  - jx-values.yaml
+- chart: gh/dkv-pav-ui
+  version: 0.0.0-DEVELOP-1730995078219
+  name: dkv-pav-ui
+  namespace: '{{ requiredEnv "PREVIEW_NAMESPACE" }}'
+  values:
+  - 18_dkv-pav-ui-values.yaml.gotmpl
+  - jx-values.yaml
 - chart: jx3/jx-verify
   name: jx-verify
   namespace: '{{ requiredEnv "PREVIEW_NAMESPACE" }}'
@@ -29,3 +66,33 @@ releases:
     - "secret.jenkins-x.io/replica-source=true"
     - --to
     - '{{ requiredEnv "PREVIEW_NAMESPACE" }}'
+  - events: ["presync"]
+    showlogs: true
+    command: "jx"
+    args:
+    - secret
+    - copy
+    - -n
+    - jx-dkv-develop
+    - --name
+    - tls-develop-jaraxa-systems-p
+    - --to
+    - '{{ requiredEnv "PREVIEW_NAMESPACE" }}'
+  - events: ["postsync"]
+    showlogs: false
+    command: "bash"
+    args:
+    - '-c'
+    - "kubectl exec -ti deploy/netcomp -n '{{ requiredEnv "PREVIEW_NAMESPACE" }}' -- /opt/code/netcomp/bin/netcomp eval 'dkv_telemed_svc:load_objs(),dkv_shp_svc:load_objs(),dkv_collab_svc:load_objs().'"
+  - events: ["postsync"]
+    showlogs: false
+    command: "bash"
+    args:
+    - '-c'
+    - "kubectl exec -ti deploy/netcomp -n '{{ requiredEnv "PREVIEW_NAMESPACE" }}' -- /opt/code/netcomp/bin/netcomp eval 'dkv_telemed_svc:load_coaches().'"
+  - events: ["postsync"]
+    showlogs: false
+    command: "bash"
+    args:
+    - '-c'
+    - "kubectl exec -ti deploy/netcomp -n '{{ requiredEnv "PREVIEW_NAMESPACE" }}' -- /opt/code/netcomp/bin/netcomp eval 'dkv_telemed_import:import_all().'"

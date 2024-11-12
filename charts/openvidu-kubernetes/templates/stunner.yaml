@@ -122,7 +122,7 @@ spec:
           namespace: {{ .Release.Namespace }}
       {{- end }}
         - name: stunner-{{ include "openvidu.fullname" . }}-server
-          namespace: {{ .Release.Namespace }}      
+          namespace: {{ .Release.Namespace }}
 ---
 apiVersion: apps/v1
 kind: Deployment
