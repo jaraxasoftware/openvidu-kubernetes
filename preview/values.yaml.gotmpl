@@ -51,7 +51,14 @@ services:
       iceServers: 
         - turns:turns.{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}:443,username=turn,credential=jaraxa
         - turns:turns.{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}:5349,username=turn,credential=jaraxa 
-        - turn:turns.{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}:3478,username=turn,credential=jaraxa        
+        - turn:turns.{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}:3478,username=turn,credential=jaraxa
+    bandwidth:
+      received:
+        max: 0
+        min: 0
+      send:
+        max: 0
+        min: 0        
     transcoding:
       enabled: false
     webhook:
