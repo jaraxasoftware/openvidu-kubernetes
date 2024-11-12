@@ -72,7 +72,12 @@ spec:
             if [ -d "charts/$REPO_NAME" ]; then
             jx gitops yset -p version -v "$VERSION" -f ./charts/$REPO_NAME/Chart.yaml
             jx gitops yset -p appVersion -v "$VERSION" -f ./charts/$REPO_NAME/Chart.yaml
-            else echo no charts; fi       
+            else echo no charts; fi
+            
+            git add * || true
+            git commit -a -m "chore: release $VERSION" --allow-empty
+            git tag -fa v$VERSION -m "Pre-release version $VERSION"
+            git push --force origin v$VERSION            
         - name: promote-helm-release
           resources: {}
         - name: promote-jx-promote
