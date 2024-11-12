@@ -51,7 +51,6 @@ export class WebRtcPeer {
     pc: RTCPeerConnection;
     remoteCandidatesQueue: RTCIceCandidate[] = [];
     localCandidatesQueue: RTCIceCandidate[] = [];
-    eventMediaStream: MediaStream;
 
     // Same as WebRtcPeerConfiguration but without optional fields.
     protected configuration: Required<WebRtcPeerConfiguration>;
@@ -103,10 +102,6 @@ export class WebRtcPeer {
                     }
                 }
             }
-        });
-
-        this.pc.addEventListener('addstream', (event : any) => {
-            this.eventMediaStream = event.stream;
         });
     }
 
@@ -477,12 +472,6 @@ export class WebRtcPeer {
                     //     // prettier-ignore
                     //     logger.debug(`[processRemoteAnswer] Transceiver send parameters (effective):\n${JSON.stringify(tc?.sender.getParameters(), null, 2)}`);
                     // }
-                    if (this.pc.signalingState === 'stable') {
-                        while (this.iceCandidateList.length > 0) {
-                            var candidate = this.iceCandidateList.shift();
-                            this.pc.addIceCandidate(candidate);
-                        }
-                    }
 
                     resolve();
                 })
