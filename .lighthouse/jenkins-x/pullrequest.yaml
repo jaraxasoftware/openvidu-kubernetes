@@ -14,7 +14,7 @@ spec:
           env:
           - name: BUILD_VERSION
             value: -PR
-          image: uses:jaraxasoftware/jaraxa-pipeline-catalog/tasks/helm/pullrequest.yaml@versionStream
+          image: uses:jaraxasoftware/jaraxa-pipeline-catalog/tasks/javascript/pullrequest.yaml@versionStream
           name: ""
           resources:
             # override limits for all containers here
@@ -30,7 +30,9 @@ spec:
             requests:
               cpu: 400m
               memory: 512Mi
-        - name: next-version
+        - image: ghcr.io/jenkins-x/jx-release-version:2.6.10
+          name: next-version
+          resources: {}
           script: |
             #!/usr/bin/env sh
             echo $BUILD_VERSION-$BUILD_ID >> VERSION              
