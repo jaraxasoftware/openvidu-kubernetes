@@ -12,6 +12,8 @@ spec:
         metadata: {}
         stepTemplate:
           env:
+          - name: BUILD_VERSION
+            value: -PR
           image: uses:jaraxasoftware/jaraxa-pipeline-catalog/tasks/helm/pullrequest.yaml@versionStream
           name: ""
           resources:
@@ -27,7 +29,28 @@ spec:
             # override requests for the pod here
             requests:
               cpu: 400m
-              memory: 512Mi      
+              memory: 512Mi
+        - name: next-version
+          script: |
+            #!/usr/bin/env sh
+            echo $BUILD_VERSION-$BUILD_ID >> VERSION              
+        - image: node:14-slim
+          name: build-npm-version
+          script: |
+            #!/bin/bash
+            source .jx/variables.sh
+            cd openvidu-browser
+            npm install
+            npm --no-git-tag-version version $VERSION
+        - image: node:14-slim
+          name: openvidu-browser-build
+          script: |
+            #!/usr/bin/env bash
+            source .jx/variables.sh
+            cd openvidu-browser
+            echo "Building openvidu-browser"
+            npm run build
+            npm run browserify                          
         - name: promote-jx-preview
           resources: {}
   podTemplate: {}
