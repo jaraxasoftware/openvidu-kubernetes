@@ -46,7 +46,7 @@ spec:
   dnsNames:
   {{- toYaml . | nindent 2 }}
   {{- end }}
----  
+---
 {{- else if and .Values.stunner.enabled (not .Values.stunner.zerossl.enabled) (not .Values.stunner.owncert.enabled) }}
 apiVersion: cert-manager.io/v1
 kind: Certificate
@@ -56,7 +56,7 @@ spec:
   secretName: stunner-{{ include "openvidu.fullname" . }}-tls
   issuerRef:
     group: cert-manager.io
-    kind: Issuer  
+    kind: Issuer
     name: letsencrypt-prod
   {{- with .Values.stunner.zerossl.dnsNames }}
   dnsNames:

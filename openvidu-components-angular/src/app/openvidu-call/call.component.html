@@ -1,9 +1,17 @@
 <ov-videoconference
+	[simulcast]="true"
 	[tokens]="tokens"
 	[minimal]="false"
-	[lang]="'en'"
+	[lang]="'es'"
+	[langOptions]="[
+		{ name: 'Spanish', lang: 'es' },
+		{ name: 'custom', lang: 'cus' }
+	]"
 	[captionsLang]=""
-	[captionsLangOptions]="[{ name: 'Spanish', ISO: 'es-ES' },{ name: 'English', ISO: 'en-US' }]"
+	[captionsLangOptions]="[
+		{ name: 'Spanish', lang: 'es-ES' },
+		{ name: 'English', lang: 'en-US' }
+	]"
 	[prejoin]="true"
 	[participantName]="'Participant'"
 	[videoMuted]="false"
@@ -19,6 +27,8 @@
 	[toolbarParticipantsPanelButton]="true"
 	[toolbarDisplayLogo]="true"
 	[toolbarDisplaySessionName]="true"
+	[streamResolution]="'640x480'"
+	[streamFrameRate]="25"
 	[streamDisplayParticipantName]="true"
 	[streamDisplayAudioDetection]="true"
 	[streamSettingsButton]="true"
@@ -38,6 +48,7 @@
 	(onToolbarChatPanelButtonClicked)="onToolbarChatPanelButtonClicked()"
 	(onToolbarStartRecordingClicked)="onStartRecordingClicked()"
 	(onToolbarStopRecordingClicked)="onStopRecordingClicked()"
+	(onToolbarStartBroadcastingClicked)="onStartBroadcastingClicked($event)"
 	(onActivitiesPanelStartRecordingClicked)="onStartRecordingClicked()"
 	(onActivitiesPanelStopRecordingClicked)="onStopRecordingClicked()"
 	(onActivitiesPanelDeleteRecordingClicked)="onDeleteRecordingClicked($event)"
@@ -46,10 +57,14 @@
 	(onActivitiesPanelStopBroadcastingClicked)="onStopBroadcastingClicked()"
 	(onToolbarStopBroadcastingClicked)="onStopBroadcastingClicked()"
 	(onNodeCrashed)="onNodeCrashed()"
+	(onLangChanged)="onLangChanged($event)"
 >
-	<!-- <div *ovActivitiesPanel>HELLO</div> -->
+	<!-- <div *ovActivitiesPanel>{{ 'CUSTOM.BUTTON' | translate }}</div> -->
 
 	<!-- <ov-toolbar *ovToolbar [activitiesPanelButton]="false"
 	[chatPanelButton]="false"></ov-toolbar> -->
-
+	<!-- <div *ovStream="let stream">
+		<ov-stream [stream]="stream" [displayParticipantName]="false" [frameRate]="2" [resolution]="'160x120'"></ov-stream>
+		<p>{{ stream.participant.nickname }}</p>
+	</div> -->
 </ov-videoconference>

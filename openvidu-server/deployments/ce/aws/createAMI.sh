@@ -17,9 +17,10 @@ TEMPJSON=$(mktemp -t cloudformation-XXX --suffix .json)
 getUbuntuAmiId() {
   local AMI_ID=$(
     aws --region ${1} ec2 describe-images \
-      --filters "Name=name,Values=*ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*" \
+      --filters "Name=name,Values=*ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*" \
+                "Name=owner-alias,Values=amazon" \
       --query "sort_by(Images, &CreationDate)" |
-      jq -r 'del(.[] | select(.ImageOwnerAlias != null)) | .[-1].ImageId'
+      jq -r '.[-1].ImageId'
   )
   echo $AMI_ID
 }
@@ -66,8 +67,8 @@ fi
 
 aws cloudformation create-stack \
   --stack-name openvidu-ce-${DATESTAMP} \
-  --template-url ${TEMPLATE_URL} \
-  "$(if [ "$NIGHTLY" == "false" ]; then echo '--disable-rollback'; fi)"
+  --template-url ${TEMPLATE_URL}
+  # --disable-rollback
 
 aws cloudformation wait stack-create-complete --stack-name openvidu-ce-${DATESTAMP}
 

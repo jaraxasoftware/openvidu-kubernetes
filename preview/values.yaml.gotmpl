@@ -1,14 +1,103 @@
+serviceAccount:
+  create: true
+  tokenAutomount: false
+
+stunner:
+  enabled: true
+  annotations:
+    stunner.l7mp.io/enable-mixed-protocol-lb: "true"
+  username: turn
+  password: jaraxa
+  logLevel: all:INFO
+  realm: openvidu
+  routesNamespaces: Same
+  owncert:
+    enabled: true
+    secret: tls-develop-jaraxa-systems-p
+  zerossl:
+    enabled: false
+
+# Mandatory. Can be deployment or distributed
+mode: deployment
+
+annotations:
+  wave.pusher.com/update-on-config-change: "true"
+
+services:
+  openvidu:
+    enabled: true
+    type: master
+    image:
+      repository: openvidu/openvidu-server
+      tag: 2.30.0
+      pullPolicy: IfNotPresent
+    port: 443
+    configDir: /opt/openvidu/
+    secret: openvidu
+    pro:
+      enabled: false
+    protocols:
+      - TCP
+    ssl:
+      enabled: false
+      certType: owncert
+    kms:
+      uris:
+        - "ws://localhost:8888/kurento"
+    coturn:
+      ip: "turn.{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"
+      port: 3478
+      uris: "turns:turns.{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}:443"
+      iceServers:
+        - turns:turns.{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}:443,username=turn,credential=jaraxa
+        - turns:turns.{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}:5349,username=turn,credential=jaraxa
+        - turn:turns.{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}:3478,username=turn,credential=jaraxa
+    bandwidth:
+      received:
+        max: 0
+        min: 0
+      send:
+        max: 0
+        min: 0
+    transcoding:
+      enabled: false
+    webhook:
+      enabled: true
+      endpoint: "https://{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}/pet/api/v1/webhooks/openvidu"
+      headers: '["Brand: DKV", "Product: Openvidu", "x-pet-app-id: dfcd90b3", "x-pet-app-secret: 3a7e1ecf-59d0-4432-a322-8add3cf3c914"]'
+      events: '["sessionCreated", "sessionDestroyed", "participantJoined", "participantLeft", "webrtcConnectionCreated", "webrtcConnectionDestroyed", "recordingStatusChanged", "filterEventDispatched", "signalSent"]'
+    cdr:
+      enabled: false
+      path: /opt/openvidu/cdr
+    env: {}
+
+  kms:
+    enabled: true
+    type: media
+    image:
+      repository: kurento/kurento-media-server
+      tag: 7.0.1
+      pullPolicy: IfNotPresent
+    protocols:
+      - TCP
+    port: 8888
+    env:
+      KURENTO_LOGS_PATH: "/var/log/kurento-media-server/"
+      KMS_MIN_PORT: "40000"
+      KMS_MAX_PORT: "45000"
+
 ingress:
   enabled: true
   class: nginx
   annotations:
+    kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/rewrite-target: /$1
   paths:
     - /(.*)
   hosts:
     - "{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"
   tls:
-{{- if and (.Values.jxRequirements.ingress.tls.enabled) (hasKey .Values.jxRequirements.ingress "tls") (hasKey .Values.jxRequirements.ingress.tls "secretName") }} 
+{{- if and (.Values.jxRequirements.ingress.tls.enabled) (hasKey .Values.jxRequirements.ingress "tls") (hasKey .Values.jxRequirements.ingress.tls "secretName") }}
     - secretName: "{{ .Values.jxRequirements.ingress.tls.secretName }}"
       hosts:
         - "{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"
@@ -21,8 +110,3 @@ ingress:
       hosts:
         - "{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"
 {{- end }}
-
-image:
-  repository: "{{ requiredEnv "DOCKER_REGISTRY" }}/{{ requiredEnv "DOCKER_REGISTRY_ORG" }}/{{ requiredEnv "APP_NAME" }}"
-  tag: "{{ requiredEnv "VERSION" }}"
-  pullPolicy: "Always"

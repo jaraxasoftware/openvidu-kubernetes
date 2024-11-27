@@ -395,16 +395,14 @@ export class Publisher extends StreamManager {
                 this.accessAllowed = true;
                 this.accessDenied = false;
 
-                if (typeof this.properties.streamSource === "undefined") {
-                    if (typeof MediaStreamTrack !== 'undefined' && this.properties.audioSource instanceof MediaStreamTrack) {
-                        mediaStream.removeTrack(mediaStream.getAudioTracks()[0]);
-                        mediaStream.addTrack(<MediaStreamTrack>this.properties.audioSource);
-                    }
+                if (typeof MediaStreamTrack !== 'undefined' && this.properties.audioSource instanceof MediaStreamTrack) {
+                    mediaStream.removeTrack(mediaStream.getAudioTracks()[0]);
+                    mediaStream.addTrack(<MediaStreamTrack>this.properties.audioSource);
+                }
 
-                    if (typeof MediaStreamTrack !== 'undefined' && this.properties.videoSource instanceof MediaStreamTrack) {
-                        mediaStream.removeTrack(mediaStream.getVideoTracks()[0]);
-                        mediaStream.addTrack(<MediaStreamTrack>this.properties.videoSource);
-                    }
+                if (typeof MediaStreamTrack !== 'undefined' && this.properties.videoSource instanceof MediaStreamTrack) {
+                    mediaStream.removeTrack(mediaStream.getVideoTracks()[0]);
+                    mediaStream.addTrack(<MediaStreamTrack>this.properties.videoSource);
                 }
 
                 // Apply PublisherProperties.publishAudio and PublisherProperties.publishVideo
@@ -472,6 +470,15 @@ export class Publisher extends StreamManager {
                         };
 
                         if (this.stream.isSendScreen()) {
+
+                            if(this.stream.isSendAudio() && mediaStream.getAudioTracks().length === 0){
+                                // If sending audio is enabled and there are no audio tracks in the mediaStream, disable audio for screen sharing.
+                                this.stream.audioActive = false;
+                                this.stream.hasAudio = false;
+                                this.stream.outboundStreamOpts.publisherProperties.publishAudio = false;
+                                this.stream.outboundStreamOpts.publisherProperties.audioSource = false;
+                            }
+
                             // Set interval to listen for screen resize events
                             this.screenShareResizeInterval = setInterval(() => {
                                 const settings: MediaTrackSettings = mediaStream.getVideoTracks()[0].getSettings();
@@ -506,7 +513,7 @@ export class Publisher extends StreamManager {
 
             const getMediaSuccess = async (mediaStream: MediaStream, definedAudioConstraint) => {
                 this.clearPermissionDialogTimer(startTime, timeForDialogEvent);
-                if (this.stream.isSendScreen() && this.stream.isSendAudio()) {
+                if (this.stream.isSendScreen() && this.properties.audioSource !== 'screen' && this.stream.isSendAudio()) {
                     // When getting desktop as user media audio constraint must be false. Now we can ask for it if required
                     constraintsAux.audio = definedAudioConstraint;
                     constraintsAux.video = false;
@@ -621,46 +628,42 @@ export class Publisher extends StreamManager {
             };
 
             try {
-                if (typeof this.properties.streamSource !== "undefined") {
-                    successCallback(this.properties.streamSource);
+                const myConstraints = await this.openvidu.generateMediaConstraints(this.properties);
+                if (
+                    (!!myConstraints.videoTrack && !!myConstraints.audioTrack) ||
+                    (!!myConstraints.audioTrack && myConstraints.constraints?.video === false) ||
+                    (!!myConstraints.videoTrack && myConstraints.constraints?.audio === false)
+                ) {
+                    // No need to call getUserMedia at all. MediaStreamTracks already provided
+                    successCallback(this.openvidu.addAlreadyProvidedTracks(myConstraints, new MediaStream(), this.stream));
                 } else {
-                    const myConstraints = await this.openvidu.generateMediaConstraints(this.properties);
-                    if (
-                        (!!myConstraints.videoTrack && !!myConstraints.audioTrack) ||
-                        (!!myConstraints.audioTrack && myConstraints.constraints?.video === false) ||
-                        (!!myConstraints.videoTrack && myConstraints.constraints?.audio === false)
-                    ) {
-                        // No need to call getUserMedia at all. MediaStreamTracks already provided
-                        successCallback(this.openvidu.addAlreadyProvidedTracks(myConstraints, new MediaStream(), this.stream));
-                    } else {
-                        constraints = myConstraints.constraints;
+                    constraints = myConstraints.constraints;
 
-                        const outboundStreamOptions = {
-                            mediaConstraints: constraints,
-                            publisherProperties: this.properties
-                        };
-                        this.stream.setOutboundStreamOptions(outboundStreamOptions);
+                    const outboundStreamOptions = {
+                        mediaConstraints: constraints,
+                        publisherProperties: this.properties
+                    };
+                    this.stream.setOutboundStreamOptions(outboundStreamOptions);
 
-                        const definedAudioConstraint = constraints.audio === undefined ? true : constraints.audio;
-                        constraintsAux.audio = this.stream.isSendScreen() ? false : definedAudioConstraint;
-                        constraintsAux.video = constraints.video;
-                        startTime = Date.now();
-                        this.setPermissionDialogTimer(timeForDialogEvent);
+                    const definedAudioConstraint = constraints.audio === undefined ? true : constraints.audio;
+                    constraintsAux.audio = this.stream.isSendScreen() ? false : definedAudioConstraint;
+                    constraintsAux.video = constraints.video;
+                    startTime = Date.now();
+                    this.setPermissionDialogTimer(timeForDialogEvent);
 
-                        try {
-                            if (this.stream.isSendScreen() && navigator.mediaDevices['getDisplayMedia'] && !platform.isElectron()) {
-                                const mediaStream = await navigator.mediaDevices['getDisplayMedia']({ video: true });
-                                this.openvidu.addAlreadyProvidedTracks(myConstraints, mediaStream);
-                                await getMediaSuccess(mediaStream, definedAudioConstraint);
-                            } else {
-                                this.stream.lastVideoTrackConstraints = constraintsAux.video;
-                                const mediaStream = await navigator.mediaDevices.getUserMedia(constraintsAux);
-                                this.openvidu.addAlreadyProvidedTracks(myConstraints, mediaStream, this.stream);
-                                await getMediaSuccess(mediaStream, definedAudioConstraint);
-                            }
-                        } catch (error) {
-                            await getMediaError(error);
+                    try {
+                        if (this.stream.isSendScreen() && navigator.mediaDevices['getDisplayMedia'] && !platform.isElectron()) {
+                            const mediaStream = await navigator.mediaDevices['getDisplayMedia']({ video: true, audio: this.properties.audioSource === 'screen' });
+                            this.openvidu.addAlreadyProvidedTracks(myConstraints, mediaStream);
+                            await getMediaSuccess(mediaStream, definedAudioConstraint);
+                        } else {
+                            this.stream.lastVideoTrackConstraints = constraintsAux.video;
+                            const mediaStream = await navigator.mediaDevices.getUserMedia(constraintsAux);
+                            this.openvidu.addAlreadyProvidedTracks(myConstraints, mediaStream, this.stream);
+                            await getMediaSuccess(mediaStream, definedAudioConstraint);
                         }
+                    } catch (error) {
+                        await getMediaError(error);
                     }
                 }
             } catch (error) {
@@ -706,14 +709,13 @@ export class Publisher extends StreamManager {
     getVideoDimensions(): Promise<{ width: number; height: number }> {
         return new Promise((resolve, reject) => {
             // Ionic iOS and Safari iOS supposedly require the video element to actually exist inside the DOM
-            const requiresDomInsertion: boolean = platform.isIonicIos() || platform.isIOSWithSafari();
+            const requiresDomInsertion: boolean = (platform.isIonicIos() || platform.isIOSWithSafari()) && (this.videoReference.readyState < 1);
 
             let loadedmetadataListener;
             const resolveDimensions = () => {
                 let width: number;
                 let height: number;
-                let videoTracks : MediaStreamTrack[] = typeof (this.stream as any).getVideoTracks === 'function' ? ((this.stream as any).getVideoTracks() as MediaStreamTrack[]) : this.stream.getMediaStream().getVideoTracks();
-                if (typeof videoTracks[0].getSettings === 'function') {
+                if (typeof this.stream.getMediaStream().getVideoTracks()[0].getSettings === 'function') {
                     const settings = this.stream.getMediaStream().getVideoTracks()[0].getSettings();
                     width = settings.width || this.videoReference.videoWidth;
                     height = settings.height || this.videoReference.videoHeight;
@@ -727,12 +729,7 @@ export class Publisher extends StreamManager {
                     this.videoReference.removeEventListener('loadedmetadata', loadedmetadataListener);
                 }
                 if (requiresDomInsertion) {
-                    try {
-                        this.videoReference.srcObject = null;
-                        document.body.removeChild(this.videoReference);
-                    } catch (error) {
-                        logger.error("Error removing video from body", error);
-                    }
+                    document.body.removeChild(this.videoReference);
                 }
 
                 return resolve({ width, height });
@@ -861,12 +858,12 @@ export class Publisher extends StreamManager {
         const senders: RTCRtpSender[] = this.stream.getRTCPeerConnection().getSenders();
         let sender: RTCRtpSender | undefined;
         if (track.kind === 'video') {
-            sender = senders.find((s) => (!!s.track && s.track.kind === 'video') || (!!(s as any)._enabled && (s as any).kind === 'video'));
+            sender = senders.find((s) => !!s.track && s.track.kind === 'video');
             if (!sender) {
                 throw new Error("There's no replaceable track for that kind of MediaStreamTrack in this Publisher object");
             }
         } else if (track.kind === 'audio') {
-            sender = senders.find((s) => (!!s.track && s.track.kind === 'audio') || (!!(s as any)._enabled && (s as any).kind === 'audio'));
+            sender = senders.find((s) => !!s.track && s.track.kind === 'audio');
             if (!sender) {
                 throw new Error("There's no replaceable track for that kind of MediaStreamTrack in this Publisher object");
             }

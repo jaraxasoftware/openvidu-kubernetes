@@ -71,8 +71,14 @@ export class DeviceService {
 				this.updateAudioDeviceSelected();
 				this.updateVideoDeviceSelected();
 
-				this._isVideoMuted = this.storageSrv.isVideoMuted() || this.libSrv.videoMuted.getValue();
-				this._isAudioMuted = this.storageSrv.isAudioMuted() || this.libSrv.audioMuted.getValue();
+				this._isVideoMuted =
+					this.libSrv.videoMuted.getValue() === undefined
+						? this.storageSrv.isVideoMuted()
+						: Boolean(this.libSrv.videoMuted.getValue());
+				this._isAudioMuted =
+					this.libSrv.audioMuted.getValue() === undefined
+						? this.storageSrv.isAudioMuted()
+						: Boolean(this.libSrv.audioMuted.getValue());
 
 				this.log.d('Media devices', this.cameras, this.microphones);
 			}
@@ -177,8 +183,8 @@ export class DeviceService {
 		return this.microphoneSelected;
 	}
 
-	setCameraSelected(deviceField: any) {
-		this.cameraSelected = this.getCameraByDeviceField(deviceField);
+	setCameraSelected(deviceId: any) {
+		this.cameraSelected = this.getCameraByDeviceField(deviceId);
 		this.saveCameraToStorage(this.cameraSelected);
 	}
 
@@ -187,8 +193,8 @@ export class DeviceService {
 		this.saveMicrophoneToStorage(this.microphoneSelected);
 	}
 
-	needUpdateVideoTrack(newVideoSource: string): boolean {
-		return this.cameraSelected?.device !== newVideoSource;
+	needUpdateVideoTrack(newDevice: CustomDevice): boolean {
+		return this.cameraSelected?.device !== newDevice.device || this.cameraSelected?.label !== newDevice.label;
 	}
 
 	needUpdateAudioTrack(newAudioSource: string): boolean {

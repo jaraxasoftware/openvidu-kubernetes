@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { BroadcastingService, BroadcastingStatus, RecordingInfo, RecordingService, RecordingStatus, TokenModel } from 'openvidu-angular';
+import { BroadcastingService, BroadcastingStatus, RecordingInfo, RecordingService, RecordingStatus, TokenModel, LangOption } from 'openvidu-angular';
 import { RestService } from '../services/rest.service';
 
 @Component({
@@ -85,8 +85,16 @@ export class CallComponent implements OnInit {
 		console.log('TOOLBAR LEAVE CLICKED');
 	}
 
+	onLangChanged(lang: LangOption) {
+		console.warn('LANG CHANGED', lang);
+	}
+
 	async onStartBroadcastingClicked(broadcastUrl: string) {
 		console.log('START STREAMING', broadcastUrl);
+		if (!broadcastUrl) {
+			console.error('Broadcasting URL is empty');
+			return;
+		}
 		try {
 			this.broadcastingError = null;
 			const resp = await this.restService.startBroadcasting(broadcastUrl);
