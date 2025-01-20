@@ -26,7 +26,7 @@ function environmentLaunch {
 
     # Kurento and mediasoup needs to run as network host, so we need Docker host IP.
     local DOCKER_HOST_IP
-    DOCKER_HOST_IP="$(docker network inspect bridge | grep Subnet | cut -d'"' -f4 | cut -d'/' -f1 | sed 's/.$/1/' | grep 172)"
+    DOCKER_HOST_IP="$(docker inspect bridge --format '{{with index .IPAM.Config 0}}{{or .Gateway .Subnet}}{{end}}' | sed -r 's|\.0/[[:digit:]]+$|.1|')"
 
     if [[ "${MEDIA_SERVER}" == "kurento" ]]; then
         docker run -e KMS_UID=$(id -u) --network=host --detach=true --volume=/opt/openvidu/recordings:/opt/openvidu/recordings "${KURENTO_MEDIA_SERVER_IMAGE}"
@@ -49,7 +49,8 @@ function environmentLaunch {
             fi
         done
     elif [[ "${MEDIA_SERVER}" == "mediasoup" ]]; then
-        docker run --network=host --restart=always --detach=true \
+        LOG_DATE=$(printf '%(%Y-%m-%d-%H-%M-%S)T')
+        docker run --network=host --restart=always \
             --env=KMS_MIN_PORT=40000 \
             --env=KMS_MAX_PORT=65535 \
             --env=OPENVIDU_PRO_LICENSE="${OPENVIDU_PRO_LICENSE}" \
@@ -57,7 +58,7 @@ function environmentLaunch {
             --env=WEBRTC_LISTENIPS_0_ANNOUNCEDIP="${DOCKER_HOST_IP}" \
             --env=WEBRTC_LISTENIPS_0_IP="${DOCKER_HOST_IP}" \
             --volume=/opt/openvidu/recordings:/opt/openvidu/recordings \
-            openvidu/mediasoup-controller:"${MEDIASOUP_CONTROLLER_VERSION}"
+            openvidu/mediasoup-controller:"${MEDIASOUP_CONTROLLER_VERSION}" >& /opt/openvidu/mediasoup-controller-${LOG_DATE}.log &
         until $(curl --insecure --output /dev/null --silent http://${DOCKER_HOST_IP}:8888/kurento); do
             echo "Waiting for ${MEDIA_SERVER}..."
             sleep 1

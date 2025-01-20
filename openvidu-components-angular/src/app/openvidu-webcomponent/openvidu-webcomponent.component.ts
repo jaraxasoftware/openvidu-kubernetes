@@ -1,5 +1,5 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { OpenViduService, ParticipantAbstractModel, RecordingInfo, TokenModel } from 'openvidu-angular';
+import { OpenViduService, ParticipantAbstractModel, RecordingInfo, TokenModel, LangOption } from 'openvidu-angular';
 import { Session } from 'openvidu-browser';
 import { CaptionsLangOption } from '../../../projects/openvidu-angular/src/lib/models/caption.model';
 
@@ -37,6 +37,11 @@ export class OpenviduWebComponentComponent implements OnInit {
 	/**
 	 * @internal
 	 */
+	_langOptions: LangOption;
+
+	/**
+	 * @internal
+	 */
 	_captionsLangOptions: CaptionsLangOption;
 
 	/**
@@ -55,6 +60,11 @@ export class OpenviduWebComponentComponent implements OnInit {
 	 * @internal
 	 */
 	_audioMuted: boolean = false;
+
+	/**
+	 * @internal
+	 */
+	_simulcast: boolean = false;
 	/**
 	 * @internal
 	 */
@@ -122,6 +132,14 @@ export class OpenviduWebComponentComponent implements OnInit {
 	/**
 	 * @internal
 	 */
+	_streamResolution: string = '640x480';
+	/**
+	 * @internal
+	 */
+	_streamFrameRate: number = 30;
+	/**
+	 * @internal
+	 */
 	_participantPanelItemMuteButton: boolean = true;
 	/**
 	 * @internal
@@ -181,6 +199,39 @@ export class OpenviduWebComponentComponent implements OnInit {
 	@Input() set captionsLang(value: string) {
 		this._captionsLang = value;
 	}
+
+	/**
+	 * The **langOptions** directive allows to set the application language options.
+	 * It will override the application languages provided by default.
+	 * This propety is an array of objects which must comply with the {@link LangOption} interface.
+	 *
+	 * It is only available for {@link VideoconferenceComponent}.
+	 *
+	 * Default: ```
+	 * [
+	 * 	{ name: 'English', lang: 'en' },
+	 *  { name: 'Español', lang: 'es' },
+	 *  { name: 'Deutsch', lang: 'de' },
+	 *  { name: 'Français', lang: 'fr' },
+	 *  { name: '中国', lang: 'cn' },
+	 *  { name: 'हिन्दी', lang: 'hi' },
+	 *  { name: 'Italiano', lang: 'it' },
+	 *  { name: 'やまと', lang: 'ja' },
+	 *  { name: 'Dutch', lang: 'nl' },
+	 *  { name: 'Português', lang: 'pt' }
+	 * ]```
+	 *
+	 * Note: If you want to add a new language, you must add a new object with the name and the language code (e.g. `{ name: 'Custom', lang: 'cus' }`)
+	 * and then add the language file in the `assets/lang` folder with the name `cus.json`.
+	 *
+	 *
+	 * @example
+	 * <openvidu-webcomponent captions-lang-options="[{name:'Spanish', lang: 'es-ES'}]"></openvidu-webcomponent>
+	 */
+	@Input() set langOptions(value: string | LangOption[]) {
+		this._langOptions = this.castToArray(value);
+	}
+
 	/**
 	 * The captionsLangOptions attribute sets the language options for the captions.
 	 * It will override the languages provided by default.
@@ -188,19 +239,19 @@ export class OpenviduWebComponentComponent implements OnInit {
 	 *
 	 * Default: ```
 	 * [
-	 * 	{ name: 'English', ISO: 'en-US' },
-	 * 	{ name: 'Español', ISO: 'es-ES' },
-	 * 	{ name: 'Deutsch', ISO: 'de-DE' },
-	 * 	{ name: 'Français', ISO: 'fr-FR' },
-	 * 	{ name: '中国', ISO: 'zh-CN' },
-	 * 	{ name: 'हिन्दी', ISO: 'hi-IN' },
-	 * 	{ name: 'Italiano', ISO: 'it-IT' },
-	 * 	{ name: 'やまと', ISO: 'jp-JP' },
-	 * 	{ name: 'Português', ISO: 'pt-PT' }
+	 * 	{ name: 'English', lang: 'en-US' },
+	 * 	{ name: 'Español', lang: 'es-ES' },
+	 * 	{ name: 'Deutsch', lang: 'de-DE' },
+	 * 	{ name: 'Français', lang: 'fr-FR' },
+	 * 	{ name: '中国', lang: 'zh-CN' },
+	 * 	{ name: 'हिन्दी', lang: 'hi-IN' },
+	 * 	{ name: 'Italiano', lang: 'it-IT' },
+	 * 	{ name: 'やまと', lang: 'jp-JP' },
+	 * 	{ name: 'Português', lang: 'pt-PT' }
 	 * ]```
 	 *
 	 * @example
-	 * <openvidu-webcomponent captions-lang-options="[{name:'Spanish', ISO: 'es-ES'}]"></openvidu-webcomponent>
+	 * <openvidu-webcomponent captions-lang-options="[{name:'Spanish', lang: 'es-ES'}]"></openvidu-webcomponent>
 	 */
 	@Input() set captionsLangOptions(value: string | CaptionsLangOption[]) {
 		this._captionsLangOptions = this.castToArray(value);
@@ -255,6 +306,20 @@ export class OpenviduWebComponentComponent implements OnInit {
 	 */
 	@Input() set audioMuted(value: string | boolean) {
 		this._audioMuted = this.castToBoolean(value);
+	}
+
+	/**
+	 * The **simulcast** directive allows to enable/disable the Simulcast feature. Simulcast is a technique that allows
+	 * to send multiple versions of the same video stream at different resolutions, framerates and qualities. This way,
+	 * the receiver can subscribe to the most appropriate stream for its current network conditions.
+	 *
+	 * Default: `false`
+	 *
+	 * @example
+	 * <openvidu-webcomponent simulcast="true"></openvidu-webcomponent>
+	 */
+	@Input() set simulcast(value: string | boolean) {
+		this._simulcast = this.castToBoolean(value);
 	}
 
 	/**
@@ -486,6 +551,36 @@ export class OpenviduWebComponentComponent implements OnInit {
 	@Input() set streamSettingsButton(value: string | boolean) {
 		this._streamSettingsButton = this.castToBoolean(value);
 	}
+
+	/**
+	 * The **resolution** directive allows to set a specific participant resolution in stream component.
+	 *
+	 * Default: `640x480`
+	 *
+	 * <div class="warn-container">
+	 * 	<span>WARNING</span>: If you want to use this parameter to OpenVidu Web Component statically, you have to replace the <strong>camelCase</strong> with a <strong>hyphen between words</strong>.</div>
+	 *
+	 * @example
+	 * <openvidu-webcomponent stream-resolution="'320x240'"></openvidu-webcomponent>
+	 */
+	@Input() set streamResolution(value: string) {
+		this._streamResolution = value;
+	}
+
+	/**
+	 * The **frameRate** directive allows initialize the publisher with a specific frame rate in stream component.
+	 *
+	 * Default: `30`
+	 *
+	 * <div class="warn-container">
+	 * 	<span>WARNING</span>: If you want to use this parameter to OpenVidu Web Component statically, you have to replace the <strong>camelCase</strong> with a <strong>hyphen between words</strong>.</div>
+	 *
+	 * @example
+	 * <openvidu-webcomponent stream-frame-rate="30"></openvidu-webcomponent>
+	 */
+	@Input() set streamFrameRate(value: number) {
+		this._streamFrameRate = Number(value);
+	}
 	/**
 	 * The **participantPanelItemMuteButton** attribute allows show/hide the muted button in participant panel item component.
 	 *
@@ -616,6 +711,11 @@ export class OpenviduWebComponentComponent implements OnInit {
 	 *  The recording should be stopped using the REST API.
 	 */
 	@Output() onToolbarStopRecordingClicked: EventEmitter<void> = new EventEmitter<void>();
+
+	/**
+	 * Provides event notifications that fire when start broadcasting button is clicked from {@link ToolbarComponent}.
+	 */
+	@Output() onToolbarStartBroadcastingClicked: EventEmitter<void> = new EventEmitter<void>();
 
 	/**
 	 * Provides event notifications that fire when stop broadcasting button is clicked from {@link ToolbarComponent}.
@@ -888,7 +988,7 @@ export class OpenviduWebComponentComponent implements OnInit {
 			return value;
 		} else {
 			throw new Error(
-				'Parameter has not a valid type. The parameters must to be string or CaptionsLangOptions [] [{name:string, ISO: string}].'
+				'Parameter has not a valid type. The parameters must to be string or CaptionsLangOptions [] [{name:string, lang: string}].'
 			);
 		}
 	}

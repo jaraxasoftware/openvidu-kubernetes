@@ -1,6 +1,9 @@
+import monkeyPatchMediaDevices from './utils/media-devices.js';
+
 var MINIMAL;
 var LANG;
 var CAPTIONS_LANG;
+var CUSTOM_LANG_OPTIONS;
 var CUSTOM_CAPTIONS_LANG_OPTIONS;
 var PREJOIN;
 var VIDEO_MUTED;
@@ -29,6 +32,7 @@ var CAPTIONS_BUTTON;
 
 var SINGLE_TOKEN;
 var SESSION_NAME;
+var FAKE_DEVICES;
 
 var PARTICIPANT_NAME;
 
@@ -43,10 +47,14 @@ $(document).ready(() => {
 
 	SINGLE_TOKEN = url.searchParams.get('singleToken') === null ? false : url.searchParams.get('singleToken') === 'true';
 
+	FAKE_DEVICES = url.searchParams.get('fakeDevices') === null ? false : url.searchParams.get('fakeDevices') === 'true';
+
 	// Directives
 	MINIMAL = url.searchParams.get('minimal') === null ? false : url.searchParams.get('minimal') === 'true';
 	LANG = url.searchParams.get('lang') || 'en';
 	CAPTIONS_LANG = url.searchParams.get('captionsLang') || 'en-US';
+	CUSTOM_LANG_OPTIONS =
+	url.searchParams.get('langOptions') === null ? false : url.searchParams.get('langOptions') === 'true';
 	CUSTOM_CAPTIONS_LANG_OPTIONS =
 		url.searchParams.get('captionsLangOptions') === null ? false : url.searchParams.get('captionsLangOptions') === 'true';
 	PARTICIPANT_NAME = url.searchParams.get('participantName') || 'TEST_USER';
@@ -197,6 +205,11 @@ function appendElement(id) {
 async function joinSession(sessionName, participantName) {
 	var webComponent = document.querySelector('openvidu-webcomponent');
 	var tokens;
+
+	if (FAKE_DEVICES) {
+		monkeyPatchMediaDevices();
+	}
+
 	if (SINGLE_TOKEN) {
 		tokens = await getToken(sessionName);
 	} else {
@@ -206,6 +219,12 @@ async function joinSession(sessionName, participantName) {
 	webComponent.minimal = MINIMAL;
 	webComponent.lang = LANG;
 	webComponent.captionsLang = CAPTIONS_LANG;
+	if (CUSTOM_LANG_OPTIONS) {
+		webComponent.langOptions = [
+			{ name: 'Esp', lang: 'es' },
+			{ name: 'Eng', lang: 'en' }
+		];
+	}
 	if (CUSTOM_CAPTIONS_LANG_OPTIONS) {
 		webComponent.captionsLangOptions = [
 			{ name: 'Esp', lang: 'es-ES' },

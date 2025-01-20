@@ -1,0 +1,31 @@
+image:
+  repository: ghcr.io/jaraxasoftware/dkv-pet-admin
+  tag: openvidu-pr1
+  pullPolicy: Always
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      rewrite ^(/admin)$ $1/ redirect;
+  paths:
+    - /admin(/|$)(.*)
+  hosts:
+    - "{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"
+  tls:
+{{- if and (.Values.jxRequirements.ingress.tls.enabled) (hasKey .Values.jxRequirements.ingress "tls") (hasKey .Values.jxRequirements.ingress.tls "secretName") }}
+    - secretName: "{{ .Values.jxRequirements.ingress.tls.secretName }}"
+      hosts:
+        - "{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"
+{{- else if .Values.jxRequirements.ingress.tls.production }}
+    - secretName: "tls-{{ .Values.jxRequirements.ingress.domain | replace "." "-" }}-p"
+      hosts:
+        - "{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"
+{{- else }}
+    - secretName: "tls-{{ .Values.jxRequirements.ingress.domain | replace "." "-" }}-s"
+      hosts:
+        - "{{ requiredEnv "APP_NAME" }}-pr{{ requiredEnv "PULL_NUMBER" }}.{{ .Values.jxRequirements.ingress.domain }}"
+{{- end }}

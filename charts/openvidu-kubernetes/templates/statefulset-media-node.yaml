@@ -148,7 +148,7 @@ spec:
         - name: DOCKER_TLS_VERIFY
           value: "1"
         - name: DOCKER_HOST
-          value: tcp://localhost:2376        
+          value: tcp://localhost:2376
           {{- end }}
         {{- else if eq $name "metricbeat" }}
         - name: NODE_ROLE
@@ -178,8 +178,8 @@ spec:
           mountPath: {{ $.Values.services.openvidu.recording.path }}
           {{- else }}
         - name: docker-socket
-          mountPath: /var/run/docker.sock 
-          readOnly: true            
+          mountPath: /var/run/docker.sock
+          readOnly: true
           {{- end }}
         {{- else if eq $name "logging" }}
         - name: filebeat-{{ $.Chart.Name }}

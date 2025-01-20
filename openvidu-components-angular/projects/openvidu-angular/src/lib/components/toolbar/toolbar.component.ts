@@ -42,6 +42,7 @@ import { PlatformService } from '../../services/platform/platform.service';
 import { RecordingService } from '../../services/recording/recording.service';
 import { StorageService } from '../../services/storage/storage.service';
 import { TranslateService } from '../../services/translate/translate.service';
+import { CdkOverlayService } from '../../services/cdk-overlay/cdk-overlay.service';
 
 /**
  *
@@ -186,6 +187,11 @@ export class ToolbarComponent implements OnInit, OnDestroy, AfterViewInit {
 
 	/**
 	 * Provides event notifications that fire when start broadcasting button has been clicked.
+	 */
+	@Output() onStartBroadcastingClicked: EventEmitter<void> = new EventEmitter<void>();
+
+	/**
+	 * Provides event notifications that fire when stop broadcasting button has been clicked.
 	 */
 	@Output() onStopBroadcastingClicked: EventEmitter<void> = new EventEmitter<void>();
 
@@ -411,7 +417,8 @@ export class ToolbarComponent implements OnInit, OnDestroy, AfterViewInit {
 		private recordingService: RecordingService,
 		private broadcastingService: BroadcastingService,
 		private translateService: TranslateService,
-		private storageSrv: StorageService
+		private storageSrv: StorageService,
+		private cdkOverlayService: CdkOverlayService
 	) {
 		this.log = this.loggerSrv.get('ToolbarComponent');
 	}
@@ -462,6 +469,7 @@ export class ToolbarComponent implements OnInit, OnDestroy, AfterViewInit {
 		this.menuTrigger?.menuOpened.subscribe(() => {
 			this.isSessionCreator = this.participantService.amIModerator();
 		});
+		this.subscribeToFullscreenChanged();
 	}
 
 	ngOnDestroy(): void {
@@ -485,6 +493,10 @@ export class ToolbarComponent implements OnInit, OnDestroy, AfterViewInit {
 		if (this.screenSizeSub) this.screenSizeSub.unsubscribe();
 		if (this.settingsButtonSub) this.settingsButtonSub.unsubscribe();
 		if (this.captionsSubs) this.captionsSubs.unsubscribe();
+		document.removeEventListener('fullscreenchange', () => {
+			this.isFullscreenActive = false;
+			this.cdkOverlayService.setSelector('body');
+		});
 	}
 
 	/**
@@ -493,7 +505,7 @@ export class ToolbarComponent implements OnInit, OnDestroy, AfterViewInit {
 	async toggleMicrophone() {
 		this.onMicrophoneButtonClicked.emit();
 		try {
-			await this.openviduService.publishAudio(!this.isAudioActive);
+			this.participantService.publishAudio(!this.isAudioActive);
 		} catch (error) {
 			this.log.e('There was an error toggling microphone:', error.code, error.message);
 			this.actionService.openDialog(
@@ -514,7 +526,7 @@ export class ToolbarComponent implements OnInit, OnDestroy, AfterViewInit {
 			if (this.panelService.isExternalPanelOpened() && !publishVideo) {
 				this.panelService.togglePanel(PanelType.BACKGROUND_EFFECTS);
 			}
-			await this.openviduService.publishVideo(publishVideo);
+			await this.participantService.publishVideo(publishVideo);
 		} catch (error) {
 			this.log.e('There was an error toggling camera:', error.code, error.message);
 			this.actionService.openDialog(this.translateService.translate('ERRORS.TOGGLE_CAMERA'), error?.error || error?.message || error);
@@ -529,7 +541,7 @@ export class ToolbarComponent implements OnInit, OnDestroy, AfterViewInit {
 		this.onScreenshareButtonClicked.emit();
 
 		try {
-			await this.openviduService.toggleScreenshare();
+			await this.participantService.toggleScreenshare();
 		} catch (error) {
 			this.log.e('There was an error toggling screen share', error.code, error.message);
 			if (error && error.name === 'SCREEN_SHARING_NOT_SUPPORTED') {
@@ -577,6 +589,7 @@ export class ToolbarComponent implements OnInit, OnDestroy, AfterViewInit {
 			this.onStopBroadcastingClicked.emit();
 			this.broadcastingService.updateStatus(BroadcastingStatus.STOPPING);
 		} else if (this.broadcastingStatus === BroadcastingStatus.STOPPED) {
+			this.onStartBroadcastingClicked.emit();
 			if (this.showActivitiesPanelButton && !this.isActivitiesOpened) {
 				this.toggleActivitiesPanel('broadcasting');
 			}
@@ -638,7 +651,6 @@ export class ToolbarComponent implements OnInit, OnDestroy, AfterViewInit {
 	 * @ignore
 	 */
 	toggleFullscreen() {
-		this.isFullscreenActive = !this.isFullscreenActive;
 		this.documentService.toggleFullscreen('session-container');
 		this.onFullscreenButtonClicked.emit();
 	}
@@ -659,6 +671,14 @@ export class ToolbarComponent implements OnInit, OnDestroy, AfterViewInit {
 			this.isConnectionLost = false;
 		});
 	}
+
+	private subscribeToFullscreenChanged() {
+		document.addEventListener('fullscreenchange', (event) => {
+			this.isFullscreenActive = Boolean(document.fullscreenElement);
+			this.cdkOverlayService.setSelector(this.isFullscreenActive ? '#session-container' : 'body');
+		});
+	}
+
 	protected subscribeToMenuToggling() {
 		this.panelTogglingSubscription = this.panelService.panelOpenedObs.subscribe((ev: PanelEvent) => {
 			this.isChatOpened = ev.opened && ev.type === PanelType.CHAT;

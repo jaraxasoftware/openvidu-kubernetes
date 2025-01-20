@@ -236,6 +236,9 @@ public class OpenViduTestAppE2eTest extends AbstractOpenViduTestappE2eTest {
 
 		log.info("One2Many [Video + Audio]");
 
+		WebElement one2ManyInput = user.getDriver().findElement(By.id("one2many-input"));
+		one2ManyInput.clear();
+		one2ManyInput.sendKeys("3");
 		user.getDriver().findElement(By.id("auto-join-checkbox")).click();
 		user.getDriver().findElement(By.id("one2many-btn")).click();
 
@@ -691,7 +694,7 @@ public class OpenViduTestAppE2eTest extends AbstractOpenViduTestappE2eTest {
 
 		Queue<Boolean> threadAssertions = new ConcurrentLinkedQueue<Boolean>();
 
-		OpenViduTestappUser user = setupBrowserAndConnectToOpenViduTestapp("chrome");
+		OpenViduTestappUser user = setupBrowserAndConnectToOpenViduTestapp("chromeAlternateScreenShare");
 
 		log.info("Change publisher dynamically");
 
@@ -770,7 +773,7 @@ public class OpenViduTestAppE2eTest extends AbstractOpenViduTestappE2eTest {
 		Assertions.assertEquals(2, numberOfVideos, "Wrong number of videos");
 		Assertions.assertTrue(user.getBrowserUser()
 				.assertMediaTracks(user.getDriver().findElements(By.tagName("video")), false, true),
-				"Videos were expected to only have audio tracks");
+				"Videos were expected to only have video tracks");
 
 		final CountDownLatch latch3 = new CountDownLatch(2);
 
