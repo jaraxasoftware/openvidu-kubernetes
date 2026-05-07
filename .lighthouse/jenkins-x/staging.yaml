@@ -79,6 +79,12 @@ spec:
           resources: {}
         - name: promote-jx-promote
           resources: {}
+        - name: promote-jx-promote-pet3
+          resources: {}
+          script: |
+            #!/usr/bin/env sh
+            source .jx/variables.sh
+            jx promote -b --all-auto --timeout 1h --version $VERSION --no-poll --env pet3-staging
         volumes:
         - name: npmrc
           secret:
