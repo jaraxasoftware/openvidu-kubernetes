@@ -113,6 +113,9 @@ services:
               hosts:
                 - openvidu.localhost
         resources: {}
+        # Scheduling of the Elasticsearch and Kibana pods
+        nodeSelector: {}
+        tolerations: []
     protocols:
       - TCP
     ssl:

@@ -25,6 +25,14 @@ spec:
         storageClassName: {{ .Values.services.openvidu.pro.elasticsearch.storageClassName }}
     podTemplate:
       spec:
+        {{- with .Values.services.openvidu.pro.elasticsearch.nodeSelector }}
+        nodeSelector:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with .Values.services.openvidu.pro.elasticsearch.tolerations }}
+        tolerations:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         initContainers:
           - name: sysctl
             securityContext:
@@ -67,6 +75,14 @@ spec:
         disabled: true
   podTemplate:
     spec:
+      {{- with .Values.services.openvidu.pro.elasticsearch.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.services.openvidu.pro.elasticsearch.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
       - name: kibana
         readinessProbe:
